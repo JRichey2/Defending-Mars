@@ -22,7 +22,7 @@ class EventSystem(ecs.System):
                 sys.exit(0)
 
             if (event.type in (pygame.KEYDOWN, pygame.KEYUP) and
-                    event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d)):
+                    event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_q, pygame.K_e)):
                 inputs = ecs.Entity.with_component("input")
                 for i in inputs:
                     ic = i['input']
@@ -35,4 +35,8 @@ class EventSystem(ecs.System):
                         ic.s = pressed
                     elif event.key == pygame.K_d:
                         ic.d = pressed
+                    elif event.key == pygame.K_q:
+                        ic.q = pressed
+                    elif event.key == pygame.K_e:
+                        ic.e = pressed
                     print(i, ic)

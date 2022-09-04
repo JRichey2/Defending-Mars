@@ -8,3 +8,5 @@ class InputComponent(Component):
     a: bool = False 
     s: bool = False 
     d: bool = False 
+    q: bool = False
+    e: bool = False
