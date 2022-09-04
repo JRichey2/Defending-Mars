@@ -4,7 +4,7 @@ import weakref
 from pyrsistent import PClass, field
 
 
-class Component(PClass):
+class Component:
     component_name = 'Base Component'
 
 

@@ -1,4 +1,5 @@
 import pygame
+import os
 
 # ECS Import
 from . import ecs
@@ -7,14 +8,22 @@ from . import ecs
 from .ecs import Entity
 
 # Component Imports
-from .echo_component import EchoComponent
 from .screen_component import ScreenComponent
+from .surface_component import SurfaceComponent
+from .position_component import PositionComponent
+from .input_component import InputComponent
 
 # System Imports
-from .echo_system import EchoSystem
 from .event_system import EventSystem
 from .render_system import RenderSystem
+from .physics_system import PhysicsSystem
 
+
+def create_sprite(x, y, surface):
+    sprite = Entity()
+    sprite.attach(PositionComponent(x=x, y=y))
+    sprite.attach(SurfaceComponent(surface=surface))
+    return sprite
 
 def run_game():
 
@@ -23,31 +32,21 @@ def run_game():
     # quikli as possible
     event_system = EventSystem()
 
-    # The echo system can be used for debugging
-    echo_system = EchoSystem()
-    # The echo system is interested in responding to Key Press events
-    echo_system.subscribe('Key Press')
+    physics_system = PhysicsSystem()
 
     # The render system draws things to the screen
     render_system = RenderSystem()
 
-    # This entity is just for testing.
-    # When we have actual game entities, we'll initialize those instead.
-    test_entity = Entity()
-    test_entity.attach(EchoComponent())
-
     pygame.init()
     screen_entity = Entity()
-    screen=pygame.display.set_mode((800, 600))
-    background = pygame.Surface(screen.get_size())
-    background = background.convert()
-    background.fill((250, 250, 250))
-    font = pygame.font.Font(None, 36)
-    text = font.render("Well, Hello There!", 1, (10, 10, 10))
-    textpos = text.get_rect()
-    textpos.centerx = background.get_rect().centerx
-    background.blit(text, textpos)
+    screen=pygame.display.set_mode((900, 500))
+    background = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'space.png')), (900, 500))
+
     screen_entity.attach(ScreenComponent(screen=screen, background=background))
+
+    ship_entity = create_sprite(450, 250, pygame.image.load(os.path.join('assets', 'spaceship_yellow.png')))
+    ship_entity.attach(InputComponent())
+    ship_entity2 = create_sprite(100, 50, pygame.image.load(os.path.join('assets', 'spaceship_red.png')))
 
     # This is the game loop.  Yup, that's all of it.
     while True:
