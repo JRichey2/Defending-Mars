@@ -2,8 +2,6 @@ from . import ecs
 
 class PhysicsSystem(ecs.System):
 
-    NAME = 'Physics System'
-
     def update(self):
         entities = ecs.Entity.with_component("input")
         for entity in entities:

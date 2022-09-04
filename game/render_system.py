@@ -5,8 +5,6 @@ from . import ecs
 
 class RenderSystem(ecs.System):
 
-    NAME = 'Render System'
-
     def update(self):
         screen = list(ecs.Entity.with_component("screen"))[0]
         component = screen['screen']

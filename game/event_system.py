@@ -13,8 +13,6 @@ class Keypress(ecs.Event):
 
 class EventSystem(ecs.System):
 
-    NAME = 'Event System'
-
     def update(self):
         '''Convert inputs to ECS messages for other systems'''
 

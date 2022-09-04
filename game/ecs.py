@@ -1,6 +1,9 @@
+import os
 import uuid
 import json
 import weakref
+import importlib
+import traceback
 from pyrsistent import PClass, field
 
 
@@ -46,11 +49,16 @@ class System:
     systems = {}
     subscriptions = {}
 
-    NAME = 'Base System'
-
     def __init__(self):
         self.events = []
-        self.systems[self.NAME] = self
+        self.systems[self.name] = self
+        self.disabled = False
+        module = importlib.import_module(name=self.__module__)
+        self.loaded_at = os.path.getmtime(module.__file__)
+
+    @property
+    def name(self):
+        return self.__class__.__name__
 
     def subscribe(self, event_kind):
         if event_kind not in self.subscriptions:
@@ -62,6 +70,23 @@ class System:
         for subscriber in cls.subscriptions.get(event.kind, []):
             subscriber.events.append(event)
 
+    def reload(self):
+        # Get a reference to the module containing the system
+        module = importlib.import_module(name=self.__module__)
+        last_modified = os.path.getmtime(module.__file__)
+
+        if self.loaded_at >= last_modified:
+            return
+
+        # Reload the module that the system was defined in
+        importlib.reload(module)
+
+        # re-create the system
+        cls = getattr(module, self.name)
+        cls()
+
+        print(f"Reloaded system {self.name}")
+
     def update(self):
         pass
 
@@ -69,6 +94,17 @@ class System:
     def run(cls):
         while True:
             for system_name, system in cls.systems.items():
-                system.update()
+                system.reload()
+                if system.disabled:
+                    continue
+                try:
+                    system.update()
+                except SystemExit:
+                    # Exit exceptions should be allowed through
+                    raise
+                except:
+                    # All other exceptions should disable the system until next reload
+                    traceback.print_exc()
+                    system.disabled = True
 
 
