@@ -1,8 +1,9 @@
-from .ecs import Component, field
+from .ecs import Component
+from dataclasses import dataclass
+from pygame import Surface
 
-
+@dataclass
 class ScreenComponent(Component):
-    component_name = "Screen Component"
-    screen = field(mandatory=True)
-    background = field(mandatory=True)
-
+    screen: Surface 
+    background: Surface
+    component_name: str = "Screen Component"
