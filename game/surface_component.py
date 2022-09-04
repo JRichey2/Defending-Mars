@@ -5,4 +5,4 @@ from pygame import Surface
 @dataclass
 class SurfaceComponent(Component):
     surface: Surface
-    component_name: str = "Surface Component"
+    component_name: str = "surface"

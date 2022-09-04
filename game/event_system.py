@@ -23,33 +23,18 @@ class EventSystem(ecs.System):
             if event.type == pygame.QUIT:
                 sys.exit(0)
 
-            if event.type in (pygame.KEYDOWN, pygame.KEYUP):
-
-                # This is an example of injecting an event.
-                # Other systems can subscribe to events by kind
-
-
-                if event.key == pygame.K_w:
-                    inputs = ecs.Entity.with_component("Input Component")
-                    for i in inputs:
-                        ic = [c for c in i.components if c.component_name == 'Input Component'][0]
-                        ic.w = event.type == pygame.KEYDOWN 
-                        print(i, ic)
-                elif event.key == pygame.K_a:
-                    inputs = ecs.Entity.with_component("Input Component")
-                    for i in inputs:
-                        ic = [c for c in i.components if c.component_name == 'Input Component'][0]
-                        ic.a = event.type == pygame.KEYDOWN 
-                        print(i, ic)
-                elif event.key == pygame.K_s:
-                    inputs = ecs.Entity.with_component("Input Component")
-                    for i in inputs:
-                        ic = [c for c in i.components if c.component_name == 'Input Component'][0]
-                        ic.s = event.type == pygame.KEYDOWN 
-                        print(i, ic)
-                elif event.key == pygame.K_d:
-                    inputs = ecs.Entity.with_component("Input Component")
-                    for i in inputs:
-                        ic = [c for c in i.components if c.component_name == 'Input Component'][0]
-                        ic.d = event.type == pygame.KEYDOWN 
-                        print(i, ic)
+            if (event.type in (pygame.KEYDOWN, pygame.KEYUP) and
+                    event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d)):
+                inputs = ecs.Entity.with_component("input")
+                for i in inputs:
+                    ic = i['input']
+                    pressed = event.type == pygame.KEYDOWN
+                    if event.key == pygame.K_w:
+                        ic.w = pressed
+                    elif event.key == pygame.K_a:
+                        ic.a = pressed
+                    elif event.key == pygame.K_s:
+                        ic.s = pressed
+                    elif event.key == pygame.K_d:
+                        ic.d = pressed
+                    print(i, ic)

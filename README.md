@@ -1,5 +1,6 @@
-# Defending-Mars
-Pyweek 34 Entry
+# Defending Mars
+
+A Pyweek 34 Entry by Quikli and JRichey2SwiFt
 
 Dependencies:
 

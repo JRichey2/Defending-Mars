@@ -18,14 +18,14 @@ class Entity:
 
     def __init__(self):
         self.entity_id = str(uuid.uuid4())
-        self.components = []
+        self.components = {}
         self.entity_index[self.entity_id] = self
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.entity_id}>"
 
     def attach(self, component:Component):
-        self.components.append(component)
+        self.components[component.component_name] = component
         if component.component_name not in self.component_index:
             self.component_index[component.component_name] = weakref.WeakSet()
         self.component_index[component.component_name].add(self)
@@ -37,6 +37,9 @@ class Entity:
     @classmethod
     def find(cls, entity_id):
         return cls.entity_index[entity_id]
+
+    def __getitem__(self, attr):
+        return self.components.get(attr)
 
 
 class System:
@@ -63,8 +66,9 @@ class System:
         pass
 
     @classmethod
-    def update_all(cls):
-        for system_name, system in cls.systems.items():
-            system.update()
+    def run(cls):
+        while True:
+            for system_name, system in cls.systems.items():
+                system.update()
 
 
