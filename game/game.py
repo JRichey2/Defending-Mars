@@ -19,11 +19,20 @@ from .render_system import RenderSystem
 from .physics_system import PhysicsSystem
 
 
+# Global objects
+ASSETS = {}
+RESOLUTION = 900, 500
+
+
 def create_sprite(x, y, surface):
     sprite = Entity()
     sprite.attach(PositionComponent(x=x, y=y))
     sprite.attach(SurfaceComponent(surface=surface))
     return sprite
+
+
+def load_image(asset_name):
+    return pygame.image.load(os.path.join('assets', asset_name))
 
 
 def run_game():
@@ -42,18 +51,22 @@ def run_game():
     # Initialize pygame
     pygame.init()
 
+    # Load all of our assets
+    ASSETS['background'] = pygame.transform.scale(load_image('space.png'), RESOLUTION)
+    ASSETS['spaceship_yellow'] = load_image('spaceship_yellow.png')
+    ASSETS['spaceship_red'] = load_image('spaceship_red.png')
+
     # Create a background entity
     screen_entity = Entity()
-    screen=pygame.display.set_mode((900, 500))
-    background = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'space.png')), (900, 500))
-    screen_entity.attach(ScreenComponent(screen=screen, background=background))
+    screen=pygame.display.set_mode(RESOLUTION)
+    screen_entity.attach(ScreenComponent(screen=screen, background=ASSETS['background']))
 
     # Create a ship entity that we can control
-    ship_entity = create_sprite(450, 250, pygame.image.load(os.path.join('assets', 'spaceship_yellow.png')))
+    ship_entity = create_sprite(450, 250, ASSETS['spaceship_yellow'])
     ship_entity.attach(InputComponent())
 
     # Create a second ship entity that we cannot control
-    ship_entity2 = create_sprite(100, 50, pygame.image.load(os.path.join('assets', 'spaceship_red.png')))
+    ship_entity2 = create_sprite(100, 50, ASSETS['spaceship_red'])
 
     # This is the game loop.  Yup, that's all of it.
     ecs.System.run()
