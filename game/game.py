@@ -1,3 +1,5 @@
+import pygame
+
 # ECS Import
 from . import ecs
 
@@ -6,6 +8,7 @@ from .ecs import Entity
 
 # Component Imports
 from .echo_component import EchoComponent
+from .screen_component import ScreenComponent
 
 # System Imports
 from .echo_system import EchoSystem
@@ -32,6 +35,19 @@ def run_game():
     # When we have actual game entities, we'll initialize those instead.
     test_entity = Entity()
     test_entity.attach(EchoComponent())
+
+    pygame.init()
+    screen_entity = Entity()
+    screen=pygame.display.set_mode((800, 600))
+    background = pygame.Surface(screen.get_size())
+    background = background.convert()
+    background.fill((250, 250, 250))
+    font = pygame.font.Font(None, 36)
+    text = font.render("Well, Hello There!", 1, (10, 10, 10))
+    textpos = text.get_rect()
+    textpos.centerx = background.get_rect().centerx
+    background.blit(text, textpos)
+    screen_entity.attach(ScreenComponent(screen=screen, background=background))
 
     # This is the game loop.  Yup, that's all of it.
     while True:

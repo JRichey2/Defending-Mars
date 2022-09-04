@@ -48,10 +48,6 @@ class System:
     def __init__(self):
         self.events = []
         self.systems[self.NAME] = self
-        self.setup()
-
-    def setup(self):
-        pass
 
     def subscribe(self, event_kind):
         if event_kind not in self.subscriptions:
