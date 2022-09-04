@@ -1,5 +1,6 @@
 import pygame
 import os
+from pygame.math import Vector2 as V2
 
 # ECS Import
 from . import ecs
@@ -24,9 +25,9 @@ ASSETS = {}
 RESOLUTION = 900, 500
 
 
-def create_sprite(x, y, surface):
+def create_sprite(position, rotate, surface):
     sprite = Entity()
-    sprite.attach(PositionComponent(x=x, y=y))
+    sprite.attach(PositionComponent(position=position, rotate=rotate))
     sprite.attach(SurfaceComponent(surface=surface))
     return sprite
 
@@ -52,21 +53,26 @@ def run_game():
     pygame.init()
 
     # Load all of our assets
-    ASSETS['background'] = pygame.transform.scale(load_image('space.png'), RESOLUTION)
-    ASSETS['spaceship_yellow'] = load_image('spaceship_yellow.png')
-    ASSETS['spaceship_red'] = load_image('spaceship_red.png')
+    # ASSETS['background'] = pygame.transform.scale(load_image('solar-system.jpg'), RESOLUTION)
+    ASSETS['background'] = load_image('solar-system.jpg')
+    ASSETS['base_ship'] = load_image('ship-base-256x256.png')
+    ASSETS['red_planet'] = load_image('red-planet.png')
+    ASSETS['red_planet_shield'] = load_image('red-planet-shield.png')
 
     # Create a background entity
     screen_entity = Entity()
     screen=pygame.display.set_mode(RESOLUTION)
     screen_entity.attach(ScreenComponent(screen=screen, background=ASSETS['background']))
 
-    # Create a ship entity that we can control
-    ship_entity = create_sprite(450, 250, ASSETS['spaceship_yellow'])
-    ship_entity.attach(InputComponent())
+    # Create a home planet that will be set at a specific coordinate area
+    red_planet_entity = create_sprite(V2(450.0, 500.0), 0, ASSETS['red_planet'])
 
-    # Create a second ship entity that we cannot control
-    ship_entity2 = create_sprite(100, 50, ASSETS['spaceship_red'])
+    # Create a shield to go over the planet entity. This will need to be callable some other way for a power up and coordinate location
+    red_planet_shield_entity = create_sprite(V2(450.0, 500.0), 0, ASSETS['red_planet_shield'])
+
+    # Create a ship entity that we can control
+    ship_entity = create_sprite(V2(250.0, 300.0), 0, ASSETS['base_ship'])
+    ship_entity.attach(InputComponent())
 
     # This is the game loop.  Yup, that's all of it.
     ecs.System.run()

@@ -4,6 +4,7 @@ import json
 import weakref
 import importlib
 import traceback
+import pygame
 from pyrsistent import PClass, field
 
 
@@ -89,10 +90,13 @@ class System:
 
     def update(self):
         pass
-
+    
     @classmethod
     def run(cls):
+        clock = pygame.time.Clock()
         while True:
+            clock.tick(60)
+            # print(clock.get_fps())
             for system_name, system in cls.systems.items():
                 system.reload()
                 if system.disabled:
