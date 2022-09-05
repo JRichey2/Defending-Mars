@@ -8,7 +8,7 @@ from .vector import V2
 
 # Component Imports
 from .components import (
-    ScreenComponent,
+    WindowComponent,
     SpriteComponent,
     PhysicsComponent,
     InputComponent,
@@ -34,11 +34,12 @@ def create_sprite(position, rotation, image, scale=1.0, subpixel=True):
     return entity
 
 
-def load_image(asset_name):
+def load_image(asset_name, center=True):
     print(f"loading image {asset_name}")
     image = pyglet.resource.image(os.path.join('assets', asset_name))
-    image.anchor_x = image.width // 2
-    image.anchor_y = image.height // 2
+    if center:
+        image.anchor_x = image.width // 2
+        image.anchor_y = image.height // 2
     return image
 
 
@@ -53,24 +54,15 @@ class DefendingMarsWindow(pyglet.window.Window):
         super().__init__(*args, **kwargs)
         self.assets = {}
         # Load all of our assets
-        self.assets['star_field'] = load_image('starfield-2048x2048.png')
-        self.assets['closer_stars'] = load_image('closer-stars-2048x2048.png')
-        self.assets['nebula'] = load_image('nebula-2048x2048.png')
+        self.assets['star_field'] = load_image('starfield-2048x2048.png', center=False)
+        self.assets['closer_stars'] = load_image('closer-stars-2048x2048.png', center=False)
+        self.assets['nebula'] = load_image('nebula-2048x2048.png', center=False)
         self.assets['base_ship'] = load_image('ship-base-256x256.png')
         self.assets['red_planet'] = load_image('red-planet.png')
         self.assets['red_planet_shield'] = load_image('red-planet-shield.png')
         self.assets['moon'] = load_image('moon-128x128.png')
         self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
         self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
-
-        self.star_field = create_sprite(V2(0.0, 0.0), 0, self.assets['star_field'], subpixel=False)
-        self.star_field['physics'].z_index = 10
-
-        self.closer_stars = create_sprite(V2(0.0, 0.0), 0, self.assets['closer_stars'], subpixel=False)
-        self.closer_stars['physics'].z_index = 5
-
-        self.nebula = create_sprite(V2(0.0, 0.0), 0, self.assets['nebula'], subpixel=False)
-        self.nebula['physics'].z_index = 3
 
         # Create a home planet that will be set at a specific coordinate area
         self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
@@ -122,16 +114,21 @@ def run_game():
     # Physics system handles movement an collision
     physics_system = PhysicsSystem()
 
-    # The render system draws things to the screen
+    # The render system draws things to the Window
     render_system = RenderSystem()
 
-    # Create a Window/Screen entity
-    screen_entity = Entity()
+    # Create a Window entity
+    window_entity = Entity()
     window=DefendingMarsWindow(1280, 720, resizable=True)
 
-    screen_entity.attach(ScreenComponent(
-        screen=window,
+    window_entity.attach(WindowComponent(
+        window=window,
         viewport_size=RESOLUTION,
+        background_layers = [
+            SpriteComponent(window.assets['star_field'], x=0, y=0),
+            SpriteComponent(window.assets['closer_stars'], x=0, y=0),
+            SpriteComponent(window.assets['nebula'], x=0, y=0),
+        ]
     ))
 
     def update(dt, *args, **kwargs):

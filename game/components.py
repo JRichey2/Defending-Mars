@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import pyglet
 from pyglet.sprite import Sprite
@@ -23,17 +23,17 @@ class PhysicsComponent:
     position: V2 = V2(0.0, 0.0)
     rotation: int = 0
     velocity: V2 = V2(0.0, 0.0)
-    z_index: int = 0
-
-
-@dataclass
-class ScreenComponent:
-    screen: pyglet.window.Window
-    viewport_size: V2
-    component_name: str = "screen"
-    camera_position: V2 = V2(0.0, 0.0)
 
 
 class SpriteComponent(Sprite):
     component_name = "sprite"
+
+
+@dataclass
+class WindowComponent:
+    window: pyglet.window.Window
+    viewport_size: V2
+    component_name: str = "window"
+    camera_position: V2 = V2(0.0, 0.0)
+    background_layers: list[SpriteComponent] = field(default_factory=list)
 

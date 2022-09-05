@@ -4,12 +4,30 @@ from . import ecs
 class RenderSystem(ecs.System):
 
     def update(self):
-        screen = list(ecs.Entity.with_component("screen"))[0]
-        sc = screen['screen']
-        camera = sc.camera_position
-        viewport = sc.viewport_size
+        window_entity = list(ecs.Entity.with_component("window"))[0]
+        window = window_entity['window']
+        camera = window.camera_position
+        viewport = window.viewport_size
+        width, height = window.window.width, window.window.height
 
-        #sc.background.fill((0, 0, 0))
+        layer_paralax = [10, 5, 2]
+        for paralax, sprite in zip(layer_paralax, window.background_layers):
+
+            sl = int(camera.x // paralax)
+            sr = int(camera.x // paralax + width)
+            st = int(camera.y // paralax + height)
+            sb = int(camera.y // paralax)
+
+            ixl = int(sl // sprite.width)
+            ixr = int(sr // sprite.width)
+            ixt = int(st // sprite.height)
+            ixb = int(sb // sprite.height)
+
+            for ox in range(ixl, ixr + 1):
+                for oy in range(ixb, ixt + 1):
+                    sprite.x = -camera.x // paralax + ox * sprite.width
+                    sprite.y = -camera.y // paralax + oy * sprite.height
+                    sprite.draw()
 
         entities = ecs.Entity.with_component("sprite")
         for entity in entities:
@@ -17,46 +35,8 @@ class RenderSystem(ecs.System):
             if physics is None:
                 continue
             sprite = entity['sprite']
-
-            # Paralax scrolling
-            if physics.z_index != 0:
-                sprite.x = (physics.position.x - camera.x - viewport.x / 2) / physics.z_index + viewport.x / 2
-                sprite.y = (physics.position.y - camera.y - viewport.y / 2) / physics.z_index + viewport.y / 2
-            else:
-                sprite.x = (physics.position.x - camera.x)
-                sprite.y = (physics.position.y - camera.y)
-
+            sprite.x = physics.position.x - camera.x + width // 2
+            sprite.y = physics.position.y - camera.y + height // 2
             sprite.rotation = float(-physics.rotation)
-
             sprite.draw()
-            #sc.background.blit(surface.surface, new_position)
-
-        #sc_w = sc.screen.width
-        #sc_h = sc.screen.height
-        #sc_ar = sc_w / sc_h
-
-        #t_w = sc.background.width
-        #t_h = sc.background.height
-        #t_ar = t_w / t_h
-
-        #scale = t_ar / sc_ar
-
-        # Vertical Bars
-        #if sc_ar > t_ar:
-            #sw = int(sc_w * scale)
-            #sh = sc_h
-            #ox = (sc_w - sw) // 2
-            #oy = 0
-
-        # Horizontal Bars
-        #else:
-            #sw = sc_w
-            #sh = int(sc_w / t_ar)
-            #ox = 0
-            #oy = (sc_h - sh) // 2
-
-
-        #sc.screen.fill((0, 0, 0))
-        #scaled_bg = scale to (sw, sh)
-        #sc.screen.blit(scaled_bg, (ox, oy))
 

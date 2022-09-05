@@ -32,10 +32,10 @@ class PhysicsSystem(ecs.System):
             physics.velocity += acceleration
             physics.position += physics.velocity
 
-            screen = list(ecs.Entity.with_component("screen"))[0]
-            sc = screen['screen']
-            sc.camera_position.x = physics.position.x - 1280 / 2
-            sc.camera_position.y = physics.position.y - 720 / 2
+            window_entity = list(ecs.Entity.with_component("window"))[0]
+            window = window_entity['window']
+            window.camera_position.x = physics.position.x
+            window.camera_position.y = physics.position.y
 
             physics.rotation -= 2.0 if inputs.e else 0
             physics.rotation += 2.0 if inputs.q else 0
