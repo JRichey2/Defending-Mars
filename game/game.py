@@ -25,10 +25,10 @@ ASSETS = {}
 RESOLUTION = 900, 500
 
 
-def create_sprite(position, rotate, surface):
+def create_sprite(position, rotate, surface, scale=1.0):
     sprite = Entity()
     sprite.attach(PositionComponent(position=position, rotate=rotate))
-    sprite.attach(SurfaceComponent(surface=surface))
+    sprite.attach(SurfaceComponent(surface=surface, scale=scale))
     return sprite
 
 
@@ -65,13 +65,13 @@ def run_game():
     screen_entity.attach(ScreenComponent(screen=screen, background=ASSETS['background']))
 
     # Create a home planet that will be set at a specific coordinate area
-    red_planet_entity = create_sprite(V2(450.0, 500.0), 0, ASSETS['red_planet'])
+    red_planet_entity = create_sprite(V2(2048.0, 2048.0), 0, ASSETS['red_planet'])
 
     # Create a shield to go over the planet entity. This will need to be callable some other way for a power up and coordinate location
-    red_planet_shield_entity = create_sprite(V2(450.0, 500.0), 0, ASSETS['red_planet_shield'])
+    red_planet_shield_entity = create_sprite(V2(2048.0, 2048.0), 0, ASSETS['red_planet_shield'])
 
     # Create a ship entity that we can control
-    ship_entity = create_sprite(V2(250.0, 300.0), 0, ASSETS['base_ship'])
+    ship_entity = create_sprite(V2(2048.0, 1850.0), 0, ASSETS['base_ship'], 0.25)
     ship_entity.attach(InputComponent())
 
     # This is the game loop.  Yup, that's all of it.
