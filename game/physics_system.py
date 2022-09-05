@@ -9,7 +9,6 @@ class PhysicsSystem(ecs.System):
         for entity in entities:
             inputs = entity['input']
             physics = entity['physics']
-            print(entity)
             if physics is None:
                 continue
 
