@@ -29,14 +29,29 @@ class RenderSystem(ecs.System):
                     sprite.y = -camera.y // paralax + oy * sprite.height
                     sprite.draw()
 
+
+        ox = width // 2 - camera.x
+        oy = height // 2 - camera.y
+
+        entities = ecs.Entity.with_component("emitter")
+        for entity in entities:
+            emitter = entity['emitter']
+            for sprite in emitter.sprites:
+                sprite.x += ox
+                sprite.y += oy
+            emitter.batch.draw()
+            for sprite in emitter.sprites:
+                sprite.x -= ox
+                sprite.y -= oy
+
         entities = ecs.Entity.with_component("sprite")
         for entity in entities:
             physics = entity['physics']
             if physics is None:
                 continue
             sprite = entity['sprite']
-            sprite.x = physics.position.x - camera.x + width // 2
-            sprite.y = physics.position.y - camera.y + height // 2
+            sprite.x = physics.position.x + ox
+            sprite.y = physics.position.y + oy
             sprite.rotation = float(-physics.rotation)
             sprite.draw()
 

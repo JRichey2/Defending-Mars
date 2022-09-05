@@ -12,6 +12,7 @@ from .components import (
     SpriteComponent,
     PhysicsComponent,
     InputComponent,
+    EmitterComponent,
 )
 
 # System Imports
@@ -63,6 +64,7 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['moon'] = load_image('moon-128x128.png')
         self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
         self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
+        self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
 
         # Create a home planet that will be set at a specific coordinate area
         self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
@@ -91,6 +93,11 @@ class DefendingMarsWindow(pyglet.window.Window):
         # Create a ship entity that we can control
         self.ship_entity = create_sprite(V2(200.0, 200.0), 0, self.assets['base_ship'], 0.25)
         self.ship_entity.attach(InputComponent())
+        self.ship_entity.attach(EmitterComponent(
+            image=self.assets['energy_particle_cyan'],
+            batch=pyglet.graphics.Batch(),
+            rate=0.1,
+        ))
 
     def on_key_press(self, symbol, modifiers):
         ecs.System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=True))

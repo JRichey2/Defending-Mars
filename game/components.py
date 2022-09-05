@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 
 import pyglet
-from pyglet.sprite import Sprite
 
 from .vector import V2
 
@@ -25,7 +24,7 @@ class PhysicsComponent:
     velocity: V2 = V2(0.0, 0.0)
 
 
-class SpriteComponent(Sprite):
+class SpriteComponent(pyglet.sprite.Sprite):
     component_name = "sprite"
 
 
@@ -36,4 +35,21 @@ class WindowComponent:
     component_name: str = "window"
     camera_position: V2 = V2(0.0, 0.0)
     background_layers: list[SpriteComponent] = field(default_factory=list)
+
+
+@dataclass
+class EmitterComponent:
+    component_name = 'emitter'
+    image: pyglet.image.AbstractImage
+    # A sprite batch to draw all of the emitted particles
+    batch: pyglet.graphics.Batch
+    # A list of sprites that have been emitted
+    sprites: list[pyglet.sprite.Sprite] = field(default_factory=list)
+    # time between each particle
+    rate: float = 1.0
+    # records last time particle was emitted
+    time_since_last_emission: float = 0.0
+    # Determines if particles should be emitting currently
+    enabled: bool = True
+
 

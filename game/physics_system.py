@@ -1,6 +1,8 @@
 from . import ecs
 from .vector import V2
 
+import pyglet
+
 
 class PhysicsSystem(ecs.System):
 
@@ -42,4 +44,49 @@ class PhysicsSystem(ecs.System):
 
             physics.rotation -= 2.0 if inputs.e else 0
             physics.rotation += 2.0 if inputs.q else 0
+
+            emitter = entity['emitter']
+            if emitter is None:
+                continue
+
+            if not emitter.enabled:
+                for sprite in emitter.sprites:
+                    sprite.delete()
+                emitter.sprites = []
+                continue
+
+            if acceleration.length > 0:
+                emitter.rate = 0.01
+            else:
+                emitter.rate = 0.03
+
+            for sprite in emitter.sprites:
+                sprite.opacity *= 1 - (0.1 * time_factor)
+
+            to_be_deleted = [s for s in emitter.sprites if s.opacity < 0.01]
+            emitter.sprites = [s for s in emitter.sprites if s.opacity >= 0.01]
+            for sprite in to_be_deleted:
+                sprite.delete()
+
+            emitter.time_since_last_emission += dt
+            if emitter.time_since_last_emission > emitter.rate:
+                offset = V2.from_degrees_and_length(rotation + 270, 16.0)
+                sprite = pyglet.sprite.Sprite(
+                    emitter.image,
+                    x=physics.position.x + offset.x,
+                    y=physics.position.y + offset.y,
+                    batch=emitter.batch,
+                    blend_src=pyglet.gl.GL_SRC_ALPHA,
+                    blend_dest=pyglet.gl.GL_ONE,
+                )
+                sprite.rotation = -rotation
+                emitter.sprites.append(sprite)
+                emitter.time_since_last_emission = 0
+
+
+
+
+
+
+
 
