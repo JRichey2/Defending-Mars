@@ -132,6 +132,7 @@ def run_game():
     ))
 
     def update(dt, *args, **kwargs):
+        ecs.DELTA_TIME = dt
         window.clear()
         ecs.System.update_all()
 

@@ -10,7 +10,7 @@ class RenderSystem(ecs.System):
         viewport = window.viewport_size
         width, height = window.window.width, window.window.height
 
-        layer_paralax = [10, 5, 2]
+        layer_paralax = [10, 8, 2]
         for paralax, sprite in zip(layer_paralax, window.background_layers):
 
             sl = int(camera.x // paralax)

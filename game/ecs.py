@@ -7,6 +7,9 @@ import traceback
 from pyrsistent import PClass, field
 
 
+DELTA_TIME = 0.01667
+
+
 class Event(PClass):
     kind = field(type=str, mandatory=True)
 

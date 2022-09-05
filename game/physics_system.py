@@ -28,9 +28,12 @@ class PhysicsSystem(ecs.System):
                 acceleration.normalize()
                 acceleration *= 0.3
 
-            physics.velocity *= 0.97
-            physics.velocity += acceleration
-            physics.position += physics.velocity
+
+            dt = ecs.DELTA_TIME
+            time_factor = dt / 0.01667
+            physics.velocity *= 1 - (0.03 * time_factor)
+            physics.velocity += acceleration * time_factor
+            physics.position += physics.velocity * time_factor
 
             window_entity = list(ecs.Entity.with_component("window"))[0]
             window = window_entity['window']
