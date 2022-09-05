@@ -1,14 +1,9 @@
 import sys
-import pygame
+from pyglet.window import key
 
 from game import input_component
 
 from . import ecs
-
-
-class Keypress(ecs.Event):
-    key = ecs.field(type=str, mandatory=True)
-    press = ecs.field(type=bool, mandatory=True)
 
 
 class EventSystem(ecs.System):
@@ -16,27 +11,27 @@ class EventSystem(ecs.System):
     def update(self):
         '''Convert inputs to ECS messages for other systems'''
 
-        for event in pygame.event.get():
+        events, self.events = self.events, []
 
-            if event.type == pygame.QUIT:
+        for event in events:
+
+            if event.kind == 'Quit':
                 sys.exit(0)
 
-            if (event.type in (pygame.KEYDOWN, pygame.KEYUP) and
-                    event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_q, pygame.K_e)):
+            if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D, key.Q, key.E)):
                 inputs = ecs.Entity.with_component("input")
                 for i in inputs:
                     ic = i['input']
-                    pressed = event.type == pygame.KEYDOWN
-                    if event.key == pygame.K_w:
-                        ic.w = pressed
-                    elif event.key == pygame.K_a:
-                        ic.a = pressed
-                    elif event.key == pygame.K_s:
-                        ic.s = pressed
-                    elif event.key == pygame.K_d:
-                        ic.d = pressed
-                    elif event.key == pygame.K_q:
-                        ic.q = pressed
-                    elif event.key == pygame.K_e:
-                        ic.e = pressed
+                    if event.key_symbol == key.W:
+                        ic.w = event.pressed
+                    elif event.key_symbol == key.A:
+                        ic.a = event.pressed
+                    elif event.key_symbol == key.S:
+                        ic.s = event.pressed
+                    elif event.key_symbol == key.D:
+                        ic.d = event.pressed
+                    elif event.key_symbol == key.Q:
+                        ic.q = event.pressed
+                    elif event.key_symbol == key.E:
+                        ic.e = event.pressed
                     #print(i, ic)

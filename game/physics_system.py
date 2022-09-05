@@ -1,5 +1,5 @@
 from . import ecs
-from pygame.math import Vector2 as V2
+from .vector import V2
 
 
 class PhysicsSystem(ecs.System):
@@ -14,17 +14,17 @@ class PhysicsSystem(ecs.System):
             acceleration = V2(0.0, 0.0)
 
             if ic.w:
-                acceleration += V2(0.0, -1.0).rotate(-position.rotate)
+                acceleration += V2.from_degrees_and_length(position.rotate + 90, 1.0)
             if ic.a:
-                acceleration += V2(-1.0, 0.0).rotate(-position.rotate)
+                acceleration += V2.from_degrees_and_length(position.rotate + 180, 1.0)
             if ic.s:
-                acceleration += V2(0.0, 1.0).rotate(-position.rotate)
+                acceleration += V2.from_degrees_and_length(position.rotate + 270, 1.0)
             if ic.d:
-                acceleration += V2(1.0, 0.0).rotate(-position.rotate)
+                acceleration += V2.from_degrees_and_length(position.rotate, 1.0)
 
-            if acceleration.length() > 0:
-                acceleration = acceleration.normalize()
-                acceleration = acceleration * 0.3
+            if acceleration.length > 0:
+                acceleration.normalize()
+                acceleration *= 0.3
 
             position.velocity *= 0.97
             position.velocity += acceleration
@@ -32,8 +32,8 @@ class PhysicsSystem(ecs.System):
 
             screen = list(ecs.Entity.with_component("screen"))[0]
             sc = screen['screen']
-            sc.camera_position.x = position.position.x - sc.viewport_size.x / 2
-            sc.camera_position.y = position.position.y - sc.viewport_size.y / 2
+            sc.camera_position.x = position.position.x - 1280 / 2
+            sc.camera_position.y = position.position.y - 720 / 2
 
             # creating another velocity variable in case these need to be a little different
             rotate_velocity = 2.0

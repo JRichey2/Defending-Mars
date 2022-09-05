@@ -4,7 +4,7 @@ A Pyweek 34 Entry by Quikli and JRichey2SwiFt
 
 Dependencies:
 
-* pygame 2.1+
+* pyglet 1.5+
 * pyrsistent 0.18+
 
 To install dependencies:

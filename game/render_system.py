@@ -1,5 +1,3 @@
-import pygame
-
 from . import ecs
 
 
@@ -11,73 +9,55 @@ class RenderSystem(ecs.System):
         camera = sc.camera_position
         viewport = sc.viewport_size
 
-        sc.background.fill((0, 0, 0))
+        #sc.background.fill((0, 0, 0))
 
-        sprites = ecs.Entity.with_component("surface")
+        sprites = ecs.Entity.with_component("sprite")
         for sprite in sprites:
             position = sprite['position']
             if position is None:
                 continue
-            surface = sprite['surface']
+            sprite_comp = sprite['sprite']
 
-            if position.rotate != 0.0 or surface.scale != 1.0:
-                rotated_surface = pygame.transform.rotozoom(surface.surface, position.rotate, surface.scale)
-                center = surface.surface.get_rect(center=position.position).center
-                new_position = rotated_surface.get_rect(center=center)
-                new_position.x -= camera.x
-                new_position.y -= camera.y
-
-                # Paralax scrolling
-                if position.z_index != 0:
-                    new_position.x = new_position.x // position.z_index
-                    new_position.y = new_position.y // position.z_index
-
-                sc.background.blit(rotated_surface, new_position)
+            # Paralax scrolling
+            if position.z_index != 0:
+                sprite_comp.sprite.x = (position.position.x - camera.x - viewport.x / 2) / position.z_index + viewport.x / 2
+                sprite_comp.sprite.y = (position.position.y - camera.y - viewport.y / 2) / position.z_index + viewport.y / 2
             else:
-                center = surface.surface.get_rect(center=position.position).center
-                new_position = surface.surface.get_rect(center=center)
-                new_position.x -= camera.x
-                new_position.y -= camera.y
+                sprite_comp.sprite.x = (position.position.x - camera.x)
+                sprite_comp.sprite.y = (position.position.y - camera.y)
 
-                # Paralax scrolling
-                if position.z_index != 0:
-                    new_position.x = new_position.x // position.z_index
-                    new_position.y = new_position.y // position.z_index
+            sprite_comp.sprite.scale = sprite_comp.scale
+            sprite_comp.sprite.rotation = float(-position.rotate)
 
-                sc.background.blit(surface.surface, new_position)
+            sprite_comp.sprite.draw()
+            #sc.background.blit(surface.surface, new_position)
 
-            # special_flags=pygame.BLEND_ADD
+        #sc_w = sc.screen.width
+        #sc_h = sc.screen.height
+        #sc_ar = sc_w / sc_h
 
-        screen_rect = sc.screen.get_rect()
-        sc_w = screen_rect.width
-        sc_h = screen_rect.height
-        sc_ar = sc_w / sc_h
+        #t_w = sc.background.width
+        #t_h = sc.background.height
+        #t_ar = t_w / t_h
 
-        bg_rect = sc.background.get_rect()
-        t_w = bg_rect.width
-        t_h = bg_rect.height
-        t_ar = t_w / t_h
-
-        scale = t_ar / sc_ar
+        #scale = t_ar / sc_ar
 
         # Vertical Bars
-        if sc_ar > t_ar:
-            sw = int(sc_w * scale)
-            sh = sc_h
-            ox = (sc_w - sw) // 2
-            oy = 0
+        #if sc_ar > t_ar:
+            #sw = int(sc_w * scale)
+            #sh = sc_h
+            #ox = (sc_w - sw) // 2
+            #oy = 0
 
         # Horizontal Bars
-        else:
-            sw = sc_w
-            sh = int(sc_w / t_ar)
-            ox = 0
-            oy = (sc_h - sh) // 2
+        #else:
+            #sw = sc_w
+            #sh = int(sc_w / t_ar)
+            #ox = 0
+            #oy = (sc_h - sh) // 2
 
 
-        sc.screen.fill((0, 0, 0))
-        scaled_bg = pygame.transform.smoothscale(sc.background, (sw, sh))
-        sc.screen.blit(scaled_bg, (ox, oy))
-
-        pygame.display.flip()
+        #sc.screen.fill((0, 0, 0))
+        #scaled_bg = scale to (sw, sh)
+        #sc.screen.blit(scaled_bg, (ox, oy))
 

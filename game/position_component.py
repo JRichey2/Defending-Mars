@@ -1,7 +1,6 @@
 from .ecs import Component
+from .vector import V2
 from dataclasses import dataclass
-import pygame
-from pygame.math import Vector2 as V2
 
 @dataclass
 class PositionComponent(Component):

@@ -4,7 +4,6 @@ import json
 import weakref
 import importlib
 import traceback
-import pygame
 from pyrsistent import PClass, field
 
 
@@ -92,23 +91,19 @@ class System:
         pass
 
     @classmethod
-    def run(cls):
-        clock = pygame.time.Clock()
-        while True:
-            clock.tick(60)
-            #print(clock.get_fps())
-            for system_name, system in cls.systems.items():
-                system.reload()
-                if system.disabled:
-                    continue
-                try:
-                    system.update()
-                except SystemExit:
-                    # Exit exceptions should be allowed through
-                    raise
-                except:
-                    # All other exceptions should disable the system until next reload
-                    traceback.print_exc()
-                    system.disabled = True
+    def update_all(cls):
+        for system_name, system in cls.systems.items():
+            system.reload()
+            if system.disabled:
+                continue
+            try:
+                system.update()
+            except SystemExit:
+                # Exit exceptions should be allowed through
+                raise
+            except:
+                # All other exceptions should disable the system until next reload
+                traceback.print_exc()
+                system.disabled = True
 
 
