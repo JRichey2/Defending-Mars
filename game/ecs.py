@@ -17,7 +17,7 @@ class Event(PClass):
 
 
 class Entity:
-    entity_index = weakref.WeakValueDictionary()
+    entity_index = {}
     component_index = {}
 
     def __init__(self):
@@ -31,12 +31,12 @@ class Entity:
     def attach(self, component:Component):
         self.components[component.component_name] = component
         if component.component_name not in self.component_index:
-            self.component_index[component.component_name] = weakref.WeakSet()
-        self.component_index[component.component_name].add(self)
+            self.component_index[component.component_name] = []
+        self.component_index[component.component_name].append(self)
 
     @classmethod
     def with_component(cls, component_name):
-        return set(cls.component_index.get(component_name, set()))
+        return cls.component_index.get(component_name, [])
 
     @classmethod
     def find(cls, entity_id):
@@ -90,13 +90,13 @@ class System:
 
     def update(self):
         pass
-    
+
     @classmethod
     def run(cls):
         clock = pygame.time.Clock()
         while True:
             clock.tick(60)
-            # print(clock.get_fps())
+            #print(clock.get_fps())
             for system_name, system in cls.systems.items():
                 system.reload()
                 if system.disabled:

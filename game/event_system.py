@@ -39,4 +39,4 @@ class EventSystem(ecs.System):
                         ic.q = pressed
                     elif event.key == pygame.K_e:
                         ic.e = pressed
-                    print(i, ic)
+                    #print(i, ic)

@@ -1,6 +1,7 @@
 from . import ecs
 from pygame.math import Vector2 as V2
 
+
 class PhysicsSystem(ecs.System):
 
     def update(self):
@@ -26,15 +27,13 @@ class PhysicsSystem(ecs.System):
                 acceleration = acceleration * 0.3
 
             position.velocity *= 0.97
-
             position.velocity += acceleration
-            
             position.position += position.velocity
 
             screen = list(ecs.Entity.with_component("screen"))[0]
             sc = screen['screen']
-            sc.x = int(position.position.x - sc.width // 2)
-            sc.y = int(position.position.y - sc.height // 2)
+            sc.camera_position.x = position.position.x - sc.viewport_size.x / 2
+            sc.camera_position.y = position.position.y - sc.viewport_size.y / 2
 
             # creating another velocity variable in case these need to be a little different
             rotate_velocity = 2.0

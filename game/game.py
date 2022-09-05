@@ -22,7 +22,7 @@ from .physics_system import PhysicsSystem
 
 # Global objects
 ASSETS = {}
-RESOLUTION = 900, 500
+RESOLUTION = V2(1920, 1080)
 
 
 def create_sprite(position, rotate, surface, scale=1.0):
@@ -64,8 +64,15 @@ def run_game():
 
     # Create a background entity
     screen_entity = Entity()
-    screen=pygame.display.set_mode(RESOLUTION)
-    screen_entity.attach(ScreenComponent(screen=screen, background=ASSETS['background']))
+    screen=pygame.display.set_mode(RESOLUTION, pygame.RESIZABLE)
+    screen_entity.attach(ScreenComponent(
+        screen=screen,
+        viewport_size=RESOLUTION,
+        background=pygame.Surface(RESOLUTION),
+    ))
+
+    star_field = create_sprite(V2(2048.0, 2048.0), 0, ASSETS['background'])
+    star_field['position'].z_index = 10
 
     # Create a home planet that will be set at a specific coordinate area
     red_planet_entity = create_sprite(V2(2048.0, 2048.0), 0, ASSETS['red_planet'])
