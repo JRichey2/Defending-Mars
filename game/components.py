@@ -53,3 +53,8 @@ class EmitterComponent:
     enabled: bool = True
 
 
+@dataclass
+class FlightPathComponent:
+    component_name = "flight path"
+    vertices: pyglet.graphics.vertexdomain.VertexList
+

@@ -1,5 +1,7 @@
 from . import ecs
 
+import pyglet
+
 
 class RenderSystem(ecs.System):
 
@@ -13,10 +15,10 @@ class RenderSystem(ecs.System):
         layer_paralax = [10, 8, 2]
         for paralax, sprite in zip(layer_paralax, window.background_layers):
 
-            sl = int(camera.x // paralax)
-            sr = int(camera.x // paralax + width)
-            st = int(camera.y // paralax + height)
-            sb = int(camera.y // paralax)
+            sl = int(camera.x // paralax) - width // 2
+            sr = int(camera.x // paralax + width) - width // 2
+            st = int(camera.y // paralax + height) - height // 2
+            sb = int(camera.y // paralax) - height // 2
 
             ixl = int(sl // sprite.width)
             ixr = int(sr // sprite.width)
@@ -25,8 +27,8 @@ class RenderSystem(ecs.System):
 
             for ox in range(ixl, ixr + 1):
                 for oy in range(ixb, ixt + 1):
-                    sprite.x = -camera.x // paralax + ox * sprite.width
-                    sprite.y = -camera.y // paralax + oy * sprite.height
+                    sprite.x = width // 2 - camera.x // paralax + ox * sprite.width
+                    sprite.y = height // 2 - camera.y // paralax + oy * sprite.height
                     sprite.draw()
 
 
@@ -43,6 +45,16 @@ class RenderSystem(ecs.System):
             for sprite in emitter.sprites:
                 sprite.x -= ox
                 sprite.y -= oy
+
+        entities = ecs.Entity.with_component("flight path")
+        for entity in entities:
+            flight_path = entity["flight path"]
+            pyglet.gl.glEnable(pyglet.gl.GL_LINE_SMOOTH)
+            pyglet.gl.glHint(pyglet.gl.GL_LINE_SMOOTH_HINT, pyglet.gl.GL_NICEST)
+            pyglet.gl.glMatrixMode(pyglet.gl.GL_MODELVIEW)
+            pyglet.gl.glTranslatef(ox, oy, 0.0)
+            flight_path.vertices.draw(pyglet.gl.GL_LINE_STRIP)
+            pyglet.gl.glLoadIdentity()
 
         entities = ecs.Entity.with_component("sprite")
         for entity in entities:

@@ -1,5 +1,6 @@
 import pyglet
 import os
+from itertools import cycle
 
 # ECS Import
 from . import ecs
@@ -13,6 +14,7 @@ from .components import (
     PhysicsComponent,
     InputComponent,
     EmitterComponent,
+    FlightPathComponent,
 )
 
 # System Imports
@@ -98,6 +100,49 @@ class DefendingMarsWindow(pyglet.window.Window):
             batch=pyglet.graphics.Batch(),
             rate=0.1,
         ))
+
+        self.flight_path_1 = Entity()
+
+
+        points = [
+            V2(100.0, 100.0),
+            V2(110.0, 110.0),
+            V2(300.0, 100.0),
+            V2(300.0, -300.0),
+            V2(-500.0, -300.0),
+            V2(-2000.0, 1000.0),
+        ]
+
+
+        new_points = []
+        for i, point in enumerate(points):
+            if i == 0:
+                new_points.append(point)
+            elif i == 1:
+                new_points.append((point - new_points[0]) * 0.5)
+                new_points.append(point)
+            else:
+                new_points.append(new_points[-1] - new_points[-2] + new_points[-1])
+                new_points.append(point)
+
+        vertices = []
+        for i, p in enumerate(zip(new_points, new_points[1:], new_points[2:])):
+            if i % 2 == 0:
+                for i in range(16 + 1):
+                    t = i / 16
+                    x = (1 - t) * (1 - t) * p[0].x + 2 * (1 - t) * t * p[1].x + t * t * p[2].x
+                    y = (1 - t) * (1 - t) * p[0].y + 2 * (1 - t) * t * p[1].y + t * t * p[2].y
+                    vertices.append(x)
+                    vertices.append(y)
+
+        self.flight_path_1.attach(
+            FlightPathComponent(
+                vertices = pyglet.graphics.vertex_list(len(vertices) // 2,
+                    ('v2f', vertices),
+                    ('c4B', list(y for x, y in zip(range(len(vertices) // 2 * 4), cycle((255, 0, 0, 50))))),
+                )
+            )
+        )
 
     def on_key_press(self, symbol, modifiers):
         ecs.System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=True))
