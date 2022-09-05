@@ -6,3 +6,4 @@ from pygame import Surface
 class SurfaceComponent(Component):
     surface: Surface
     component_name: str = "surface"
+    scale: float = 1.0
