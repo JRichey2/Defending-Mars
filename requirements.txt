@@ -1,3 +1,4 @@
 pyglet >= 1.5
 pyrsistent >= 0.18
+Pillow >= 9.2
 

@@ -1,8 +1,6 @@
 import sys
 from pyglet.window import key
 
-from game import input_component
-
 from . import ecs
 
 

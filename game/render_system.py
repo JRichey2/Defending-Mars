@@ -11,25 +11,24 @@ class RenderSystem(ecs.System):
 
         #sc.background.fill((0, 0, 0))
 
-        sprites = ecs.Entity.with_component("sprite")
-        for sprite in sprites:
-            position = sprite['position']
-            if position is None:
+        entities = ecs.Entity.with_component("sprite")
+        for entity in entities:
+            physics = entity['physics']
+            if physics is None:
                 continue
-            sprite_comp = sprite['sprite']
+            sprite = entity['sprite']
 
             # Paralax scrolling
-            if position.z_index != 0:
-                sprite_comp.sprite.x = (position.position.x - camera.x - viewport.x / 2) / position.z_index + viewport.x / 2
-                sprite_comp.sprite.y = (position.position.y - camera.y - viewport.y / 2) / position.z_index + viewport.y / 2
+            if physics.z_index != 0:
+                sprite.x = (physics.position.x - camera.x - viewport.x / 2) / physics.z_index + viewport.x / 2
+                sprite.y = (physics.position.y - camera.y - viewport.y / 2) / physics.z_index + viewport.y / 2
             else:
-                sprite_comp.sprite.x = (position.position.x - camera.x)
-                sprite_comp.sprite.y = (position.position.y - camera.y)
+                sprite.x = (physics.position.x - camera.x)
+                sprite.y = (physics.position.y - camera.y)
 
-            sprite_comp.sprite.scale = sprite_comp.scale
-            sprite_comp.sprite.rotation = float(-position.rotate)
+            sprite.rotation = float(-physics.rotation)
 
-            sprite_comp.sprite.draw()
+            sprite.draw()
             #sc.background.blit(surface.surface, new_position)
 
         #sc_w = sc.screen.width

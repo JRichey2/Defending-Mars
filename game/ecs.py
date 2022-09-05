@@ -7,10 +7,6 @@ import traceback
 from pyrsistent import PClass, field
 
 
-class Component:
-    component_name = 'Base Component'
-
-
 class Event(PClass):
     kind = field(type=str, mandatory=True)
 
@@ -27,7 +23,7 @@ class Entity:
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.entity_id}>"
 
-    def attach(self, component:Component):
+    def attach(self, component):
         self.components[component.component_name] = component
         if component.component_name not in self.component_index:
             self.component_index[component.component_name] = []

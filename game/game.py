@@ -7,10 +7,12 @@ from .ecs import Entity, Event, field
 from .vector import V2
 
 # Component Imports
-from .screen_component import ScreenComponent
-from .sprite_component import SpriteComponent
-from .position_component import PositionComponent
-from .input_component import InputComponent
+from .components import (
+    ScreenComponent,
+    SpriteComponent,
+    PhysicsComponent,
+    InputComponent,
+)
 
 # System Imports
 from .event_system import EventSystem
@@ -22,16 +24,14 @@ from .physics_system import PhysicsSystem
 RESOLUTION = V2(1920, 1080)
 
 
-def create_sprite(position, rotate, image, scale=1.0):
-    sprite = Entity()
-    sprite.attach(PositionComponent(position=position, rotate=rotate))
-    sprite.attach(
-        SpriteComponent(
-            sprite=pyglet.sprite.Sprite(image, x=position.x, y=position.y),
-            scale=scale
-        )
-    )
-    return sprite
+def create_sprite(position, rotation, image, scale=1.0):
+    entity = Entity()
+    entity.attach(PhysicsComponent(position=position, rotation=rotation))
+    sprite=SpriteComponent(image, x=position.x, y=position.y)
+    sprite.scale = scale
+    sprite.rotation = rotation
+    entity.attach(sprite)
+    return entity
 
 
 def load_image(asset_name):
@@ -64,13 +64,14 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
 
         self.star_field = create_sprite(V2(0.0, 0.0), 0, self.assets['star_field'])
-        self.star_field['position'].z_index = 10
+        self.star_field['physics'].z_index = 10
 
         self.closer_stars = create_sprite(V2(0.0, 0.0), 0, self.assets['closer_stars'])
-        self.closer_stars['position'].z_index = 5
+        self.closer_stars['physics'].z_index = 5
 
         self.nebula = create_sprite(V2(0.0, 0.0), 0, self.assets['nebula'])
-        self.nebula['position'].z_index = 3
+        self.nebula['physics'].z_index = 3
+        self.nebula['sprite'].texture = pyglet.image.TileableTexture.create_for_image(self.assets['nebula'])
 
         # Create a home planet that will be set at a specific coordinate area
         self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
