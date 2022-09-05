@@ -39,6 +39,11 @@ class RenderSystem(ecs.System):
                 new_position.x -= camera.x
                 new_position.y -= camera.y
 
+                # Paralax scrolling
+                if position.z_index != 0:
+                    new_position.x = new_position.x // position.z_index
+                    new_position.y = new_position.y // position.z_index
+
                 sc.background.blit(surface.surface, new_position)
 
             # special_flags=pygame.BLEND_ADD
