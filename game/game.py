@@ -37,7 +37,7 @@ def create_sprite(position, rotation, image, scale=1.0, subpixel=True):
 
 def load_image(asset_name, center=True):
     print(f"loading image {asset_name}")
-    image = pyglet.resource.image(os.path.join('assets', asset_name))
+    image = pyglet.image.load(os.path.join('assets', asset_name))
     if center:
         image.anchor_x = image.width // 2
         image.anchor_y = image.height // 2
