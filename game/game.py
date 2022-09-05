@@ -187,9 +187,9 @@ def run_game():
         ecs.DELTA_TIME = dt
         window.clear()
         ecs.System.update_all()
-    
+
     # Music: https://www.chosic.com/free-music/all/
-    background_audio = pyglet.media.load('assets\\background_music_test.mp3')
+    background_audio = pyglet.media.load(os.path.join('assets', 'background_music_test.mp3'))
 
     player = pyglet.media.Player()
     player.loop = True
