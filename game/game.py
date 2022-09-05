@@ -59,6 +59,8 @@ def run_game():
     ASSETS['red_planet'] = load_image('red-planet.png')
     ASSETS['red_planet_shield'] = load_image('red-planet-shield.png')
     ASSETS['moon'] = load_image('moon-128x128.png')
+    ASSETS['turret_base'] = load_image('turret-basic-base-64x64.png')
+    ASSETS['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
 
     # Create a background entity
     screen_entity = Entity()
@@ -80,6 +82,14 @@ def run_game():
 
     # Create a moon for a specific location number 3
     moon_planet_entity_3 = create_sprite(V2(3730,860), 0, ASSETS['moon'])
+
+    # Create a turrent base for moon_plant_1 
+    # 75 off to make it perfectly on top it seems
+    turret_base_entity_1 = create_sprite(V2(2650,1325), 0, ASSETS['turret_base'])
+
+    # Create a turrent base for moon_plant_1 
+    # 16 off to make it perfectly on top it seems
+    turret_basic_cannon_1 = create_sprite(V2(2650,1325), 0, ASSETS['turret_basic_cannon'])
 
     # Create a ship entity that we can control
     ship_entity = create_sprite(V2(2048.0, 1850.0), 0, ASSETS['base_ship'], 0.25)
