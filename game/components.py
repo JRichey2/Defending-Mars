@@ -26,6 +26,8 @@ class PhysicsComponent:
 class SpriteComponent(pyglet.sprite.Sprite):
     component_name = "sprite"
 
+class SpriteComponentLocator(pyglet.sprite.Sprite):
+    component_name = "spritelocator"
 
 @dataclass
 class WindowComponent:

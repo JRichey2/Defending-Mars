@@ -17,6 +17,7 @@ from .components import (
     EmitterComponent,
     FlightPathComponent,
     EnemyComponent,
+    SpriteComponentLocator,
 )
 
 # System Imports
@@ -38,6 +39,10 @@ def create_sprite(position, rotation, image, scale=1.0, subpixel=True):
     entity.attach(sprite)
     return entity
 
+def create_sprite_locator(image, scale=1.0, subpixel=True):
+    sprite=SpriteComponentLocator(image, subpixel=subpixel)
+    sprite.scale = scale 
+    return sprite
 
 def load_image(asset_name, center=True):
     print(f"loading image {asset_name}")
@@ -78,6 +83,9 @@ class DefendingMarsWindow(pyglet.window.Window):
 
         # Create a home planet that will be set at a specific coordinate area
         self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
+
+        # trying to create a sprite for the image I want to place later on
+        self.red_planet_entity.attach(create_sprite_locator(self.assets['red_planet'], 0.25))
 
         # Create a shield to go over the planet entity. This will need to be callable some other way for a power up and coordinate location
         self.red_planet_shield_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet_shield'])
