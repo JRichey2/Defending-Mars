@@ -16,7 +16,6 @@ from .components import (
     InputComponent,
     EmitterComponent,
     FlightPathComponent,
-    EnemyComponent,
     SpriteComponentLocator,
     EnemyComponent,
 )
