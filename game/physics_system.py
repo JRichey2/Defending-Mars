@@ -163,8 +163,11 @@ class PhysicsSystem(ecs.System):
                 sep_length = separation.length
                 min_length = collision.circle_radius + collider_collision.circle_radius
                 if sep_length < min_length:
+                    n = separation.normalized
+                    v = physics.velocity
+                    a = n * (v.dot_product(n))
                     physics.position += separation.normalized * (min_length - sep_length)
-                    physics.velocity = separation.normalized * physics.velocity.length * 0.7
+                    physics.velocity = (v - (a * 2)) * 0.7
 
 
 
