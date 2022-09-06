@@ -48,10 +48,6 @@ def create_sprite_locator(image, scale=1.0, subpixel=True):
     sprite.scale = scale 
     return sprite
 
-def create_sprite_checkpoint(image, subpixel=True):
-    sprite=SpriteCheckpointComponent(image, subpixel=subpixel)
-    return sprite
-
 def load_image(asset_name, center=True):
     print(f"loading image {asset_name}")
     image = pyglet.image.load(os.path.join('assets', asset_name))
@@ -162,27 +158,27 @@ class DefendingMarsWindow(pyglet.window.Window):
 
         # Checkpoint 1 top test
         self.checkpoint_top = create_sprite(V2(-996.0, 93.9), 0, self.assets['checkpoint_top'])
-        self.checkpoint_top.attach(create_sprite_checkpoint(self.assets['checkpoint_top']))
+        self.checkpoint_top.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_top'], cp_order=0))
 
         # Checkpoint 1 bottom test
         self.checkpoint_bottom = create_sprite(V2(-996.0, 94.1), 0, self.assets['checkpoint_bottom'])
-        self.checkpoint_bottom.attach(create_sprite_checkpoint(self.assets['checkpoint_bottom']))
+        self.checkpoint_bottom.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=1))
 
         # Checkpoint 2 top test
         self.checkpoint_top2 = create_sprite(V2(-708.0, -500.1), 0, self.assets['checkpoint_next_top'])
-        self.checkpoint_top2.attach(create_sprite_checkpoint(self.assets['checkpoint_next_top']))
+        self.checkpoint_top2.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_top'], cp_order=2))
 
         # Checkpoint 2 bottom test
         self.checkpoint_bottom2 = create_sprite(V2(-708.0, -499.9), 0, self.assets['checkpoint_next_bottom'])
-        self.checkpoint_bottom2.attach(create_sprite_checkpoint(self.assets['checkpoint_next_bottom']))
+        self.checkpoint_bottom2.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=3))
 
         # Checkpoint 3 top test
         self.checkpoint_top3 = create_sprite(V2(-600.0, 599.9), 0, self.assets['checkpoint_next_top'])
-        self.checkpoint_top3.attach(create_sprite_checkpoint(self.assets['checkpoint_next_top']))
+        self.checkpoint_top3.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_top'], cp_order=4))
 
         # Checkpoint 3 bottom test
         self.checkpoint_bottom3 = create_sprite(V2(-600.0, 600.1), 0, self.assets['checkpoint_next_bottom'])
-        self.checkpoint_bottom3.attach(create_sprite_checkpoint(self.assets['checkpoint_next_bottom']))
+        self.checkpoint_bottom3.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=5))
 
         # self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
         # self.enemy_1.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))

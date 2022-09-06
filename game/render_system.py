@@ -120,12 +120,27 @@ class RenderSystem(ecs.System):
 
         # method for removing our checkpoint
         entities = ecs.Entity.with_component("checkpoint")
+        checkpoint_order = 1000
         for entity in entities:
-            # print(entities)
+            sprite = entity['checkpoint']
+            sprite_entity = entity['sprite']
+            if sprite_entity.visible == True:
+                checkpoint_order = min(checkpoint_order, sprite.cp_order)
+        
+        for entity in entities:
+            sprite = entity['checkpoint']
+            sprite_entity = entity['sprite']
+            if sprite.cp_order == checkpoint_order or sprite.cp_order == checkpoint_order +1:
+                sprite_entity.image = sprite.next_image
+                
+        for entity in entities:
             sprite = entity['checkpoint']
             physics = entity['physics']
             sprite_entity = entity['sprite']
             if camera.x >= physics.position.x - sprite_entity.width // 2 and camera.x <= physics.position.x + sprite_entity.width //2:
                 if camera.y >= physics.position.y - sprite_entity.height // 2 and camera.y <= physics.position.y + sprite_entity.height //2:
-                    sprite_entity.visible = False 
+                    if sprite.cp_order == checkpoint_order:
+                        sprite_entity.visible = False 
+                        sprite.cp_order -= sprite.cp_order
+                        checkpoint_order += 1
 
