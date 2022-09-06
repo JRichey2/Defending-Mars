@@ -1,6 +1,7 @@
 from . import ecs
 
 import pyglet
+import os
 
 
 class RenderSystem(ecs.System):
@@ -65,5 +66,14 @@ class RenderSystem(ecs.System):
             sprite.x = physics.position.x + ox
             sprite.y = physics.position.y + oy
             sprite.rotation = float(-physics.rotation)
+            sprite.draw()
+
+        # identify where home base is located
+        entities = ecs.Entity.with_component("spritelocator")
+        for entity in entities:
+            sprite = entity['spritelocator']
+            physics = entity['physics']
+            sprite.x = 32
+            sprite.y = 32
             sprite.draw()
 
