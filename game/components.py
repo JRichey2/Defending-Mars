@@ -56,4 +56,5 @@ class EmitterComponent:
 class FlightPathComponent:
     component_name = "flight path"
     vertices: pyglet.graphics.vertexdomain.VertexList
+    points: pyglet.graphics.vertexdomain.VertexList
 
