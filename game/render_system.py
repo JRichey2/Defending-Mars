@@ -101,13 +101,17 @@ class RenderSystem(ecs.System):
         entities = ecs.Entity.with_component("boost")
         for entity in entities:
             boost = entity["boost"]
+            boost.ui_base.opacity = 127
+            boost.blend_src=pyglet.gl.GL_SRC_ALPHA,
+            boost.blend_dest=pyglet.gl.GL_ONE,
             boost.ui_base.x = width - 160
             boost.ui_base.y = 50
             boost.ui_base.draw()
 
             for i, tick in enumerate(boost.ticks):
+                tick.opacity = 127
                 tick.x = width - 56
-                tick.y = 30 + (i + 1) * 48
+                tick.y = 34 + (i + 1) * 34
                 tick.draw()
 
 

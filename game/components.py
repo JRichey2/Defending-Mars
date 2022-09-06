@@ -91,18 +91,62 @@ class BoostComponent:
         window_entity = list(ecs.Entity.with_component("window"))[0]
         window = window_entity['window'].window
         self.boost = 100
-        self.ui_base = pyglet.sprite.Sprite(window.assets['boost_ui_base'])
+        self.ui_base = pyglet.sprite.Sprite(
+            window.assets['boost_ui_base'],
+            blend_src=pyglet.gl.GL_SRC_ALPHA,
+            blend_dest=pyglet.gl.GL_ONE,
+        )
         self.ticks = [
-            pyglet.sprite.Sprite(window.assets['boost_tick_red']),
-            pyglet.sprite.Sprite(window.assets['boost_tick_yellow']),
-            pyglet.sprite.Sprite(window.assets['boost_tick_yellow']),
-            pyglet.sprite.Sprite(window.assets['boost_tick_yellow']),
-            pyglet.sprite.Sprite(window.assets['boost_tick_yellow']),
-            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
-            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
-            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
-            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
-            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_red'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_yellow'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_yellow'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_yellow'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_yellow'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_blue'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_blue'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_blue'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_blue'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
+            pyglet.sprite.Sprite(
+                window.assets['boost_tick_blue'],
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ),
         ]
 
 
