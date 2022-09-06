@@ -78,8 +78,8 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['red_planet'] = load_image('red-planet.png')
         self.assets['red_planet_shield'] = load_image('red-planet-shield.png')
         self.assets['moon'] = load_image('moon-64x64.png')
-        self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
-        self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
+        # self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
+        # self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
         self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
 
         # Create a home planet that will be set at a specific coordinate area
@@ -134,22 +134,22 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.earth.attach(create_sprite_locator(self.assets['red_planet_shield'], 0.25))
         self.earth.attach(MassComponent(mass=400))
 
-        self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
-        self.enemy_1.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))
-        self.enemy_2 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
-        self.enemy_2.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))
-        self.enemy_3 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
-        self.enemy_3.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))
-        self.enemy_4 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
-        self.enemy_4.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))
+        # self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
+        # self.enemy_1.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))
+        # self.enemy_2 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
+        # self.enemy_2.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))
+        # self.enemy_3 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
+        # self.enemy_3.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))
+        # self.enemy_4 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
+        # self.enemy_4.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))
 
         # Create a turrent base for moon_plant_1 
         # 75 off to make it perfectly on top it seems
-        self.turret_base_entity_1 = create_sprite(V2(-715.0, -275.0), 0, self.assets['turret_base'])
+        # self.turret_base_entity_1 = create_sprite(V2(-715.0, -275.0), 0, self.assets['turret_base'])
 
         # Create a turrent base for moon_plant_1 
         # 16 off to make it perfectly on top it seems
-        self.turret_basic_cannon_1 = create_sprite(V2(-715.0, -275.0), 0, self.assets['turret_basic_cannon'])
+        # self.turret_basic_cannon_1 = create_sprite(V2(-715.0, -275.0), 0, self.assets['turret_basic_cannon'])
 
         # Create a ship entity that we can control
         self.ship_entity = create_sprite(V2(200.0, 200.0), 0, self.assets['base_ship'], 0.25)
@@ -220,29 +220,29 @@ class DefendingMarsWindow(pyglet.window.Window):
             )
         )
 
-        self.enemy_1.attach(EnemyComponent(
-            flight_path=self.flight_path_1.entity_id,
-            offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
-            speed=random() * 0.3 + 0.2,
-        ))
+        # self.enemy_1.attach(EnemyComponent(
+        #     flight_path=self.flight_path_1.entity_id,
+        #     offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
+        #     speed=random() * 0.3 + 0.2,
+        # ))
 
-        self.enemy_2.attach(EnemyComponent(
-            flight_path=self.flight_path_1.entity_id,
-            offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
-            speed=random() * 0.3 + 0.2,
-        ))
+        # self.enemy_2.attach(EnemyComponent(
+        #     flight_path=self.flight_path_1.entity_id,
+        #     offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
+        #     speed=random() * 0.3 + 0.2,
+        # ))
 
-        self.enemy_3.attach(EnemyComponent(
-            flight_path=self.flight_path_1.entity_id,
-            offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
-            speed=random() * 0.3 + 0.2,
-        ))
+        # self.enemy_3.attach(EnemyComponent(
+        #     flight_path=self.flight_path_1.entity_id,
+        #     offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
+        #     speed=random() * 0.3 + 0.2,
+        # ))
 
-        self.enemy_4.attach(EnemyComponent(
-            flight_path=self.flight_path_1.entity_id,
-            offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
-            speed=random() * 0.3 + 0.2,
-        ))
+        # self.enemy_4.attach(EnemyComponent(
+        #     flight_path=self.flight_path_1.entity_id,
+        #     offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
+        #     speed=random() * 0.3 + 0.2,
+        # ))
 
     def on_key_press(self, symbol, modifiers):
         ecs.System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=True))

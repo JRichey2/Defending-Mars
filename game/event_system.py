@@ -33,8 +33,8 @@ class EventSystem(ecs.System):
                 player = list(ecs.Entity.with_component("input"))[0]
                 physics = player['physics']
                 physics.rotation = (mouse_position - physics.position).degrees - 90
-
-            if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D)):
+            
+            if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D, key.LSHIFT)):
                 inputs = ecs.Entity.with_component("input")
                 for i in inputs:
                     ic = i['input']
@@ -46,4 +46,6 @@ class EventSystem(ecs.System):
                         ic.s = event.pressed
                     elif event.key_symbol == key.D:
                         ic.d = event.pressed
+                    elif event.key_symbol == key.LSHIFT:
+                        ic.boost = event.pressed
                     #print(i, ic)

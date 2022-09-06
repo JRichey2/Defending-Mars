@@ -12,6 +12,7 @@ class InputComponent:
     a: bool = False
     s: bool = False
     d: bool = False
+    boost: bool = False
 
 
 @dataclass
