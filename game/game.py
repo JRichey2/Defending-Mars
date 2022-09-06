@@ -14,7 +14,7 @@ from .components import (
     SpriteComponent,
     PhysicsComponent,
     InputComponent,
-    EmitterComponent,
+    EmitterBoostComponent,
     FlightPathComponent,
     SpriteComponentLocator,
     EnemyComponent,
@@ -82,6 +82,7 @@ class DefendingMarsWindow(pyglet.window.Window):
         # self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
         # self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
         self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
+        self.assets['energy_particle_red'] = load_image('energy-particle-red-64x64.png')
         self.assets['boost_ui_base'] = load_image('boost-ui-base-288x64.png')
         self.assets['boost_tick_red'] = load_image('boost-tick-red-48x48.png')
         self.assets['boost_tick_blue'] = load_image('boost-tick-blue-48x48.png')
@@ -159,11 +160,13 @@ class DefendingMarsWindow(pyglet.window.Window):
         # Create a ship entity that we can control
         self.ship_entity = create_sprite(V2(200.0, 200.0), 0, self.assets['base_ship'], 0.25)
         self.ship_entity.attach(InputComponent())
-        self.ship_entity.attach(EmitterComponent(
+        self.ship_entity.attach(EmitterBoostComponent(
             image=self.assets['energy_particle_cyan'],
+            boost_image=self.assets['energy_particle_red'],
             batch=pyglet.graphics.Batch(),
             rate=0.1,
         ))
+
 
         self.flight_path_1 = Entity()
 
