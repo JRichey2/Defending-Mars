@@ -115,10 +115,10 @@ class DefendingMarsWindow(pyglet.window.Window):
         # Earth Planet 1
         self.earth = create_sprite(V2(1900.0, 2100.0), 0, self.assets['red_planet_shield'])
 
-        self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'], 2.0)
-        self.enemy_2 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'], 2.0)
-        self.enemy_3 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'], 2.0)
-        self.enemy_4 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'], 2.0)
+        self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
+        self.enemy_2 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
+        self.enemy_3 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
+        self.enemy_4 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
 
         # Create a turrent base for moon_plant_1 
         # 75 off to make it perfectly on top it seems
