@@ -89,21 +89,36 @@ class DefendingMarsWindow(pyglet.window.Window):
 
         # we could probably create a def function to create these based on a series of coords
         # Create a moon for a specific location number 1
-        self.moon_planet_entity_1 = create_sprite(V2(500.0,500.0), 0, self.assets['moon'])
+        self.moon_planet_entity_1 = create_sprite(V2(-715.0, -350.0), 0, self.assets['moon'])
 
         # Create a moon for a specific location number 2
-        self.moon_planet_entity_2 = create_sprite(V2(-500.0,-500.0), 0, self.assets['moon'])
+        self.moon_planet_entity_2 = create_sprite(V2(-890.0, 20.0), 0, self.assets['moon'])
 
         # Create a moon for a specific location number 3
-        self.moon_planet_entity_3 = create_sprite(V2(1300.0,860.0), 0, self.assets['moon'])
+        self.moon_planet_entity_3 = create_sprite(V2(-600.0, 460.0), 0, self.assets['moon'])
+
+        # Create a moon for a specific location number 4
+        self.moon_planet_entity_4 = create_sprite(V2(-600.0, 800.0), 0, self.assets['moon'])
+
+        # Create a moon for a specific location number 5
+        self.moon_planet_entity_5 = create_sprite(V2(260.0, 1642.0), 0, self.assets['moon'])
+
+        # Create a moon for a specific location number 6
+        self.moon_planet_entity_6 = create_sprite(V2(900.0, 1847.0), 0, self.assets['moon'])
+
+        # Large Planet 1
+        self.large_planet_1 = create_sprite(V2(246.0, 1136.0), 0, self.assets['red_planet'])
+
+        # Earth Planet 1
+        self.earth = create_sprite(V2(1900.0, 2100.0), 0, self.assets['red_planet_shield'])
 
         # Create a turrent base for moon_plant_1 
         # 75 off to make it perfectly on top it seems
-        self.turret_base_entity_1 = create_sprite(V2(500.0,575.0), 0, self.assets['turret_base'])
+        self.turret_base_entity_1 = create_sprite(V2(-715.0, -275.0), 0, self.assets['turret_base'])
 
         # Create a turrent base for moon_plant_1 
         # 16 off to make it perfectly on top it seems
-        self.turret_basic_cannon_1 = create_sprite(V2(500.0,575.0), 0, self.assets['turret_basic_cannon'])
+        self.turret_basic_cannon_1 = create_sprite(V2(-715.0, -275.0), 0, self.assets['turret_basic_cannon'])
 
         # Create a ship entity that we can control
         self.ship_entity = create_sprite(V2(200.0, 200.0), 0, self.assets['base_ship'], 0.25)
@@ -118,21 +133,26 @@ class DefendingMarsWindow(pyglet.window.Window):
 
 
         points = [
-            V2(100.0, 100.0),
-            V2(110.0, 110.0),
-            V2(300.0, 100.0),
-            V2(300.0, -300.0),
-            V2(-500.0, -300.0),
-            V2(-2000.0, 1000.0),
+            V2(110.0 - 70, 110.0 + 43),
+            V2(220.0 - 70, 76.0 + 43),
+            V2(225.0 - 70, -35.0 + 43),
+            V2(130.0 - 70, -205.0 + 43),
+            V2(-550.0 - 70, 0.0 + 43),
+            V2(-861.0 - 70, -293.0 + 43),
+            V2(-500.0, -133.0),
+            V2(-600.0, 600.0),
+            V2(-700.0, 1100.0),
+            V2(50.0, 1400.0),
+            V2(352.0, 1000.0),
+            V2(50.0, 1340.0),
+            V2(500.0, 1700.0),
+            V2(1900.0, 2100.0),
         ]
 
 
         new_points = []
         for i, point in enumerate(points):
-            if i == 0:
-                new_points.append(point)
-            elif i == 1:
-                new_points.append((point - new_points[0]) * 0.5)
+            if i < 3:
                 new_points.append(point)
             else:
                 new_points.append(new_points[-1] - new_points[-2] + new_points[-1])
@@ -148,11 +168,20 @@ class DefendingMarsWindow(pyglet.window.Window):
                     vertices.append(x)
                     vertices.append(y)
 
+        new_points_p = []
+        for p in new_points:
+            new_points_p.append(p.x)
+            new_points_p.append(p.y)
+
         self.flight_path_1.attach(
             FlightPathComponent(
                 vertices = pyglet.graphics.vertex_list(len(vertices) // 2,
                     ('v2f', vertices),
                     ('c4B', list(y for x, y in zip(range(len(vertices) // 2 * 4), cycle((255, 0, 0, 50))))),
+                ),
+                points = pyglet.graphics.vertex_list(len(new_points),
+                    ('v2f', new_points_p),
+                    ('c4B', list(y for x, y in zip(range(len(new_points) * 4), cycle((255, 0, 255, 50))))),
                 )
             )
         )
@@ -162,7 +191,7 @@ class DefendingMarsWindow(pyglet.window.Window):
 
     def on_key_release(self, symbol, modifiers):
         ecs.System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=False))
-    
+
     def on_mouse_motion(self, x, y, dx, dy):
         ecs.System.inject(MouseMotionEvent(kind='MouseMotion', x=x, y=y, dx=dx, dy=dy))
 
