@@ -147,6 +147,28 @@ class PhysicsSystem(ecs.System):
                 emitter.sprites.append(sprite)
                 emitter.time_since_last_emission = 0
 
+            collision = entity['collision']
+            if collision is None:
+                return
+            colliders = ecs.Entity.with_component("collision")
+            for collider in colliders:
+                # Don't collide with self
+                if collider.entity_id == entity.entity_id:
+                    continue
+                collider_collision = collider['collision']
+                collider_physics = collider['physics']
+                if collider_physics is None:
+                    continue
+                separation = physics.position - collider_physics.position
+                sep_length = separation.length
+                min_length = collision.circle_radius + collider_collision.circle_radius
+                if sep_length < min_length:
+                    physics.position += separation.normalized * (min_length - sep_length)
+                    physics.velocity = separation.normalized * physics.velocity.length * 0.7
+
+
+
+
 
 
 

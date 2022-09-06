@@ -88,6 +88,13 @@ class MassComponent:
     mass: float
 
 
+@dataclass
+class CollisionComponent:
+    component_name = "collision"
+    collider_shape: str = "circle"
+    circle_radius: float = 0.0
+
+
 class BoostComponent:
 
     component_name = "boost"
