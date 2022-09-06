@@ -18,6 +18,7 @@ from .components import (
     FlightPathComponent,
     EnemyComponent,
     SpriteComponentLocator,
+    EnemyComponent,
 )
 
 # System Imports
