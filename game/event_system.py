@@ -2,9 +2,15 @@ import sys
 from pyglet.window import key
 
 from . import ecs
+from .vector import V2
 
 
 class EventSystem(ecs.System):
+
+    def setup(self):
+        self.subscribe('Key')
+        self.subscribe('MouseMotion')
+        self.subscribe('Quit')
 
     def update(self):
         '''Convert inputs to ECS messages for other systems'''
@@ -16,7 +22,23 @@ class EventSystem(ecs.System):
             if event.kind == 'Quit':
                 sys.exit(0)
 
-            if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D, key.Q, key.E)):
+            if (event.kind == 'MouseMotion'):
+                window_entity = list(ecs.Entity.with_component("window"))[0]
+                window = window_entity['window']
+                camera = window.camera_position
+                width, height = window.window.width, window.window.height
+                ox = width // 2 - camera.x
+                oy = height // 2 - camera.y
+                mouse_position = V2(event.x - ox, event.y - oy)
+                player = list(ecs.Entity.with_component("input"))[0]
+                physics = player['physics']
+                physics.rotation = (mouse_position - physics.position).degrees - 90
+                
+                
+                print(mouse_position)
+
+
+            if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D)):
                 inputs = ecs.Entity.with_component("input")
                 for i in inputs:
                     ic = i['input']
@@ -28,8 +50,4 @@ class EventSystem(ecs.System):
                         ic.s = event.pressed
                     elif event.key_symbol == key.D:
                         ic.d = event.pressed
-                    elif event.key_symbol == key.Q:
-                        ic.q = event.pressed
-                    elif event.key_symbol == key.E:
-                        ic.e = event.pressed
                     #print(i, ic)
