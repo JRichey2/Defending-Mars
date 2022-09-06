@@ -66,6 +66,8 @@ class PhysicsSystem(ecs.System):
             if acceleration.length > 0:
                 #acceleration.normalize()
                 acceleration *= 0.3
+            if inputs.boost:
+                acceleration *= 2
 
             gravitational_constant = 200.0
             for mass_point, mass in mass_points:

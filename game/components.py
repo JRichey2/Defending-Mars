@@ -12,6 +12,7 @@ class InputComponent:
     a: bool = False
     s: bool = False
     d: bool = False
+    boost: bool = False
 
 
 @dataclass
@@ -25,6 +26,8 @@ class PhysicsComponent:
 class SpriteComponent(pyglet.sprite.Sprite):
     component_name = "sprite"
 
+class SpriteComponentLocator(pyglet.sprite.Sprite):
+    component_name = "spritelocator"
 
 class SpriteComponentLocator(pyglet.sprite.Sprite):
     component_name = "spritelocator"
