@@ -1,7 +1,5 @@
 import os
 import uuid
-import json
-import weakref
 import importlib
 import traceback
 from pyrsistent import PClass, field
@@ -54,6 +52,10 @@ class System:
         self.disabled = False
         module = importlib.import_module(name=self.__module__)
         self.loaded_at = os.path.getmtime(module.__file__)
+        self.setup()
+
+    def setup(self):
+        pass
 
     @property
     def name(self):

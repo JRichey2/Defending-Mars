@@ -50,6 +50,11 @@ class KeyEvent(Event):
     key_symbol = field(mandatory=True)
     pressed = field(type=bool, mandatory=True)
 
+class MouseMotionEvent(Event):
+    x = field(type=int, mandatory=True)
+    y = field(type=int, mandatory=True)
+    dx = field(type=int, mandatory=True)
+    dy = field(type=int, mandatory=True)
 
 class DefendingMarsWindow(pyglet.window.Window):
 
@@ -149,6 +154,9 @@ class DefendingMarsWindow(pyglet.window.Window):
 
     def on_key_release(self, symbol, modifiers):
         ecs.System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=False))
+    
+    def on_mouse_motion(self, x, y, dx, dy):
+        ecs.System.inject(MouseMotionEvent(kind='MouseMotion', x=x, y=y, dx=dx, dy=dy))
 
     def on_close(self):
         ecs.System.inject(Event(kind='Quit'))
@@ -159,15 +167,13 @@ def run_game():
     # Initialize our systems in the order we want them to run
     # Events should come first, so we can react to input as 
     # quikli as possible
-    event_system = EventSystem()
-    event_system.subscribe('Key')
-    event_system.subscribe('Quit')
+    EventSystem()
 
     # Physics system handles movement an collision
-    physics_system = PhysicsSystem()
+    PhysicsSystem()
 
     # The render system draws things to the Window
-    render_system = RenderSystem()
+    RenderSystem()
 
     # Create a Window entity
     window_entity = Entity()
@@ -189,12 +195,12 @@ def run_game():
         ecs.System.update_all()
 
     # Music: https://www.chosic.com/free-music/all/
-    background_audio = pyglet.media.load(os.path.join('assets', 'background_music_test.mp3'))
+    # background_audio = pyglet.media.load(os.path.join('assets', 'background_music_test.mp3'))
 
-    player = pyglet.media.Player()
-    player.loop = True
-    player.queue(background_audio)
-    player.play()
+    # player = pyglet.media.Player()
+    # player.loop = True
+    # player.queue(background_audio)
+    # player.play()
 
     pyglet.clock.schedule(update, 1/60.0)
     pyglet.app.run()
