@@ -12,6 +12,7 @@ class PhysicsSystem(ecs.System):
         enemies = ecs.Entity.with_component("enemy")
         for enemy in enemies:
             self.update_enemy_ship(enemy)
+        self.update_flares()
 
 
     def update_enemy_ship(self, ship):
@@ -30,6 +31,64 @@ class PhysicsSystem(ecs.System):
         else:
             physics.position += distance_to_target.normalized * enemy.speed
         physics.position += enemy.offset
+
+
+    def update_flares(self):
+        dt = ecs.DELTA_TIME
+        time_factor = dt / 0.01667
+        ship = ecs.Entity.with_component("input")[0]
+        ship_position = ship['physics'].position
+
+        for entity in ecs.Entity.with_component("emitter"):
+            if entity.entity_id in [e.entity_id for e in ecs.Entity.with_component("input")]:
+                # Skip the ship
+                continue
+
+            physics = entity['physics']
+            if physics is None:
+                continue
+
+
+            emitter = entity['emitter']
+            if emitter is None:
+                continue
+
+
+            distance = (ship_position - physics.position).length
+            if distance < 750:
+                emitter.enabled = True
+                emitter.rate = distance / 750
+            else:
+                emitter.enabled = False
+
+
+            if not emitter.enabled:
+                for sprite in emitter.sprites:
+                    sprite.delete()
+                emitter.sprites = []
+                continue
+
+            for sprite in emitter.sprites:
+                sprite.opacity *= 1 - (0.03 * time_factor)
+
+            to_be_deleted = [s for s in emitter.sprites if s.opacity < 0.01]
+            emitter.sprites = [s for s in emitter.sprites if s.opacity >= 0.01]
+            for sprite in to_be_deleted:
+                sprite.delete()
+
+            emitter.time_since_last_emission += dt
+            if emitter.time_since_last_emission > emitter.rate:
+                sprite = pyglet.sprite.Sprite(
+                    emitter.image,
+                    x=physics.position.x,
+                    y=physics.position.y,
+                    batch=emitter.batch,
+                    blend_src=pyglet.gl.GL_SRC_ALPHA,
+                    blend_dest=pyglet.gl.GL_ONE,
+                )
+                emitter.sprites.append(sprite)
+                emitter.time_since_last_emission = 0
+
 
 
     def update_player_ship(self):

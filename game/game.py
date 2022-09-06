@@ -14,6 +14,7 @@ from .components import (
     SpriteComponent,
     PhysicsComponent,
     InputComponent,
+    EmitterComponent,
     EmitterBoostComponent,
     FlightPathComponent,
     SpriteComponentLocator,
@@ -43,13 +44,29 @@ def create_sprite(position, rotation, image, scale=1.0, subpixel=True):
     entity.attach(sprite)
     return entity
 
+
+def create_flare(image, position):
+    entity = Entity()
+    entity.attach(PhysicsComponent(position=position))
+    entity.attach(EmitterComponent(
+        image=image,
+        batch=pyglet.graphics.Batch(),
+        rate=0.1,
+    ))
+
+
 def create_sprite_locator(image, scale=1.0, subpixel=True):
     sprite=SpriteComponentLocator(image, subpixel=subpixel)
-    sprite.scale = scale 
+    sprite.scale = scale
     return sprite
 
+
+def create_sprite_checkpoint(image, subpixel=True):
+    sprite=SpriteCheckpointComponent(image, subpixel=subpixel)
+    return sprite
+
+
 def load_image(asset_name, center=True):
-    print(f"loading image {asset_name}")
     image = pyglet.image.load(os.path.join('assets', asset_name))
     if center:
         image.anchor_x = image.width // 2
@@ -61,11 +78,13 @@ class KeyEvent(Event):
     key_symbol = field(mandatory=True)
     pressed = field(type=bool, mandatory=True)
 
+
 class MouseMotionEvent(Event):
     x = field(type=int, mandatory=True)
     y = field(type=int, mandatory=True)
     dx = field(type=int, mandatory=True)
     dy = field(type=int, mandatory=True)
+
 
 class DefendingMarsWindow(pyglet.window.Window):
 
@@ -86,6 +105,7 @@ class DefendingMarsWindow(pyglet.window.Window):
         # self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
         self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
         self.assets['energy_particle_red'] = load_image('energy-particle-red-64x64.png')
+        self.assets['particle_flare'] = load_image('particle-flare-32x32.png')
         self.assets['boost_ui_base'] = load_image('boost-ui-base-288x64.png')
         self.assets['boost_tick_red'] = load_image('boost-tick-red-48x48.png')
         self.assets['boost_tick_blue'] = load_image('boost-tick-blue-48x48.png')
@@ -180,6 +200,7 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.checkpoint_bottom3 = create_sprite(V2(-600.0, 600.1), 0, self.assets['checkpoint_next_bottom'])
         self.checkpoint_bottom3.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=5))
 
+
         # self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
         # self.enemy_1.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))
         # self.enemy_2 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
@@ -213,20 +234,21 @@ class DefendingMarsWindow(pyglet.window.Window):
 
 
         points = [
-            V2(110.0 - 70, 110.0 + 43),
-            V2(220.0 - 70, 76.0 + 43),
-            V2(225.0 - 70, -35.0 + 43),
-            V2(130.0 - 70, -205.0 + 43),
-            V2(-550.0 - 70, 0.0 + 43),
-            V2(-861.0 - 70, -293.0 + 43),
-            V2(-500.0, -133.0),
-            V2(-600.0, 600.0),
-            V2(-700.0, 1100.0),
-            V2(50.0, 1400.0),
-            V2(352.0, 1000.0),
-            V2(50.0, 1340.0),
-            V2(500.0, 1700.0),
-            V2(1900.0, 2100.0),
+            V2(100, 100),
+            V2(500, 500),
+            V2(1000, 0),
+            V2(500, -500),
+            V2(0, 0),
+            #V2(-500, 0.0),
+            #V2(-800, -350),
+            #V2(-500.0, -133.0),
+            #V2(-600.0, 600.0),
+            #V2(-700.0, 1100.0),
+            #V2(50.0, 1400.0),
+            #V2(352.0, 1000.0),
+            #V2(50.0, 1340.0),
+            #V2(500.0, 1700.0),
+            #V2(1900.0, 2100.0),
         ]
 
 
@@ -268,6 +290,16 @@ class DefendingMarsWindow(pyglet.window.Window):
                 )
             )
         )
+
+
+        for i, point in enumerate(path):
+            if i % 3 == 1:
+                v = path[i] - path[i-1]
+                a = V2.from_degrees_and_length(v.degrees + 90, 150) + point
+                b = V2.from_degrees_and_length(v.degrees - 90, 150) + point
+                create_flare(self.assets['particle_flare'], a)
+                create_flare(self.assets['particle_flare'], b)
+
 
         # self.enemy_1.attach(EnemyComponent(
         #     flight_path=self.flight_path_1.entity_id,
