@@ -226,7 +226,7 @@ class PhysicsSystem(ecs.System):
                     v = physics.velocity
                     a = n * (v.dot_product(n))
                     physics.position += separation.normalized * (min_length - sep_length)
-                    physics.velocity = (v - (a * 2)) * 0.7
+                    physics.velocity = (v - (a * 1.3)) * 0.9
 
 
 
