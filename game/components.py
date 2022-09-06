@@ -57,4 +57,15 @@ class FlightPathComponent:
     component_name = "flight path"
     vertices: pyglet.graphics.vertexdomain.VertexList
     points: pyglet.graphics.vertexdomain.VertexList
+    path: list[V2] = field(default_factory=list)
+
+
+@dataclass
+class EnemyComponent(pyglet.sprite.Sprite):
+    component_name = "enemy"
+    flight_path: str
+    target: V2 = V2(0.0, 0.0)
+    path_index: int = 0
+    speed: float = 0.5
+    offset: V2 = V2(0.0, 0.0)
 

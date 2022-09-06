@@ -1,6 +1,7 @@
 import pyglet
 import os
 from itertools import cycle
+from random import random
 
 # ECS Import
 from . import ecs
@@ -15,6 +16,7 @@ from .components import (
     InputComponent,
     EmitterComponent,
     FlightPathComponent,
+    EnemyComponent,
 )
 
 # System Imports
@@ -66,9 +68,10 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['closer_stars'] = load_image('closer-stars-2048x2048.png', center=False)
         self.assets['nebula'] = load_image('nebula-2048x2048.png', center=False)
         self.assets['base_ship'] = load_image('ship-base-256x256.png')
+        self.assets['enemy_ship'] = load_image('ship-speed-64x64.png')
         self.assets['red_planet'] = load_image('red-planet.png')
         self.assets['red_planet_shield'] = load_image('red-planet-shield.png')
-        self.assets['moon'] = load_image('moon-128x128.png')
+        self.assets['moon'] = load_image('moon-64x64.png')
         self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
         self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
         self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
@@ -103,6 +106,11 @@ class DefendingMarsWindow(pyglet.window.Window):
 
         # Earth Planet 1
         self.earth = create_sprite(V2(1900.0, 2100.0), 0, self.assets['red_planet_shield'])
+
+        self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'], 2.0)
+        self.enemy_2 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'], 2.0)
+        self.enemy_3 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'], 2.0)
+        self.enemy_4 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'], 2.0)
 
         # Create a turrent base for moon_plant_1 
         # 75 off to make it perfectly on top it seems
@@ -151,14 +159,16 @@ class DefendingMarsWindow(pyglet.window.Window):
                 new_points.append(point)
 
         vertices = []
+        path = []
         for i, p in enumerate(zip(new_points, new_points[1:], new_points[2:])):
             if i % 2 == 0:
-                for i in range(16 + 1):
-                    t = i / 16
+                for i in range(32 + 1):
+                    t = i / 32
                     x = (1 - t) * (1 - t) * p[0].x + 2 * (1 - t) * t * p[1].x + t * t * p[2].x
                     y = (1 - t) * (1 - t) * p[0].y + 2 * (1 - t) * t * p[1].y + t * t * p[2].y
                     vertices.append(x)
                     vertices.append(y)
+                    path.append(V2(x, y))
 
         new_points_p = []
         for p in new_points:
@@ -167,6 +177,7 @@ class DefendingMarsWindow(pyglet.window.Window):
 
         self.flight_path_1.attach(
             FlightPathComponent(
+                path = path,
                 vertices = pyglet.graphics.vertex_list(len(vertices) // 2,
                     ('v2f', vertices),
                     ('c4B', list(y for x, y in zip(range(len(vertices) // 2 * 4), cycle((255, 0, 0, 50))))),
@@ -177,6 +188,30 @@ class DefendingMarsWindow(pyglet.window.Window):
                 )
             )
         )
+
+        self.enemy_1.attach(EnemyComponent(
+            flight_path=self.flight_path_1.entity_id,
+            offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
+            speed=random() * 0.3 + 0.2,
+        ))
+
+        self.enemy_2.attach(EnemyComponent(
+            flight_path=self.flight_path_1.entity_id,
+            offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
+            speed=random() * 0.3 + 0.2,
+        ))
+
+        self.enemy_3.attach(EnemyComponent(
+            flight_path=self.flight_path_1.entity_id,
+            offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
+            speed=random() * 0.3 + 0.2,
+        ))
+
+        self.enemy_4.attach(EnemyComponent(
+            flight_path=self.flight_path_1.entity_id,
+            offset=V2.from_degrees_and_length(random() * 360, random() * 50.0),
+            speed=random() * 0.3 + 0.2,
+        ))
 
     def on_key_press(self, symbol, modifiers):
         ecs.System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=True))
