@@ -118,4 +118,14 @@ class RenderSystem(ecs.System):
                 tick.y = 34 + (i + 1) * 34
                 tick.draw()
 
+        # method for removing our checkpoint
+        entities = ecs.Entity.with_component("checkpoint")
+        for entity in entities:
+            # print(entities)
+            sprite = entity['checkpoint']
+            physics = entity['physics']
+            sprite_entity = entity['sprite']
+            if camera.x >= physics.position.x - sprite_entity.width // 2 and camera.x <= physics.position.x + sprite_entity.width //2:
+                if camera.y >= physics.position.y - sprite_entity.height // 2 and camera.y <= physics.position.y + sprite_entity.height //2:
+                    sprite_entity.visible = False 
 

@@ -20,6 +20,7 @@ from .components import (
     EnemyComponent,
     MassComponent,
     BoostComponent,
+    SpriteCheckpointComponent,
 )
 
 # System Imports
@@ -44,6 +45,10 @@ def create_sprite(position, rotation, image, scale=1.0, subpixel=True):
 def create_sprite_locator(image, scale=1.0, subpixel=True):
     sprite=SpriteComponentLocator(image, subpixel=subpixel)
     sprite.scale = scale 
+    return sprite
+
+def create_sprite_checkpoint(image, subpixel=True):
+    sprite=SpriteCheckpointComponent(image, subpixel=subpixel)
     return sprite
 
 def load_image(asset_name, center=True):
@@ -88,6 +93,10 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['boost_tick_red'] = load_image('boost-tick-red-48x48.png')
         self.assets['boost_tick_blue'] = load_image('boost-tick-blue-48x48.png')
         self.assets['boost_tick_yellow'] = load_image('boost-tick-yellow-48x48.png')
+        self.assets['checkpoint_top'] = load_image('checkpoint-top-128x128.png')
+        self.assets['checkpoint_bottom'] = load_image('checkpoint-bottom-128x128.png')
+        self.assets['checkpoint_next_top'] = load_image('checkpoint-next-top-128x128.png')
+        self.assets['checkpoint_next_bottom'] = load_image('checkpoint-next-bottom-128x128.png')
 
         # Create a home planet that will be set at a specific coordinate area
         self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
@@ -140,6 +149,30 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.earth = create_sprite(V2(1900.0, 2100.0), 0, self.assets['earth'])
         self.earth.attach(create_sprite_locator(self.assets['earth'], 0.0625))
         self.earth.attach(MassComponent(mass=400))
+
+        # Checkpoint 1 top test
+        self.checkpoint_top = create_sprite(V2(-996.0, 93.9), 0, self.assets['checkpoint_top'])
+        self.checkpoint_top.attach(create_sprite_checkpoint(self.assets['checkpoint_top']))
+
+        # Checkpoint 1 bottom test
+        self.checkpoint_bottom = create_sprite(V2(-996.0, 94.1), 0, self.assets['checkpoint_bottom'])
+        self.checkpoint_bottom.attach(create_sprite_checkpoint(self.assets['checkpoint_bottom']))
+
+        # Checkpoint 2 top test
+        self.checkpoint_top2 = create_sprite(V2(-708.0, -500.1), 0, self.assets['checkpoint_next_top'])
+        self.checkpoint_top2.attach(create_sprite_checkpoint(self.assets['checkpoint_next_top']))
+
+        # Checkpoint 2 bottom test
+        self.checkpoint_bottom2 = create_sprite(V2(-708.0, -499.9), 0, self.assets['checkpoint_next_bottom'])
+        self.checkpoint_bottom2.attach(create_sprite_checkpoint(self.assets['checkpoint_next_bottom']))
+
+        # Checkpoint 3 top test
+        self.checkpoint_top3 = create_sprite(V2(-600.0, 599.9), 0, self.assets['checkpoint_next_top'])
+        self.checkpoint_top3.attach(create_sprite_checkpoint(self.assets['checkpoint_next_top']))
+
+        # Checkpoint 3 bottom test
+        self.checkpoint_bottom3 = create_sprite(V2(-600.0, 600.1), 0, self.assets['checkpoint_next_bottom'])
+        self.checkpoint_bottom3.attach(create_sprite_checkpoint(self.assets['checkpoint_next_bottom']))
 
         # self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
         # self.enemy_1.attach(create_sprite_locator(self.assets['enemy_ship'], 0.50))

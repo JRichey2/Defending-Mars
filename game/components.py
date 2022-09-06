@@ -30,9 +30,9 @@ class SpriteComponent(pyglet.sprite.Sprite):
 class SpriteComponentLocator(pyglet.sprite.Sprite):
     component_name = "spritelocator"
 
-class SpriteComponentLocator(pyglet.sprite.Sprite):
-    component_name = "spritelocator"
-
+class SpriteCheckpointComponent(pyglet.sprite.Sprite):
+    component_name = "checkpoint"
+    visible: bool 
 
 @dataclass
 class WindowComponent:
