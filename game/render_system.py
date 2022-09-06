@@ -109,7 +109,11 @@ class RenderSystem(ecs.System):
             boost.ui_base.draw()
 
             for i, tick in enumerate(boost.ticks):
-                tick.opacity = 127
+                lb = i * 20
+                ub = i * 20 + 20
+                ab = min(max(boost.boost, lb),ub)
+                alpha = (ab - lb) / 20
+                tick.opacity = int(127 * alpha)
                 tick.x = width - 56
                 tick.y = 34 + (i + 1) * 34
                 tick.draw()

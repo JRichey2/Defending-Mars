@@ -60,6 +60,11 @@ class EmitterComponent:
 
 
 @dataclass
+class EmitterBoostComponent(EmitterComponent):
+    boost_image: pyglet.image.AbstractImage = None
+
+
+@dataclass
 class FlightPathComponent:
     component_name = "flight path"
     vertices: pyglet.graphics.vertexdomain.VertexList

@@ -69,21 +69,34 @@ class PhysicsSystem(ecs.System):
             DRAG_CONSTANT = 0.015
             MAX_GRAV_ACC = 0.24
 
+            dt = ecs.DELTA_TIME
+            time_factor = dt / 0.01667
+
             if acceleration.length > 0:
                 #acceleration.normalize()
                 acceleration *= ACC_CONSTANT
+            boost = entity['boost']
             if inputs.boost:
-                acceleration *= BOOST_CONSTANT
+                if boost.boost > 0:
+                    acceleration *= BOOST_CONSTANT
+                    boost.boost -= 0.5 * time_factor
+                    boosting = True
+                else:
+                    boosting = False
+            else:
+                if boost.boost < 100:
+                    boost.boost += 0.1 * time_factor
+                boosting = False
 
+
+            grav_acc = V2(0,0)
             for mass_point, mass in mass_points:
                 acc_vector = mass_point - physics.position
                 acc_magnitude = GRAV_CONSTANT * mass / acc_vector.length_squared
                 acc_magnitude = min(acc_magnitude, MAX_GRAV_ACC)
-                grav_acc = acc_vector.normalized * acc_magnitude
+                grav_acc += acc_vector.normalized * acc_magnitude
 
 
-            dt = ecs.DELTA_TIME
-            time_factor = dt / 0.01667
             physics.velocity *= 1 - (DRAG_CONSTANT * time_factor)
             physics.velocity += acceleration * time_factor
             physics.velocity += grav_acc * time_factor
@@ -104,12 +117,12 @@ class PhysicsSystem(ecs.System):
                 emitter.sprites = []
                 continue
 
-            if acceleration.length > 0 and inputs.boost:
+            if acceleration.length > 0 and boosting:
                 emitter.rate = 0.005
             elif acceleration.length > 0:
                 emitter.rate = 0.015
             else:
-                emitter.rate = 0.05
+                emitter.rate = 0.03
 
             for sprite in emitter.sprites:
                 sprite.opacity *= 1 - (0.1 * time_factor)
@@ -123,7 +136,7 @@ class PhysicsSystem(ecs.System):
             if emitter.time_since_last_emission > emitter.rate:
                 offset = V2.from_degrees_and_length(rotation + 270, 16.0)
                 sprite = pyglet.sprite.Sprite(
-                    emitter.image,
+                    emitter.image if not (hasattr(emitter, "boost_image") and boosting) else emitter.boost_image,
                     x=physics.position.x + offset.x,
                     y=physics.position.y + offset.y,
                     batch=emitter.batch,
