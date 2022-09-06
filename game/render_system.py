@@ -77,19 +77,21 @@ class RenderSystem(ecs.System):
             sprite_entity = entity['sprite']
             x_ob = physics.position.x + sprite_entity.width // 2
             y_ob = physics.position.x + sprite_entity.height // 2
+            half_sprite_x = sprite.width // 2
+            half_sprite_y = sprite.height // 2
             draw = True
             if (camera.y - height // 2) > y_ob: 
-                sprite.x = max(min(sprite.width // 2 + abs(min(camera.x - width // 2,0)), width)-32,32)
-                sprite.y = 32
+                sprite.x = max(min(sprite.width // 2 + abs(min(camera.x - width // 2,0)), width)-half_sprite_x,half_sprite_x)
+                sprite.y = half_sprite_y
             elif (camera.y + height //2) < (y_ob - sprite_entity.height):
-                sprite.x = max(min(sprite.width // 2 + abs(min(camera.x - width // 2,0)), width)-32,32)
-                sprite.y = height - 32
+                sprite.x = max(min(sprite.width // 2 + abs(min(camera.x - width // 2,0)), width)-half_sprite_x,half_sprite_x)
+                sprite.y = height - half_sprite_y
             elif (camera.x - width //2) > x_ob:
-                sprite.y = max(min(sprite.height // 2 + abs(min(camera.y - height // 2,0)), height)-32,32)
-                sprite.x = 32
+                sprite.y = max(min(sprite.height // 2 + abs(min(camera.y - height // 2,0)), height)-half_sprite_y,half_sprite_y)
+                sprite.x = half_sprite_x
             elif (camera.x + width //2) < (x_ob - sprite_entity.height):
-                sprite.y = max(min(sprite.height // 2 + abs(min(camera.y - height // 2,0)), height)-32,32)
-                sprite.x = width - 32
+                sprite.y = max(min(sprite.height // 2 + abs(min(camera.y - height // 2,0)), height)-half_sprite_y,half_sprite_y)
+                sprite.x = width - half_sprite_x
             else:
                 draw = False
 
