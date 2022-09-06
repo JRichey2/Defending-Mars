@@ -63,24 +63,30 @@ class PhysicsSystem(ecs.System):
             if inputs.d:
                 acceleration += V2.from_degrees_and_length(rotation, 0.2)
 
+            GRAV_CONSTANT = 200.0
+            ACC_CONSTANT = 0.25
+            BOOST_CONSTANT = 1.75
+            DRAG_CONSTANT = 0.015
+            MAX_GRAV_ACC = 0.24
+
             if acceleration.length > 0:
                 #acceleration.normalize()
-                acceleration *= 0.3
+                acceleration *= ACC_CONSTANT
             if inputs.boost:
-                acceleration *= 2
+                acceleration *= BOOST_CONSTANT
 
-            gravitational_constant = 200.0
             for mass_point, mass in mass_points:
                 acc_vector = mass_point - physics.position
-                acc_magnitude = gravitational_constant * mass / acc_vector.length_squared
-                acc_magnitude = min(acc_magnitude, 0.15)
-                acceleration += acc_vector.normalized * acc_magnitude
+                acc_magnitude = GRAV_CONSTANT * mass / acc_vector.length_squared
+                acc_magnitude = min(acc_magnitude, MAX_GRAV_ACC)
+                grav_acc = acc_vector.normalized * acc_magnitude
 
 
             dt = ecs.DELTA_TIME
             time_factor = dt / 0.01667
-            physics.velocity *= 1 - (0.02 * time_factor)
+            physics.velocity *= 1 - (DRAG_CONSTANT * time_factor)
             physics.velocity += acceleration * time_factor
+            physics.velocity += grav_acc * time_factor
             physics.position += physics.velocity * time_factor
 
             window_entity = list(ecs.Entity.with_component("window"))[0]
@@ -98,10 +104,12 @@ class PhysicsSystem(ecs.System):
                 emitter.sprites = []
                 continue
 
-            if acceleration.length > 0:
-                emitter.rate = 0.01
+            if acceleration.length > 0 and inputs.boost:
+                emitter.rate = 0.005
+            elif acceleration.length > 0:
+                emitter.rate = 0.015
             else:
-                emitter.rate = 0.03
+                emitter.rate = 0.05
 
             for sprite in emitter.sprites:
                 sprite.opacity *= 1 - (0.1 * time_factor)
