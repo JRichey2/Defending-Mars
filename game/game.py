@@ -110,10 +110,14 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['boost_tick_red'] = load_image('boost-tick-red-48x48.png')
         self.assets['boost_tick_blue'] = load_image('boost-tick-blue-48x48.png')
         self.assets['boost_tick_yellow'] = load_image('boost-tick-yellow-48x48.png')
-        self.assets['checkpoint_top'] = load_image('checkpoint-top-128x128.png')
-        self.assets['checkpoint_bottom'] = load_image('checkpoint-bottom-128x128.png')
-        self.assets['checkpoint_next_top'] = load_image('checkpoint-next-top-128x128.png')
-        self.assets['checkpoint_next_bottom'] = load_image('checkpoint-next-bottom-128x128.png')
+        self.assets['checkpoint_top'] = load_image('checkpoint-top-256x256.png')
+        self.assets['checkpoint_bottom'] = load_image('checkpoint-bottom-256x256.png')
+        self.assets['checkpoint_next_top'] = load_image('checkpoint-next-top-256x256.png')
+        self.assets['checkpoint_next_bottom'] = load_image('checkpoint-next-bottom-256x256.png')
+        self.assets['checkpoint_finish_top'] = load_image('checkpoint-finish-top-256x256.png')
+        self.assets['checkpoint_finish_bottom'] = load_image('checkpoint-finish-bottom-256x256.png')
+        self.assets['checkpoint_passed_top'] = load_image('checkpoint-passed-top-256x256.png')
+        self.assets['checkpoint_passed_bottom'] = load_image('checkpoint-passed-bottom-256x256.png')
 
         # Create a home planet that will be set at a specific coordinate area
         self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
@@ -177,27 +181,27 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.earth.attach(CollisionComponent(circle_radius=500))
 
         # Checkpoint 1 top test
-        self.checkpoint_top = create_sprite(V2(-996.0, 93.9), 0, self.assets['checkpoint_top'], 2.0)
+        self.checkpoint_top = create_sprite(V2(-996.0, 93.9), 0, self.assets['checkpoint_top'])
         self.checkpoint_top.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_top'], cp_order=0))
 
         # Checkpoint 1 bottom test
-        self.checkpoint_bottom = create_sprite(V2(-996.0, 94.1), 0, self.assets['checkpoint_bottom'], 2.0)
+        self.checkpoint_bottom = create_sprite(V2(-996.0, 94.1), 0, self.assets['checkpoint_bottom'])
         self.checkpoint_bottom.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=1))
 
         # Checkpoint 2 top test
-        self.checkpoint_top2 = create_sprite(V2(-708.0, -500.1), 0, self.assets['checkpoint_next_top'], 2.0)
+        self.checkpoint_top2 = create_sprite(V2(-708.0, -500.1), 0, self.assets['checkpoint_next_top'])
         self.checkpoint_top2.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_top'], cp_order=2))
 
         # Checkpoint 2 bottom test
-        self.checkpoint_bottom2 = create_sprite(V2(-708.0, -499.9), 0, self.assets['checkpoint_next_bottom'], 2.0)
+        self.checkpoint_bottom2 = create_sprite(V2(-708.0, -499.9), 0, self.assets['checkpoint_next_bottom'])
         self.checkpoint_bottom2.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=3))
 
         # Checkpoint 3 top test
-        self.checkpoint_top3 = create_sprite(V2(-600.0, 599.9), 0, self.assets['checkpoint_next_top'], 2.0)
+        self.checkpoint_top3 = create_sprite(V2(-600.0, 599.9), 0, self.assets['checkpoint_next_top'])
         self.checkpoint_top3.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_top'], cp_order=4))
 
         # Checkpoint 3 bottom test
-        self.checkpoint_bottom3 = create_sprite(V2(-600.0, 600.1), 0, self.assets['checkpoint_next_bottom'], 2.0)
+        self.checkpoint_bottom3 = create_sprite(V2(-600.0, 600.1), 0, self.assets['checkpoint_next_bottom'])
         self.checkpoint_bottom3.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=5))
 
 
