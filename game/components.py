@@ -12,7 +12,6 @@ class InputComponent:
     a: bool = False
     s: bool = False
     d: bool = False
-    
 
 
 @dataclass
@@ -26,8 +25,10 @@ class PhysicsComponent:
 class SpriteComponent(pyglet.sprite.Sprite):
     component_name = "sprite"
 
+
 class SpriteComponentLocator(pyglet.sprite.Sprite):
     component_name = "spritelocator"
+
 
 @dataclass
 class WindowComponent:
@@ -70,4 +71,10 @@ class EnemyComponent(pyglet.sprite.Sprite):
     path_index: int = 0
     speed: float = 0.5
     offset: V2 = V2(0.0, 0.0)
+
+
+@dataclass
+class MassComponent:
+    component_name = "mass"
+    mass: float
 

@@ -33,6 +33,17 @@ class PhysicsSystem(ecs.System):
 
 
     def update_player_ship(self):
+        entities = ecs.Entity.with_component("mass")
+
+        mass_points = []
+        for entity in entities:
+            physics = entity['physics']
+            if physics is None:
+                continue
+            mass = entity['mass']
+            mass_points.append((physics.position, mass.mass))
+
+
         entities = ecs.Entity.with_component("input")
         for entity in entities:
             inputs = entity['input']
@@ -56,9 +67,17 @@ class PhysicsSystem(ecs.System):
                 #acceleration.normalize()
                 acceleration *= 0.3
 
+            gravitational_constant = 200.0
+            for mass_point, mass in mass_points:
+                acc_vector = mass_point - physics.position
+                acc_magnitude = gravitational_constant * mass / acc_vector.length_squared
+                acc_magnitude = min(acc_magnitude, 0.15)
+                acceleration += acc_vector.normalized * acc_magnitude
+
+
             dt = ecs.DELTA_TIME
             time_factor = dt / 0.01667
-            physics.velocity *= 1 - (0.03 * time_factor)
+            physics.velocity *= 1 - (0.02 * time_factor)
             physics.velocity += acceleration * time_factor
             physics.position += physics.velocity * time_factor
 
