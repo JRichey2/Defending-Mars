@@ -74,7 +74,24 @@ class RenderSystem(ecs.System):
         for entity in entities:
             sprite = entity['spritelocator']
             physics = entity['physics']
-            sprite.x = 32
-            sprite.y = 32
-            sprite.draw()
+            sprite_entity = entity['sprite']
+            x_ob = physics.position.x + sprite_entity.width // 2
+            y_ob = physics.position.x + sprite_entity.height // 2
+            draw = True
+            if (camera.y - height // 2) > y_ob: 
+                sprite.x = max(min(sprite.width // 2 + abs(min(camera.x - width // 2,0)), width)-32,32)
+                sprite.y = 32
+            elif (camera.y + height //2) < (y_ob - sprite_entity.height):
+                sprite.x = max(min(sprite.width // 2 + abs(min(camera.x - width // 2,0)), width)-32,32)
+                sprite.y = height - 32
+            elif (camera.x - width //2) > x_ob:
+                sprite.y = max(min(sprite.height // 2 + abs(min(camera.y - height // 2,0)), height)-32,32)
+                sprite.x = 32
+            elif (camera.x + width //2) < (x_ob - sprite_entity.height):
+                sprite.y = max(min(sprite.height // 2 + abs(min(camera.y - height // 2,0)), height)-32,32)
+                sprite.x = width - 32
+            else:
+                draw = False
 
+            if draw == True:
+                sprite.draw()

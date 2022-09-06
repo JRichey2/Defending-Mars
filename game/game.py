@@ -73,7 +73,7 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['base_ship'] = load_image('ship-base-256x256.png')
         self.assets['red_planet'] = load_image('red-planet.png')
         self.assets['red_planet_shield'] = load_image('red-planet-shield.png')
-        self.assets['moon'] = load_image('moon-128x128.png')
+        self.assets['moon'] = load_image('moon-64x64.png')
         self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
         self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
         self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
