@@ -76,9 +76,10 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['nebula'] = load_image('nebula-2048x2048.png', center=False)
         self.assets['base_ship'] = load_image('ship-base-256x256.png')
         self.assets['enemy_ship'] = load_image('ship-speed-64x64.png')
-        self.assets['red_planet'] = load_image('red-planet.png')
-        self.assets['red_planet_shield'] = load_image('red-planet-shield.png')
-        self.assets['moon'] = load_image('moon-64x64.png')
+        self.assets['red_planet'] = load_image('red-planet-512x512.png')
+        self.assets['red_planet_shield'] = load_image('red-planet-shield-512x512.png')
+        self.assets['moon'] = load_image('moon-128x128.png')
+        self.assets['earth'] = load_image('earth-1024x1024.png')
         # self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
         # self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
         self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
@@ -92,12 +93,12 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
 
         # trying to create a sprite for the image I want to place later on
-        self.red_planet_entity.attach(create_sprite_locator(self.assets['red_planet'], 0.25))
+        self.red_planet_entity.attach(create_sprite_locator(self.assets['red_planet'], 0.125))
         self.red_planet_entity.attach(MassComponent(mass=100))
 
         # Create a shield to go over the planet entity. This will need to be callable some other way for a power up and coordinate location
         self.red_planet_shield_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet_shield'])
-        self.red_planet_shield_entity.attach(create_sprite_locator(self.assets['red_planet_shield'], 0.25))
+        self.red_planet_shield_entity.attach(create_sprite_locator(self.assets['red_planet_shield'], 0.125))
 
         # we could probably create a def function to create these based on a series of coords
         # Create a moon for a specific location number 1
@@ -136,8 +137,8 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.large_planet_1.attach(MassComponent(mass=100))
 
         # Earth Planet 1
-        self.earth = create_sprite(V2(1900.0, 2100.0), 0, self.assets['red_planet_shield'])
-        self.earth.attach(create_sprite_locator(self.assets['red_planet_shield'], 0.25))
+        self.earth = create_sprite(V2(1900.0, 2100.0), 0, self.assets['earth'])
+        self.earth.attach(create_sprite_locator(self.assets['earth'], 0.0625))
         self.earth.attach(MassComponent(mass=400))
 
         # self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])
