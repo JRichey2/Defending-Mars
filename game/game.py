@@ -19,6 +19,7 @@ from .components import (
     SpriteComponentLocator,
     EnemyComponent,
     MassComponent,
+    BoostComponent,
 )
 
 # System Imports
@@ -81,6 +82,10 @@ class DefendingMarsWindow(pyglet.window.Window):
         # self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
         # self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
         self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
+        self.assets['boost_ui_base'] = load_image('boost-ui-base-288x64.png')
+        self.assets['boost_tick_red'] = load_image('boost-tick-red-64x64.png')
+        self.assets['boost_tick_blue'] = load_image('boost-tick-blue-64x64.png')
+        self.assets['boost_tick_yellow'] = load_image('boost-tick-yellow-64x64.png')
 
         # Create a home planet that will be set at a specific coordinate area
         self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
@@ -283,6 +288,7 @@ def run_game():
             SpriteComponent(window.assets['nebula'], x=0, y=0),
         ]
     ))
+    window.ship_entity.attach(BoostComponent())
 
     def update(dt, *args, **kwargs):
         ecs.DELTA_TIME = dt

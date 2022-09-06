@@ -97,3 +97,17 @@ class RenderSystem(ecs.System):
 
             if draw == True:
                 sprite.draw()
+
+        entities = ecs.Entity.with_component("boost")
+        for entity in entities:
+            boost = entity["boost"]
+            boost.ui_base.x = width - 160
+            boost.ui_base.y = 50
+            boost.ui_base.draw()
+
+            for i, tick in enumerate(boost.ticks):
+                tick.x = width - 56
+                tick.y = 30 + (i + 1) * 48
+                tick.draw()
+
+

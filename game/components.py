@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 import pyglet
 
+from . import ecs
 from .vector import V2
 
 
@@ -80,4 +81,28 @@ class EnemyComponent(pyglet.sprite.Sprite):
 class MassComponent:
     component_name = "mass"
     mass: float
+
+
+class BoostComponent:
+
+    component_name = "boost"
+
+    def __init__(self):
+        window_entity = list(ecs.Entity.with_component("window"))[0]
+        window = window_entity['window'].window
+        self.boost = 100
+        self.ui_base = pyglet.sprite.Sprite(window.assets['boost_ui_base'])
+        self.ticks = [
+            pyglet.sprite.Sprite(window.assets['boost_tick_red']),
+            pyglet.sprite.Sprite(window.assets['boost_tick_yellow']),
+            pyglet.sprite.Sprite(window.assets['boost_tick_yellow']),
+            pyglet.sprite.Sprite(window.assets['boost_tick_yellow']),
+            pyglet.sprite.Sprite(window.assets['boost_tick_yellow']),
+            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
+            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
+            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
+            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
+            pyglet.sprite.Sprite(window.assets['boost_tick_blue']),
+        ]
+
 
