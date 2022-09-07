@@ -1,4 +1,5 @@
 from . import ecs
+from . import settings
 from .settings import MOUSE_TURNING, CAMERA_SPRING
 from .vector import V2
 from random import random
@@ -40,7 +41,12 @@ class PhysicsSystem(ecs.System):
         ship = ecs.Entity.with_component("input")[0]
         ship_position = ship['physics'].position
 
-        for entity in ecs.Entity.with_component("emitter"):
+        for entity in ecs.Entity.with_component("game visual"):
+            emitters = [
+                v.value for v in entity['game visual'].visuals
+                if v.kind == 'emitter'
+            ]
+
             if entity.entity_id in [e.entity_id for e in ecs.Entity.with_component("input")]:
                 # Skip the ship
                 continue
@@ -49,53 +55,51 @@ class PhysicsSystem(ecs.System):
             if physics is None:
                 continue
 
+            for emitter in emitters:
 
-            emitter = entity['emitter']
-            if emitter is None:
-                continue
-
-
-            distance = (ship_position - physics.position).length
-            if distance < 750:
-                emitter.enabled = True
-                emitter.rate = distance / 750
-            else:
-                emitter.enabled = False
+                distance = (ship_position - physics.position).length
+                if distance < 750:
+                    emitter.enabled = True
+                    emitter.rate = distance / 750
+                else:
+                    emitter.enabled = False
 
 
-            if not emitter.enabled:
+                if not emitter.enabled:
+                    for sprite in emitter.sprites:
+                        sprite.delete()
+                    emitter.sprites = []
+                    continue
+
                 for sprite in emitter.sprites:
+                    sprite.opacity *= 1 - (0.03 * time_factor)
+
+                to_be_deleted = [s for s in emitter.sprites if s.opacity < 0.01]
+                emitter.sprites = [s for s in emitter.sprites if s.opacity >= 0.01]
+                for sprite in to_be_deleted:
                     sprite.delete()
-                emitter.sprites = []
-                continue
 
-            for sprite in emitter.sprites:
-                sprite.opacity *= 1 - (0.03 * time_factor)
-
-            to_be_deleted = [s for s in emitter.sprites if s.opacity < 0.01]
-            emitter.sprites = [s for s in emitter.sprites if s.opacity >= 0.01]
-            for sprite in to_be_deleted:
-                sprite.delete()
-
-            emitter.time_since_last_emission += dt
-            if emitter.time_since_last_emission > emitter.rate:
-                sprite = pyglet.sprite.Sprite(
-                    emitter.image,
-                    x=physics.position.x,
-                    y=physics.position.y,
-                    batch=emitter.batch,
-                    blend_src=pyglet.gl.GL_SRC_ALPHA,
-                    blend_dest=pyglet.gl.GL_ONE,
-                )
-                emitter.sprites.append(sprite)
-                emitter.time_since_last_emission = 0
-
+                emitter.time_since_last_emission += dt
+                if emitter.time_since_last_emission > emitter.rate:
+                    sprite = pyglet.sprite.Sprite(
+                        emitter.image,
+                        x=physics.position.x,
+                        y=physics.position.y,
+                        batch=emitter.batch,
+                        blend_src=pyglet.gl.GL_SRC_ALPHA,
+                        blend_dest=pyglet.gl.GL_ONE,
+                    )
+                    emitter.sprites.append(sprite)
+                    emitter.time_since_last_emission = 0
 
 
     def update_player_ship(self):
         entities = ecs.Entity.with_component("mass")
 
-        GRAV_CONSTANT = 200.0
+        if settings.GRAVITY:
+            GRAV_CONSTANT = 200.0
+        else:
+            GRAV_CONSTANT = 0.0
         ACC_CONSTANT = 0.25
         BOOST_CONSTANT = 1.75
         DRAG_CONSTANT = 0.015
@@ -112,7 +116,6 @@ class PhysicsSystem(ecs.System):
             mass = entity['mass']
             mass_points.append((physics.position, mass.mass))
 
-
         entities = ecs.Entity.with_component("input")
         for entity in entities:
             inputs = entity['input']
@@ -124,12 +127,12 @@ class PhysicsSystem(ecs.System):
             acceleration = V2(0.0, 0.0)
 
             if inputs.a:
-                if not MOUSE_TURNING:
+                if not settings.MOUSE_TURNING:
                     rotation += 3.0 * time_factor
                 else:
                     acceleration += V2.from_degrees_and_length(rotation + 180, 0.4)
             if inputs.d:
-                if not MOUSE_TURNING:
+                if not settings.MOUSE_TURNING:
                     rotation -= 3.0 * time_factor
                 else:
                     acceleration += V2.from_degrees_and_length(rotation, 0.4)
@@ -140,7 +143,7 @@ class PhysicsSystem(ecs.System):
                 acceleration += V2.from_degrees_and_length(rotation + 270, 0.4)
 
 
-            if not MOUSE_TURNING:
+            if not settings.MOUSE_TURNING:
                 physics.rotation = rotation
 
 
@@ -177,18 +180,33 @@ class PhysicsSystem(ecs.System):
             window_entity = list(ecs.Entity.with_component("window"))[0]
             window = window_entity['window']
             width, height = window.window.width, window.window.height
-            if CAMERA_SPRING:
+            if settings.CAMERA_SPRING:
                 target_camera_position = (
                     physics.position
                         + physics.velocity
-                        * 30 * (min(width, height) / 720)
+                        * 20 * (min(width, height) / 720)
                 )
                 target_camera_vector = target_camera_position - window.camera_position
-                window.camera_position = window.camera_position + target_camera_vector * 0.05
+                if target_camera_vector.length != 0:
+                    camera_adjustment = (
+                            target_camera_vector.normalized
+                            * min(target_camera_vector.length * 0.05, 20 * time_factor)
+                    )
+
+                    window.camera_position = window.camera_position + camera_adjustment
             else:
                 window.camera_position = physics.position.copy
 
-            emitter = entity['emitter']
+            game_visual = entity['game visual']
+            if game_visual is None:
+                continue
+
+            emitter = None
+            for visual in game_visual.visuals:
+                if visual.kind == 'emitter':
+                    emitter = visual.value
+                    break
+
             if emitter is None:
                 continue
 

@@ -1,3 +1,4 @@
-MOUSE_TURNING = False
+MOUSE_TURNING = True
 CAMERA_SPRING = True
+GRAVITY = False
 

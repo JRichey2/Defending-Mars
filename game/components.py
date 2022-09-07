@@ -7,6 +7,25 @@ from .vector import V2
 
 
 @dataclass
+class Visual:
+    kind: str
+    z_sort: float
+    value: object
+
+
+@dataclass
+class GameVisualComponent:
+    component_name: str = "game visual"
+    visuals: list[Visual] = field(default_factory=list)
+
+
+@dataclass
+class UIVisualComponent:
+    component_name: str = "ui visual"
+    visuals: list[Visual] = field(default_factory=list)
+
+
+@dataclass
 class InputComponent:
     component_name: str = "input"
     w: bool = False
@@ -29,16 +48,15 @@ class SpriteComponent(pyglet.sprite.Sprite):
     component_name = "sprite"
 
 
-class SpriteComponentLocator(pyglet.sprite.Sprite):
-    component_name = "spritelocator"
-
-
 @dataclass
 class SpriteCheckpointComponent:
     component_name = "checkpoint"
-    next_image: pyglet.image.AbstractImage
-    passed_image: pyglet.image.AbstractImage
+    next_image_bottom: pyglet.image.AbstractImage
+    passed_image_bottom: pyglet.image.AbstractImage
+    next_image_top: pyglet.image.AbstractImage
+    passed_image_top: pyglet.image.AbstractImage
     completed: bool = False
+    is_next: bool = False
     cp_order: int = 0
 
 
@@ -52,8 +70,7 @@ class WindowComponent:
 
 
 @dataclass
-class EmitterComponent:
-    component_name = 'emitter'
+class Emitter:
     image: pyglet.image.AbstractImage
     # A sprite batch to draw all of the emitted particles
     batch: pyglet.graphics.Batch
@@ -68,13 +85,12 @@ class EmitterComponent:
 
 
 @dataclass
-class EmitterBoostComponent(EmitterComponent):
+class EmitterBoost(Emitter):
     boost_image: pyglet.image.AbstractImage = None
 
 
 @dataclass
-class FlightPathComponent:
-    component_name = "flight path"
+class FlightPath:
     points: pyglet.graphics.vertexdomain.VertexList
     path: list[V2] = field(default_factory=list)
 
@@ -102,70 +118,9 @@ class CollisionComponent:
     circle_radius: float = 0.0
 
 
+@dataclass
 class BoostComponent:
-
     component_name = "boost"
-
-    def __init__(self):
-        window_entity = list(ecs.Entity.with_component("window"))[0]
-        window = window_entity['window'].window
-        self.boost = 100
-        self.ui_base = pyglet.sprite.Sprite(
-            window.assets['boost_ui_base'],
-            blend_src=pyglet.gl.GL_SRC_ALPHA,
-            blend_dest=pyglet.gl.GL_ONE,
-        )
-        self.ticks = [
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_red'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_yellow'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_yellow'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_yellow'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_yellow'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_blue'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_blue'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_blue'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_blue'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-            pyglet.sprite.Sprite(
-                window.assets['boost_tick_blue'],
-                blend_src=pyglet.gl.GL_SRC_ALPHA,
-                blend_dest=pyglet.gl.GL_ONE,
-            ),
-        ]
+    boost: float = 100.0
 
 
