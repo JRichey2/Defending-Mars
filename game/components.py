@@ -14,6 +14,7 @@ class InputComponent:
     s: bool = False
     d: bool = False
     boost: bool = False
+    mapping: bool = False
 
 
 @dataclass
@@ -27,14 +28,17 @@ class PhysicsComponent:
 class SpriteComponent(pyglet.sprite.Sprite):
     component_name = "sprite"
 
+
 class SpriteComponentLocator(pyglet.sprite.Sprite):
     component_name = "spritelocator"
+
 
 @dataclass
 class SpriteCheckpointComponent:
     component_name = "checkpoint"
     next_image: pyglet.image.AbstractImage
     cp_order: int = 0
+
 
 @dataclass
 class WindowComponent:

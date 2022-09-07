@@ -1,5 +1,6 @@
 import pyglet
 import os
+import json
 from itertools import cycle
 from random import random
 
@@ -28,6 +29,7 @@ from .components import (
 # System Imports
 from .event_system import EventSystem
 from .render_system import RenderSystem
+from .mapping_system import MappingSystem
 from .physics_system import PhysicsSystem
 
 
@@ -236,69 +238,34 @@ class DefendingMarsWindow(pyglet.window.Window):
 
         self.flight_path_1 = Entity()
 
+        with open("map.json", "r") as f:
+            map_data = f.read()
 
-        points = [
-            V2(100, 100),
-            V2(500, 500),
-            V2(1000, 0),
-            V2(500, -500),
-            V2(0, 0),
-            #V2(-500, 0.0),
-            #V2(-800, -350),
-            #V2(-500.0, -133.0),
-            #V2(-600.0, 600.0),
-            #V2(-700.0, 1100.0),
-            #V2(50.0, 1400.0),
-            #V2(352.0, 1000.0),
-            #V2(50.0, 1340.0),
-            #V2(500.0, 1700.0),
-            #V2(1900.0, 2100.0),
-        ]
+        points = [V2(p['x'], p['y']) for p in json.loads(map_data)]
 
-
-        new_points = []
-        for i, point in enumerate(points):
-            if i < 3:
-                new_points.append(point)
-            else:
-                new_points.append(new_points[-1] - new_points[-2] + new_points[-1])
-                new_points.append(point)
-
-        vertices = []
-        path = []
-        for i, p in enumerate(zip(new_points, new_points[1:], new_points[2:])):
-            if i % 2 == 0:
-                for i in range(32 + 1):
-                    t = i / 32
-                    x = (1 - t) * (1 - t) * p[0].x + 2 * (1 - t) * t * p[1].x + t * t * p[2].x
-                    y = (1 - t) * (1 - t) * p[0].y + 2 * (1 - t) * t * p[1].y + t * t * p[2].y
-                    vertices.append(x)
-                    vertices.append(y)
-                    path.append(V2(x, y))
-
-        new_points_p = []
-        for p in new_points:
-            new_points_p.append(p.x)
-            new_points_p.append(p.y)
+        points_p = []
+        for p in points:
+            points_p.append(p.x)
+            points_p.append(p.y)
 
         self.flight_path_1.attach(
             FlightPathComponent(
-                path = path,
-                vertices = pyglet.graphics.vertex_list(len(vertices) // 2,
-                    ('v2f', vertices),
-                    ('c4B', list(y for x, y in zip(range(len(vertices) // 2 * 4), cycle((255, 0, 0, 50))))),
+                path = points,
+                vertices = pyglet.graphics.vertex_list(len(points),
+                    ('v2f', points_p),
+                    ('c4B', list(y for x, y in zip(range(len(points) * 4), cycle((255, 0, 0, 50))))),
                 ),
-                points = pyglet.graphics.vertex_list(len(new_points),
-                    ('v2f', new_points_p),
-                    ('c4B', list(y for x, y in zip(range(len(new_points) * 4), cycle((255, 0, 255, 50))))),
+                points = pyglet.graphics.vertex_list(len(points),
+                    ('v2f', points_p),
+                    ('c4B', list(y for x, y in zip(range(len(points) * 4), cycle((255, 0, 255, 50))))),
                 )
             )
         )
 
 
-        for i, point in enumerate(path):
-            if i % 3 == 1:
-                v = path[i] - path[i-1]
+        for i, point in enumerate(points):
+            if i % 2 == 1:
+                v = points[i] - points[i-1]
                 a = V2.from_degrees_and_length(v.degrees + 90, 150) + point
                 b = V2.from_degrees_and_length(v.degrees - 90, 150) + point
                 create_flare(self.assets['particle_flare'], a)
@@ -351,6 +318,10 @@ def run_game():
 
     # Physics system handles movement an collision
     PhysicsSystem()
+
+
+    # Temporary for us to create maps with
+    MappingSystem()
 
     # The render system draws things to the Window
     RenderSystem()

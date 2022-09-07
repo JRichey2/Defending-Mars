@@ -34,7 +34,7 @@ class EventSystem(ecs.System):
                 physics = player['physics']
                 physics.rotation = (mouse_position - physics.position).degrees - 90
 
-            if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D, key.LSHIFT)):
+            if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D, key.LSHIFT, key.F)):
                 inputs = ecs.Entity.with_component("input")
                 for i in inputs:
                     ic = i['input']
@@ -48,4 +48,10 @@ class EventSystem(ecs.System):
                         ic.d = event.pressed
                     elif event.key_symbol == key.LSHIFT:
                         ic.boost = event.pressed
-                    #print(i, ic)
+                    elif event.key_symbol == key.F and event.pressed:
+                        ic.mapping = not ic.mapping
+                        if ic.mapping:
+                            ecs.System.inject(ecs.Event(kind='StartMapping'))
+                        else:
+                            ecs.System.inject(ecs.Event(kind='StopMapping'))
+
