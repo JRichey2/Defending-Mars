@@ -9,7 +9,17 @@ import pyglet
 
 class PhysicsSystem(ecs.System):
 
+    def setup(self):
+        self.subscribe('CenterCamera')
+
     def update(self):
+        events, self.events = self.events, []
+        for event in events:
+            if event.kind == 'CenterCamera':
+                window_entity = ecs.Entity.with_component("window")[0]
+                ship_entity = ecs.Entity.with_component("input")[0]
+                window_entity['window'].camera_position = ship_entity['physics'].position.copy
+
         self.update_player_ship()
         enemies = ecs.Entity.with_component("enemy")
         for enemy in enemies:
@@ -167,9 +177,10 @@ class PhysicsSystem(ecs.System):
             grav_acc = V2(0,0)
             for mass_point, mass in mass_points:
                 acc_vector = mass_point - physics.position
-                acc_magnitude = GRAV_CONSTANT * mass / acc_vector.length_squared
-                acc_magnitude = min(acc_magnitude, MAX_GRAV_ACC)
-                grav_acc += acc_vector.normalized * acc_magnitude
+                if acc_vector.length_squared > 0:
+                    acc_magnitude = GRAV_CONSTANT * mass / acc_vector.length_squared
+                    acc_magnitude = min(acc_magnitude, MAX_GRAV_ACC)
+                    grav_acc += acc_vector.normalized * acc_magnitude
 
 
             physics.velocity *= 1 - (DRAG_CONSTANT * time_factor)

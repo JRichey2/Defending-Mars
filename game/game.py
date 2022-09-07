@@ -1,11 +1,9 @@
 import pyglet
 import os
-import json
-from itertools import cycle
-from random import random
 
 # ECS Import
 from . import ecs
+from .assets import ASSETS
 from .ecs import Entity, Event, field
 from .vector import V2
 
@@ -36,44 +34,6 @@ from .mapping_system import MappingSystem
 from .physics_system import PhysicsSystem
 
 
-# Global objects
-RESOLUTION = V2(1920, 1080)
-
-
-def create_sprite(position, rotation, image, scale=1.0, subpixel=True, z_sort=0.0):
-    entity = Entity()
-    entity.attach(PhysicsComponent(position=position, rotation=rotation))
-    sprite=pyglet.sprite.Sprite(image, x=position.x, y=position.y, subpixel=subpixel)
-    sprite.scale = scale
-    sprite.rotation = rotation
-    entity.attach(
-        GameVisualComponent(
-            visuals=[
-                Visual(
-                    kind="sprite",
-                    z_sort=z_sort,
-                    value=sprite
-                )
-            ]
-        )
-    )
-    return entity
-
-
-def create_flare(image, position):
-    entity = Entity()
-    entity.attach(PhysicsComponent(position=position))
-    emitter = Emitter(image=image, batch=pyglet.graphics.Batch(), rate=0.1)
-    visual = Visual(kind="emitter", z_sort=-100.0, value=emitter)
-    entity.attach(GameVisualComponent(visuals=[visual]))
-    return entity
-
-
-def create_sprite_checkpoint(image, subpixel=True):
-    sprite=SpriteCheckpointComponent(image, subpixel=subpixel)
-    return sprite
-
-
 def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
     image = pyglet.image.load(os.path.join('assets', asset_name))
     if center:
@@ -98,217 +58,88 @@ class MouseMotionEvent(Event):
     dy = field(type=int, mandatory=True)
 
 
+class MapEvent(Event):
+    map_name = field(type=str, mandatory=True)
+
+
 class DefendingMarsWindow(pyglet.window.Window):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.assets = {}
-        self.assets['star_field'] = load_image('starfield-2048x2048.png', center=False)
-        self.assets['closer_stars'] = load_image('closer-stars-2048x2048.png', center=False)
-        self.assets['nebula'] = load_image('nebula-2048x2048.png', center=False)
-        self.assets['base_ship'] = load_image('ship-base-256x256.png')
-        self.assets['enemy_ship'] = load_image('ship-speed-64x64.png')
-        self.assets['red_planet'] = load_image('red-planet-512x512.png')
-        self.assets['red_planet_shield'] = load_image('red-planet-shield-512x512.png')
-        self.assets['moon'] = load_image('moon-128x128.png')
-        self.assets['earth'] = load_image('earth-1024x1024.png')
-        self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
-        self.assets['energy_particle_red'] = load_image('energy-particle-red-64x64.png')
-        self.assets['particle_flare'] = load_image('particle-flare-32x32.png')
-        self.assets['boost_ui_base'] = load_image('boost-ui-base-288x64.png')
-        self.assets['boost_tick_red'] = load_image('boost-tick-red-48x48.png')
-        self.assets['boost_tick_blue'] = load_image('boost-tick-blue-48x48.png')
-        self.assets['boost_tick_yellow'] = load_image('boost-tick-yellow-48x48.png')
-        self.assets['checkpoint_arrow'] = load_image('checkpoint-arrow-128x128.png', anchor_x=128, anchor_y=64)
-        self.assets['checkpoint_top'] = load_image('checkpoint-top-256x256.png')
-        self.assets['checkpoint_bottom'] = load_image('checkpoint-bottom-256x256.png')
-        self.assets['checkpoint_next_top'] = load_image('checkpoint-next-top-256x256.png')
-        self.assets['checkpoint_next_bottom'] = load_image('checkpoint-next-bottom-256x256.png')
-        self.assets['checkpoint_finish_top'] = load_image('checkpoint-finish-top-256x256.png')
-        self.assets['checkpoint_finish_bottom'] = load_image('checkpoint-finish-bottom-256x256.png')
-        self.assets['checkpoint_passed_top'] = load_image('checkpoint-passed-top-256x256.png')
-        self.assets['checkpoint_passed_bottom'] = load_image('checkpoint-passed-bottom-256x256.png')
-        self.setup()
+        self.load_assets()
+        self.create_ship()
+        ecs.System.inject(MapEvent(kind='LoadMap', map_name='default'))
 
+    def load_assets(self):
+        ASSETS['star_field'] = load_image('starfield-2048x2048.png', center=False)
+        ASSETS['closer_stars'] = load_image('closer-stars-2048x2048.png', center=False)
+        ASSETS['nebula'] = load_image('nebula-2048x2048.png', center=False)
+        ASSETS['base_ship'] = load_image('ship-base-256x256.png')
+        ASSETS['enemy_ship'] = load_image('ship-speed-64x64.png')
+        ASSETS['red_planet'] = load_image('red-planet-512x512.png')
+        ASSETS['red_planet_shield'] = load_image('red-planet-shield-512x512.png')
+        ASSETS['moon'] = load_image('moon-128x128.png')
+        ASSETS['earth'] = load_image('earth-1024x1024.png')
+        ASSETS['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
+        ASSETS['energy_particle_red'] = load_image('energy-particle-red-64x64.png')
+        ASSETS['particle_flare'] = load_image('particle-flare-32x32.png')
+        ASSETS['boost_ui_base'] = load_image('boost-ui-base-288x64.png')
+        ASSETS['boost_tick_red'] = load_image('boost-tick-red-48x48.png')
+        ASSETS['boost_tick_blue'] = load_image('boost-tick-blue-48x48.png')
+        ASSETS['boost_tick_yellow'] = load_image('boost-tick-yellow-48x48.png')
+        ASSETS['checkpoint_arrow'] = load_image('checkpoint-arrow-128x128.png', anchor_x=128, anchor_y=64)
+        ASSETS['checkpoint_top'] = load_image('checkpoint-top-256x256.png')
+        ASSETS['checkpoint_bottom'] = load_image('checkpoint-bottom-256x256.png')
+        ASSETS['checkpoint_next_top'] = load_image('checkpoint-next-top-256x256.png')
+        ASSETS['checkpoint_next_bottom'] = load_image('checkpoint-next-bottom-256x256.png')
+        ASSETS['checkpoint_finish_top'] = load_image('checkpoint-finish-top-256x256.png')
+        ASSETS['checkpoint_finish_bottom'] = load_image('checkpoint-finish-bottom-256x256.png')
+        ASSETS['checkpoint_passed_top'] = load_image('checkpoint-passed-top-256x256.png')
+        ASSETS['checkpoint_passed_bottom'] = load_image('checkpoint-passed-bottom-256x256.png')
 
-    def make_red_planet(self, position):
-        entity = create_sprite(position, 0, self.assets['red_planet'])
-        entity.attach(MassComponent(mass=100))
-        entity.attach(CollisionComponent(circle_radius=220))
+    def create_ship(self):
+        # Entity Components
+        entity = Entity()
+        entity.attach(PhysicsComponent(position=V2(0, 0), rotation=0))
+        entity.attach(InputComponent())
+        entity.attach(BoostComponent())
+        entity.attach(CollisionComponent(circle_radius=24))
 
-
-    def make_moon(self, position):
-        entity = create_sprite(position, 0, self.assets['moon'])
-        entity.attach(MassComponent(mass=15))
-        entity.attach(CollisionComponent(circle_radius=56))
-
-
-    def make_earth(self, position):
-        entity = create_sprite(V2(1900.0, 2100.0), 0, self.assets['earth'])
-        entity.attach(MassComponent(mass=400))
-        entity.attach(CollisionComponent(circle_radius=500))
-
-
-    def setup(self):
-
-        self.flight_path_1 = Entity()
-
-        with open("map1.json", "r") as f:
-            map_objects_data = f.read()
-        map_objects = json.loads(map_objects_data)
-
-        for item in map_objects:
-            if item['object'] == 'moon':
-                self.make_moon(V2(item['x'], item['y']))
-            elif item['object'] == 'earth':
-                self.make_earth(V2(item['x'], item['y']))
-            elif item['object'] == 'red_planet':
-                self.make_red_planet(V2(item['x'], item['y']))
-
-        with open("map.json", "r") as f:
-            map_path_data = f.read()
-        map_path = json.loads(map_path_data)
-
-        points = [V2(p['x'], p['y']) for p in map_path]
-        checkpoints = [
-            {
-                'center': points[i],
-                'rotation': (
-                    (points[i + 1] - points[i]).degrees - 90
-                    if i == 0 else
-                    (points[i] - points[i - 1]).degrees - 90
-                )
-            }
-            for i, p in enumerate(map_path)
-            if 'checkpoint' in p
-        ]
-
-        for cp_order, checkpoint in enumerate(checkpoints):
-
-            cp = Entity()
-
-            position = checkpoint['center']
-            rotation = checkpoint['rotation']
-            cp.attach(PhysicsComponent(position=position, rotation=rotation))
-
-            top_cp_image = 'checkpoint_top' if cp_order == 0 else 'checkpoint_next_top'
-            top_cp_sprite=pyglet.sprite.Sprite(self.assets[top_cp_image], x=position.x, y=position.y)
-
-            bottom_cp_image = 'checkpoint_bottom' if cp_order == 0 else 'checkpoint_next_bottom'
-            bottom_cp_sprite=pyglet.sprite.Sprite(self.assets[bottom_cp_image], x=position.x, y=position.y)
-
-            top_cp_sprite.rotation = rotation
-            bottom_cp_sprite.rotation = rotation
-
-            cp.attach(
-                GameVisualComponent(
-                    visuals=[
-                        Visual(
-                            kind="sprite",
-                            z_sort=-9.0,
-                            value=top_cp_sprite
-                        ),
-                        Visual(
-                            kind="sprite",
-                            z_sort=-12.0,
-                            value=bottom_cp_sprite
-                        ),
-                    ]
-                )
-            )
-
-            cp.attach(
-                UIVisualComponent(
-                    visuals=[
-                        Visual(
-                            kind="checkpoint arrow",
-                            z_sort=1.0,
-                            value=pyglet.sprite.Sprite(self.assets['checkpoint_arrow']),
-                        )
-                    ]
-                )
-            )
-
-            #TODO UI Visual cp.attach(create_sprite_locator(self.assets['checkpoint_arrow']))
-            cp.attach(SpriteCheckpointComponent(
-                next_image_bottom=self.assets['checkpoint_bottom'],
-                passed_image_bottom=self.assets['checkpoint_passed_bottom'],
-                next_image_top=self.assets['checkpoint_top'],
-                passed_image_top=self.assets['checkpoint_passed_top'],
-                cp_order=cp_order,
-            ))
-
-        # Create a ship entity that we can control
-        self.ship_entity = create_sprite(points[0].copy, 0, self.assets['base_ship'], 0.25, z_sort=-10.0)
-        self.ship_entity.attach(InputComponent())
+        # Game Visuals
+        sprite=pyglet.sprite.Sprite(ASSETS['base_ship'], x=0, y=0, subpixel=True)
+        sprite.scale = 0.25
         emitter = EmitterBoost(
-            image=self.assets['energy_particle_cyan'],
-            boost_image=self.assets['energy_particle_red'],
+            image=ASSETS['energy_particle_cyan'],
+            boost_image=ASSETS['energy_particle_red'],
             batch=pyglet.graphics.Batch(),
             rate=0.1,
         )
-        visual = Visual(kind="emitter", z_sort=-11.0, value=emitter)
-        self.ship_entity['game visual'].visuals.append(visual)
-        self.ship_entity.attach(CollisionComponent(circle_radius=24))
-        self.ship_entity.attach(BoostComponent())
+        game_visuals = [
+            Visual(kind="sprite", z_sort=-10.0, value=sprite),
+            Visual(kind="emitter", z_sort=-11.0, value=emitter),
+        ]
+        entity.attach(GameVisualComponent(visuals=game_visuals))
+
+        # UI Visuals
         boost_visual = {
-            'base': pyglet.sprite.Sprite(self.assets['boost_ui_base']),
+            'base': pyglet.sprite.Sprite(ASSETS['boost_ui_base']),
             'ticks': [
-                pyglet.sprite.Sprite(self.assets['boost_tick_red']),
-                pyglet.sprite.Sprite(self.assets['boost_tick_yellow']),
-                pyglet.sprite.Sprite(self.assets['boost_tick_yellow']),
-                pyglet.sprite.Sprite(self.assets['boost_tick_yellow']),
-                pyglet.sprite.Sprite(self.assets['boost_tick_yellow']),
-                pyglet.sprite.Sprite(self.assets['boost_tick_blue']),
-                pyglet.sprite.Sprite(self.assets['boost_tick_blue']),
-                pyglet.sprite.Sprite(self.assets['boost_tick_blue']),
-                pyglet.sprite.Sprite(self.assets['boost_tick_blue']),
-                pyglet.sprite.Sprite(self.assets['boost_tick_blue']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_red']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_yellow']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_yellow']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_yellow']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_yellow']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
+                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
             ]
         }
-        boost_visuals = [Visual(kind='boost', z_sort=0.0, value=boost_visual)]
-        self.ship_entity.attach(UIVisualComponent(visuals=boost_visuals))
-
-
-        points_p = []
-        for p in points:
-            points_p.append(p.x)
-            points_p.append(p.y)
-
-        infinite_magenta = cycle((255, 0, 255, 50))
-        self.flight_path_1.attach(
-            GameVisualComponent(
-                visuals=[
-                    Visual(
-                        kind='flight path',
-                        z_sort=-100.0,
-                        value = FlightPath(
-                            path = points,
-                            points = pyglet.graphics.vertex_list(len(points),
-                                ('v2f', points_p),
-                                ('c4B', list(
-                                    y for x, y in
-                                    zip(
-                                        range(len(points) * 4),
-                                        infinite_magenta
-                                    )
-                                )),
-                            )
-                        )
-                    )
-                ]
-            )
-        )
-        #self.flight_path_1.attach(GameVisualComponent(kind="flight path"))
-
-
-        for i, point in enumerate(points):
-            if i % 2 == 1:
-                v = points[i] - points[i-1]
-                a = V2.from_degrees_and_length(v.degrees + 90, 150) + point
-                b = V2.from_degrees_and_length(v.degrees - 90, 150) + point
-                create_flare(self.assets['particle_flare'], a)
-                create_flare(self.assets['particle_flare'], b)
+        ui_visuals = [
+            Visual(kind='boost', z_sort=0.0, value=boost_visual),
+        ]
+        entity.attach(UIVisualComponent(visuals=ui_visuals))
 
     def on_key_press(self, symbol, modifiers):
         ecs.System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=True))
@@ -345,17 +176,14 @@ def run_game():
     # Create a Window entity
     window_entity = Entity()
     window=DefendingMarsWindow(1280, 720, resizable=True)
-
     window_entity.attach(WindowComponent(
         window=window,
-        viewport_size=RESOLUTION,
         background_layers = [
-            SpriteComponent(window.assets['star_field'], x=0, y=0),
-            SpriteComponent(window.assets['closer_stars'], x=0, y=0),
-            SpriteComponent(window.assets['nebula'], x=0, y=0),
+            pyglet.sprite.Sprite(ASSETS['star_field'], x=0, y=0),
+            pyglet.sprite.Sprite(ASSETS['closer_stars'], x=0, y=0),
+            pyglet.sprite.Sprite(ASSETS['nebula'], x=0, y=0),
         ]
     ))
-    window_entity['window'].camera_position = window.ship_entity['physics'].position.copy
 
     def update(dt, *args, **kwargs):
         ecs.DELTA_TIME = dt

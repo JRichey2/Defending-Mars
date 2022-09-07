@@ -63,7 +63,6 @@ class SpriteCheckpointComponent:
 @dataclass
 class WindowComponent:
     window: pyglet.window.Window
-    viewport_size: V2
     component_name: str = "window"
     camera_position: V2 = V2(0.0, 0.0)
     background_layers: list[SpriteComponent] = field(default_factory=list)
