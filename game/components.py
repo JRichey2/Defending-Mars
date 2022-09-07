@@ -73,7 +73,6 @@ class EmitterBoostComponent(EmitterComponent):
 @dataclass
 class FlightPathComponent:
     component_name = "flight path"
-    vertices: pyglet.graphics.vertexdomain.VertexList
     points: pyglet.graphics.vertexdomain.VertexList
     path: list[V2] = field(default_factory=list)
 

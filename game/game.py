@@ -248,16 +248,13 @@ class DefendingMarsWindow(pyglet.window.Window):
             points_p.append(p.x)
             points_p.append(p.y)
 
+        infinite_magenta = cycle((255, 0, 255, 50))
         self.flight_path_1.attach(
             FlightPathComponent(
                 path = points,
-                vertices = pyglet.graphics.vertex_list(len(points),
-                    ('v2f', points_p),
-                    ('c4B', list(y for x, y in zip(range(len(points) * 4), cycle((255, 0, 0, 50))))),
-                ),
                 points = pyglet.graphics.vertex_list(len(points),
                     ('v2f', points_p),
-                    ('c4B', list(y for x, y in zip(range(len(points) * 4), cycle((255, 0, 255, 50))))),
+                    ('c4B', list(y for x, y in zip(range(len(points) * 4), infinite_magenta))),
                 )
             )
         )

@@ -2,6 +2,7 @@ import sys
 from pyglet.window import key
 
 from . import ecs
+from .settings import MOUSE_TURNING
 from .vector import V2
 
 
@@ -32,7 +33,8 @@ class EventSystem(ecs.System):
                 mouse_position = V2(event.x - ox, event.y - oy)
                 player = list(ecs.Entity.with_component("input"))[0]
                 physics = player['physics']
-                physics.rotation = (mouse_position - physics.position).degrees - 90
+                if MOUSE_TURNING:
+                    physics.rotation = (mouse_position - physics.position).degrees - 90
 
             if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D, key.LSHIFT, key.F)):
                 inputs = ecs.Entity.with_component("input")

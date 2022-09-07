@@ -1,0 +1,3 @@
+MOUSE_TURNING = False
+CAMERA_SPRING = True
+

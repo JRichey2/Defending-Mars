@@ -1,4 +1,5 @@
 from . import ecs
+from .settings import MOUSE_TURNING, CAMERA_SPRING
 from .vector import V2
 from random import random
 
@@ -94,6 +95,15 @@ class PhysicsSystem(ecs.System):
     def update_player_ship(self):
         entities = ecs.Entity.with_component("mass")
 
+        GRAV_CONSTANT = 200.0
+        ACC_CONSTANT = 0.25
+        BOOST_CONSTANT = 1.75
+        DRAG_CONSTANT = 0.015
+        MAX_GRAV_ACC = 0.24
+
+        dt = ecs.DELTA_TIME
+        time_factor = dt / 0.01667
+
         mass_points = []
         for entity in entities:
             physics = entity['physics']
@@ -113,23 +123,26 @@ class PhysicsSystem(ecs.System):
             rotation = physics.rotation
             acceleration = V2(0.0, 0.0)
 
+            if inputs.a:
+                if not MOUSE_TURNING:
+                    rotation += 3.0 * time_factor
+                else:
+                    acceleration += V2.from_degrees_and_length(rotation + 180, 0.4)
+            if inputs.d:
+                if not MOUSE_TURNING:
+                    rotation -= 3.0 * time_factor
+                else:
+                    acceleration += V2.from_degrees_and_length(rotation, 0.4)
+
             if inputs.w:
                 acceleration += V2.from_degrees_and_length(rotation + 90, 1.0)
-            if inputs.a:
-                acceleration += V2.from_degrees_and_length(rotation + 180, 0.4)
             if inputs.s:
                 acceleration += V2.from_degrees_and_length(rotation + 270, 0.4)
-            if inputs.d:
-                acceleration += V2.from_degrees_and_length(rotation, 0.2)
 
-            GRAV_CONSTANT = 200.0
-            ACC_CONSTANT = 0.25
-            BOOST_CONSTANT = 1.75
-            DRAG_CONSTANT = 0.015
-            MAX_GRAV_ACC = 0.24
 
-            dt = ecs.DELTA_TIME
-            time_factor = dt / 0.01667
+            if not MOUSE_TURNING:
+                physics.rotation = rotation
+
 
             if acceleration.length > 0:
                 #acceleration.normalize()
@@ -163,8 +176,17 @@ class PhysicsSystem(ecs.System):
 
             window_entity = list(ecs.Entity.with_component("window"))[0]
             window = window_entity['window']
-            window.camera_position.x = physics.position.x
-            window.camera_position.y = physics.position.y
+            width, height = window.window.width, window.window.height
+            if CAMERA_SPRING:
+                target_camera_position = (
+                    physics.position
+                        + physics.velocity
+                        * 30 * (min(width, height) / 720)
+                )
+                target_camera_vector = target_camera_position - window.camera_position
+                window.camera_position = window.camera_position + target_camera_vector * 0.05
+            else:
+                window.camera_position = physics.position.copy
 
             emitter = entity['emitter']
             if emitter is None:

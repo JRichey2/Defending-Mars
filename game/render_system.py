@@ -54,8 +54,7 @@ class RenderSystem(ecs.System):
             pyglet.gl.glHint(pyglet.gl.GL_LINE_SMOOTH_HINT, pyglet.gl.GL_NICEST)
             pyglet.gl.glMatrixMode(pyglet.gl.GL_MODELVIEW)
             pyglet.gl.glTranslatef(ox, oy, 0.0)
-            flight_path.vertices.draw(pyglet.gl.GL_LINE_STRIP)
-            #flight_path.points.draw(pyglet.gl.GL_LINE_STRIP)
+            flight_path.points.draw(pyglet.gl.GL_LINE_STRIP)
             pyglet.gl.glLoadIdentity()
 
         entities = ecs.Entity.with_component("sprite")
