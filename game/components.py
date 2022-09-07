@@ -37,6 +37,8 @@ class SpriteComponentLocator(pyglet.sprite.Sprite):
 class SpriteCheckpointComponent:
     component_name = "checkpoint"
     next_image: pyglet.image.AbstractImage
+    passed_image: pyglet.image.AbstractImage
+    completed: bool = False
     cp_order: int = 0
 
 

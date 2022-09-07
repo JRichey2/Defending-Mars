@@ -125,86 +125,113 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
 
         # trying to create a sprite for the image I want to place later on
-        self.red_planet_entity.attach(create_sprite_locator(self.assets['red_planet'], 0.125))
+        # self.red_planet_entity.attach(create_sprite_locator(self.assets['red_planet'], 0.125))
         self.red_planet_entity.attach(MassComponent(mass=100))
         self.red_planet_entity.attach(CollisionComponent(circle_radius=236))
 
         # Create a shield to go over the planet entity. This will need to be callable some other way for a power up and coordinate location
         self.red_planet_shield_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet_shield'])
-        self.red_planet_shield_entity.attach(create_sprite_locator(self.assets['red_planet_shield'], 0.125))
+        # self.red_planet_shield_entity.attach(create_sprite_locator(self.assets['red_planet_shield'], 0.125))
 
         # we could probably create a def function to create these based on a series of coords
         # Create a moon for a specific location number 1
         self.moon_planet_entity_1 = create_sprite(V2(-715.0, -350.0), 0, self.assets['moon'])
-        self.moon_planet_entity_1.attach(create_sprite_locator(self.assets['moon'], 0.50))
+        # self.moon_planet_entity_1.attach(create_sprite_locator(self.assets['moon'], 0.50))
         self.moon_planet_entity_1.attach(MassComponent(mass=15))
         self.moon_planet_entity_1.attach(CollisionComponent(circle_radius=56))
 
         # Create a moon for a specific location number 2
         self.moon_planet_entity_2 = create_sprite(V2(-890.0, 20.0), 0, self.assets['moon'])
-        self.moon_planet_entity_2.attach(create_sprite_locator(self.assets['moon'], 0.50))
+        # self.moon_planet_entity_2.attach(create_sprite_locator(self.assets['moon'], 0.50))
         self.moon_planet_entity_2.attach(MassComponent(mass=15))
         self.moon_planet_entity_2.attach(CollisionComponent(circle_radius=56))
 
         # Create a moon for a specific location number 3
         self.moon_planet_entity_3 = create_sprite(V2(-600.0, 460.0), 0, self.assets['moon'])
-        self.moon_planet_entity_3.attach(create_sprite_locator(self.assets['moon'], 0.50))
+        # self.moon_planet_entity_3.attach(create_sprite_locator(self.assets['moon'], 0.50))
         self.moon_planet_entity_3.attach(MassComponent(mass=15))
         self.moon_planet_entity_3.attach(CollisionComponent(circle_radius=56))
 
         # Create a moon for a specific location number 4
         self.moon_planet_entity_4 = create_sprite(V2(-600.0, 800.0), 0, self.assets['moon'])
-        self.moon_planet_entity_4.attach(create_sprite_locator(self.assets['moon'], 0.50))
+        # self.moon_planet_entity_4.attach(create_sprite_locator(self.assets['moon'], 0.50))
         self.moon_planet_entity_4.attach(MassComponent(mass=15))
         self.moon_planet_entity_4.attach(CollisionComponent(circle_radius=56))
 
         # Create a moon for a specific location number 5
         self.moon_planet_entity_5 = create_sprite(V2(260.0, 1642.0), 0, self.assets['moon'])
-        self.moon_planet_entity_5.attach(create_sprite_locator(self.assets['moon'], 0.50))
+        # self.moon_planet_entity_5.attach(create_sprite_locator(self.assets['moon'], 0.50))
         self.moon_planet_entity_5.attach(MassComponent(mass=15))
         self.moon_planet_entity_5.attach(CollisionComponent(circle_radius=56))
 
         # Create a moon for a specific location number 6
         self.moon_planet_entity_6 = create_sprite(V2(900.0, 1847.0), 0, self.assets['moon'])
-        self.moon_planet_entity_6.attach(create_sprite_locator(self.assets['moon'], 0.50))
+        # self.moon_planet_entity_6.attach(create_sprite_locator(self.assets['moon'], 0.50))
         self.moon_planet_entity_6.attach(MassComponent(mass=15))
         self.moon_planet_entity_6.attach(CollisionComponent(circle_radius=56))
 
         # Large Planet 1
         self.large_planet_1 = create_sprite(V2(246.0, 1136.0), 0, self.assets['red_planet'])
-        self.large_planet_1.attach(create_sprite_locator(self.assets['red_planet'], 0.25))
+        # self.large_planet_1.attach(create_sprite_locator(self.assets['red_planet'], 0.25))
         self.large_planet_1.attach(MassComponent(mass=100))
         self.large_planet_1.attach(CollisionComponent(circle_radius=236))
 
         # Earth Planet 1
         self.earth = create_sprite(V2(1900.0, 2100.0), 0, self.assets['earth'])
-        self.earth.attach(create_sprite_locator(self.assets['earth'], 0.0625))
+        # self.earth.attach(create_sprite_locator(self.assets['earth'], 0.0625))
         self.earth.attach(MassComponent(mass=400))
         self.earth.attach(CollisionComponent(circle_radius=500))
 
         # Checkpoint 1 top test
         self.checkpoint_top = create_sprite(V2(-996.0, 93.9), 0, self.assets['checkpoint_top'])
-        self.checkpoint_top.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_top'], cp_order=0))
+        self.checkpoint_top.attach(create_sprite_locator(self.assets['checkpoint_top'], 0.25))
+        self.checkpoint_top.attach(SpriteCheckpointComponent(
+            next_image=self.assets['checkpoint_top'], 
+            passed_image=self.assets['checkpoint_passed_top'], 
+            cp_order=0
+        ))
 
         # Checkpoint 1 bottom test
         self.checkpoint_bottom = create_sprite(V2(-996.0, 94.1), 0, self.assets['checkpoint_bottom'])
-        self.checkpoint_bottom.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=1))
+        self.checkpoint_bottom.attach(SpriteCheckpointComponent(
+            next_image=self.assets['checkpoint_bottom'], 
+            passed_image=self.assets['checkpoint_passed_bottom'], 
+            cp_order=1
+        ))
 
         # Checkpoint 2 top test
         self.checkpoint_top2 = create_sprite(V2(-708.0, -500.1), 0, self.assets['checkpoint_next_top'])
-        self.checkpoint_top2.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_top'], cp_order=2))
+        self.checkpoint_top2.attach(create_sprite_locator(self.assets['checkpoint_top'], 0.25))
+        self.checkpoint_top2.attach(SpriteCheckpointComponent(
+            next_image=self.assets['checkpoint_top'], 
+            passed_image=self.assets['checkpoint_passed_top'], 
+            cp_order=2
+        ))
 
         # Checkpoint 2 bottom test
         self.checkpoint_bottom2 = create_sprite(V2(-708.0, -499.9), 0, self.assets['checkpoint_next_bottom'])
-        self.checkpoint_bottom2.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=3))
+        self.checkpoint_bottom2.attach(SpriteCheckpointComponent(
+            next_image=self.assets['checkpoint_bottom'], 
+            passed_image=self.assets['checkpoint_passed_bottom'], 
+            cp_order=3
+        ))
 
         # Checkpoint 3 top test
         self.checkpoint_top3 = create_sprite(V2(-600.0, 599.9), 0, self.assets['checkpoint_next_top'])
-        self.checkpoint_top3.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_top'], cp_order=4))
+        self.checkpoint_top3.attach(create_sprite_locator(self.assets['checkpoint_top'], 0.25))
+        self.checkpoint_top3.attach(SpriteCheckpointComponent(
+            next_image=self.assets['checkpoint_top'], 
+            passed_image=self.assets['checkpoint_passed_top'], 
+            cp_order=4
+        ))
 
         # Checkpoint 3 bottom test
         self.checkpoint_bottom3 = create_sprite(V2(-600.0, 600.1), 0, self.assets['checkpoint_next_bottom'])
-        self.checkpoint_bottom3.attach(SpriteCheckpointComponent(next_image=self.assets['checkpoint_bottom'], cp_order=5))
+        self.checkpoint_bottom3.attach(SpriteCheckpointComponent(
+            next_image=self.assets['checkpoint_bottom'], 
+            passed_image=self.assets['checkpoint_passed_bottom'], 
+            cp_order=5
+        ))
 
 
         # self.enemy_1 = create_sprite(V2(1900.0, 2100.0), 0, self.assets['enemy_ship'])

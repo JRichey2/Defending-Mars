@@ -69,35 +69,6 @@ class RenderSystem(ecs.System):
             sprite.rotation = float(-physics.rotation)
             sprite.draw()
 
-        # identify where home base is located
-        entities = ecs.Entity.with_component("spritelocator")
-        for entity in entities:
-            sprite = entity['spritelocator']
-            physics = entity['physics']
-            sprite_entity = entity['sprite']
-            x_ob = physics.position.x + sprite_entity.width // 2
-            y_ob = physics.position.x + sprite_entity.height // 2
-            half_sprite_x = sprite.width // 2
-            half_sprite_y = sprite.height // 2
-            draw = True
-            if (camera.y - height // 2) > y_ob: 
-                sprite.x = max(min(sprite.width // 2 + abs(min(camera.x - width // 2,0)), width)-half_sprite_x,half_sprite_x)
-                sprite.y = half_sprite_y
-            elif (camera.y + height //2) < (y_ob - sprite_entity.height):
-                sprite.x = max(min(sprite.width // 2 + abs(min(camera.x - width // 2,0)), width)-half_sprite_x,half_sprite_x)
-                sprite.y = height - half_sprite_y
-            elif (camera.x - width //2) > x_ob:
-                sprite.y = max(min(sprite.height // 2 + abs(min(camera.y - height // 2,0)), height)-half_sprite_y,half_sprite_y)
-                sprite.x = half_sprite_x
-            elif (camera.x + width //2) < (x_ob - sprite_entity.height):
-                sprite.y = max(min(sprite.height // 2 + abs(min(camera.y - height // 2,0)), height)-half_sprite_y,half_sprite_y)
-                sprite.x = width - half_sprite_x
-            else:
-                draw = False
-
-            if draw == True:
-                sprite.draw()
-
         entities = ecs.Entity.with_component("boost")
         for entity in entities:
             boost = entity["boost"]
@@ -124,7 +95,7 @@ class RenderSystem(ecs.System):
         for entity in entities:
             sprite = entity['checkpoint']
             sprite_entity = entity['sprite']
-            if sprite_entity.visible == True:
+            if sprite.completed == False:
                 checkpoint_order = min(checkpoint_order, sprite.cp_order)
         
         for entity in entities:
@@ -132,6 +103,12 @@ class RenderSystem(ecs.System):
             sprite_entity = entity['sprite']
             if sprite.cp_order == checkpoint_order or sprite.cp_order == checkpoint_order +1:
                 sprite_entity.image = sprite.next_image
+
+        for entity in entities:
+            sprite = entity['checkpoint']
+            sprite_entity = entity['sprite']
+            if sprite.completed == True:
+                sprite_entity.image = sprite.passed_image
                 
         for entity in entities:
             sprite = entity['checkpoint']
@@ -140,7 +117,32 @@ class RenderSystem(ecs.System):
             if camera.x >= physics.position.x - sprite_entity.width // 2 and camera.x <= physics.position.x + sprite_entity.width //2:
                 if camera.y >= physics.position.y - sprite_entity.height // 2 and camera.y <= physics.position.y + sprite_entity.height //2:
                     if sprite.cp_order == checkpoint_order:
-                        sprite_entity.visible = False 
+                        sprite.completed = True 
                         sprite.cp_order -= sprite.cp_order
                         checkpoint_order += 1
+
+        entities = ecs.Entity.with_component("spritelocator")
+        for entity in entities:
+            locator = entity['spritelocator']
+            physics = entity['physics']
+            sprite = entity['sprite']
+            sprite_checkpoint = entity['checkpoint']
+            if sprite_checkpoint.completed == False and sprite_checkpoint.cp_order == checkpoint_order or sprite_checkpoint.cp_order == checkpoint_order +1:
+                # ox/oy translates position to screen space
+                x_ob = physics.position.x + ox
+                y_ob = physics.position.y + oy
+                half_sprite_x = sprite.width // 2
+                half_sprite_y = sprite.height // 2
+                half_locator_x = locator.width // 2
+                half_locator_y = locator.height // 2
+
+                # Check if original sprite was off the screen, and draw if so
+                if (     y_ob < -half_sprite_y
+                    or y_ob >  half_sprite_y + height
+                    or x_ob < -half_sprite_x
+                    or x_ob >  half_sprite_x + width):
+                    # Clamp locator to on the screen edge
+                    locator.x = min(max(x_ob, half_locator_x), width - half_locator_x)
+                    locator.y = min(max(y_ob, half_locator_y), height - half_locator_y)
+                    locator.draw()
 
