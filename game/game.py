@@ -103,7 +103,6 @@ class DefendingMarsWindow(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.assets = {}
-        # Load all of our assets
         self.assets['star_field'] = load_image('starfield-2048x2048.png', center=False)
         self.assets['closer_stars'] = load_image('closer-stars-2048x2048.png', center=False)
         self.assets['nebula'] = load_image('nebula-2048x2048.png', center=False)
@@ -113,8 +112,6 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['red_planet_shield'] = load_image('red-planet-shield-512x512.png')
         self.assets['moon'] = load_image('moon-128x128.png')
         self.assets['earth'] = load_image('earth-1024x1024.png')
-        # self.assets['turret_base'] = load_image('turret-basic-base-64x64.png')
-        # self.assets['turret_basic_cannon'] = load_image('turret-basic-cannon-64x64.png')
         self.assets['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
         self.assets['energy_particle_red'] = load_image('energy-particle-red-64x64.png')
         self.assets['particle_flare'] = load_image('particle-flare-32x32.png')
@@ -131,66 +128,48 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.assets['checkpoint_finish_bottom'] = load_image('checkpoint-finish-bottom-256x256.png')
         self.assets['checkpoint_passed_top'] = load_image('checkpoint-passed-top-256x256.png')
         self.assets['checkpoint_passed_bottom'] = load_image('checkpoint-passed-bottom-256x256.png')
+        self.setup()
 
-        # Create a home planet that will be set at a specific coordinate area
-        self.red_planet_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet'])
 
-        # trying to create a sprite for the image I want to place later on
-        self.red_planet_entity.attach(MassComponent(mass=100))
-        self.red_planet_entity.attach(CollisionComponent(circle_radius=236))
+    def make_red_planet(self, position):
+        entity = create_sprite(position, 0, self.assets['red_planet'])
+        entity.attach(MassComponent(mass=100))
+        entity.attach(CollisionComponent(circle_radius=220))
 
-        # Create a shield to go over the planet entity. This will need to be callable some other way for a power up and coordinate location
-        self.red_planet_shield_entity = create_sprite(V2(0.0, 0.0), 0, self.assets['red_planet_shield'])
 
-        # we could probably create a def function to create these based on a series of coords
-        # Create a moon for a specific location number 1
-        self.moon_planet_entity_1 = create_sprite(V2(-715.0, -350.0), 0, self.assets['moon'])
-        self.moon_planet_entity_1.attach(MassComponent(mass=15))
-        self.moon_planet_entity_1.attach(CollisionComponent(circle_radius=56))
+    def make_moon(self, position):
+        entity = create_sprite(position, 0, self.assets['moon'])
+        entity.attach(MassComponent(mass=15))
+        entity.attach(CollisionComponent(circle_radius=56))
 
-        # Create a moon for a specific location number 2
-        self.moon_planet_entity_2 = create_sprite(V2(-890.0, 20.0), 0, self.assets['moon'])
-        self.moon_planet_entity_2.attach(MassComponent(mass=15))
-        self.moon_planet_entity_2.attach(CollisionComponent(circle_radius=56))
 
-        # Create a moon for a specific location number 3
-        self.moon_planet_entity_3 = create_sprite(V2(-600.0, 460.0), 0, self.assets['moon'])
-        self.moon_planet_entity_3.attach(MassComponent(mass=15))
-        self.moon_planet_entity_3.attach(CollisionComponent(circle_radius=56))
+    def make_earth(self, position):
+        entity = create_sprite(V2(1900.0, 2100.0), 0, self.assets['earth'])
+        entity.attach(MassComponent(mass=400))
+        entity.attach(CollisionComponent(circle_radius=500))
 
-        # Create a moon for a specific location number 4
-        self.moon_planet_entity_4 = create_sprite(V2(-600.0, 800.0), 0, self.assets['moon'])
-        self.moon_planet_entity_4.attach(MassComponent(mass=15))
-        self.moon_planet_entity_4.attach(CollisionComponent(circle_radius=56))
 
-        # Create a moon for a specific location number 5
-        self.moon_planet_entity_5 = create_sprite(V2(260.0, 1642.0), 0, self.assets['moon'])
-        self.moon_planet_entity_5.attach(MassComponent(mass=15))
-        self.moon_planet_entity_5.attach(CollisionComponent(circle_radius=56))
-
-        # Create a moon for a specific location number 6
-        self.moon_planet_entity_6 = create_sprite(V2(900.0, 1847.0), 0, self.assets['moon'])
-        self.moon_planet_entity_6.attach(MassComponent(mass=15))
-        self.moon_planet_entity_6.attach(CollisionComponent(circle_radius=56))
-
-        # Large Planet 1
-        self.large_planet_1 = create_sprite(V2(246.0, 1136.0), 0, self.assets['red_planet'])
-        self.large_planet_1.attach(MassComponent(mass=100))
-        self.large_planet_1.attach(CollisionComponent(circle_radius=236))
-
-        # Earth Planet 1
-        self.earth = create_sprite(V2(1900.0, 2100.0), 0, self.assets['earth'])
-        self.earth.attach(MassComponent(mass=400))
-        self.earth.attach(CollisionComponent(circle_radius=500))
+    def setup(self):
 
         self.flight_path_1 = Entity()
 
+        with open("map1.json", "r") as f:
+            map_objects_data = f.read()
+        map_objects = json.loads(map_objects_data)
+
+        for item in map_objects:
+            if item['object'] == 'moon':
+                self.make_moon(V2(item['x'], item['y']))
+            elif item['object'] == 'earth':
+                self.make_earth(V2(item['x'], item['y']))
+            elif item['object'] == 'red_planet':
+                self.make_red_planet(V2(item['x'], item['y']))
+
         with open("map.json", "r") as f:
-            map_data = f.read()
+            map_path_data = f.read()
+        map_path = json.loads(map_path_data)
 
-        map = json.loads(map_data)
-
-        points = [V2(p['x'], p['y']) for p in map]
+        points = [V2(p['x'], p['y']) for p in map_path]
         checkpoints = [
             {
                 'center': points[i],
@@ -200,7 +179,7 @@ class DefendingMarsWindow(pyglet.window.Window):
                     (points[i] - points[i - 1]).degrees - 90
                 )
             }
-            for i, p in enumerate(map)
+            for i, p in enumerate(map_path)
             if 'checkpoint' in p
         ]
 
@@ -376,7 +355,6 @@ def run_game():
             SpriteComponent(window.assets['nebula'], x=0, y=0),
         ]
     ))
-    window.ship_entity.attach(BoostComponent())
     window_entity['window'].camera_position = window.ship_entity['physics'].position.copy
 
     def update(dt, *args, **kwargs):
