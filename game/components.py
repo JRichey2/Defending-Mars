@@ -34,6 +34,7 @@ class InputComponent:
     d: bool = False
     boost: bool = False
     mapping: bool = False
+    placement: bool = False
 
 
 @dataclass
