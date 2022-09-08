@@ -25,14 +25,18 @@ class TimingSystem(ecs.System):
     def update(self):
         events, self.events = self.events, []
 
+        window_entity = ecs.Entity.with_component("window")[0]
+        window = window_entity['window']
+        x_half = window.window.width // 2
+
         for event in events:
-            print(event)
+            
             if event.kind == 'MapLoaded':
                 entity = Entity()
                 self.selection_label_entity_id = entity.entity_id
                 label = pyglet.text.Label('GET READY',
                             font_size=36,
-                            x=500, y=500,
+                            x=x_half, y=window.window.height,
                             anchor_x="center", anchor_y="top")
                 entity.attach(UIVisualComponent(
                     visuals=[
@@ -50,5 +54,6 @@ class TimingSystem(ecs.System):
                 entity = ecs.Entity.find(self.selection_label_entity_id)
                 label = entity['ui visual'].visuals[0].value
                 label.text = self.countdown[countdown_index]
+                print(entity['ui visual'].visuals[0].value)
 
                
