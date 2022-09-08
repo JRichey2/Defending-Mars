@@ -74,7 +74,23 @@ class MappingSystem(ecs.System):
         self.map_file = None
         self.last_mapped_point = None
         self.mapping = False
-        self.selections = ['moon', 'red_planet', 'earth', 'checkpoint']
+        # Name, Mass, Collision Radius
+        self.selections = [
+            ('satellite', 5, 80),
+            ('asteroid_small', 10, 60),
+            ('asteroid_medium', 25, 100),
+            ('asteroid_large', 50, 175),
+            ('moon', 15, 56),
+            ('red_planet', 100, 220),
+            ('earth', 400, 500),
+            ('dwarf_gas_planet', 40, 150),
+            ('medium_gas_planet', 150, 240),
+            ('gas_giant', 300, 500),
+            ('black_hole', 1000, 332),
+            ('checkpoint', None, None),
+            ('boost_powerup', None, None),
+            ('slowdown', None, None),
+        ]
         self.selection_index = 0
 
     def update(self):
@@ -110,7 +126,8 @@ class MappingSystem(ecs.System):
                 settings.GRAVITY = False
                 entity = Entity()
                 self.selection_label_entity_id = entity.entity_id
-                label = pyglet.text.Label(self.selections[self.selection_index],
+                selection = self.selections[self.selection_index]
+                label = pyglet.text.Label(selection[0],
                           font_size=36,
                           x=20, y=20,
                           anchor_x="left", anchor_y="bottom")
@@ -135,7 +152,7 @@ class MappingSystem(ecs.System):
                 ecs.Entity.find(self.selection_label_entity_id).destroy()
 
             elif self.placement == True and event.kind == 'Place':
-                object_name = self.selections[self.selection_index]
+                object_name, mass, radius = self.selections[self.selection_index]
                 if object_name == 'checkpoint':
                     points = [
                         ((event.position - V2(p['x'],p['y'])).length_squared, p)
@@ -159,9 +176,9 @@ class MappingSystem(ecs.System):
                         rotation = (p1 - p2).degrees - 90
                         num_points = sum(1 for p in self.flight_path if 'checkpoint' in p)
                         self.load_checkpoint(V2(closest_point['x'], closest_point['y']), rotation, num_points)
-                else:
+                elif mass is not None and radius is not None:
                     self.placements.append({"object": object_name, "x": event.position.x, "y": event.position.y})
-                    getattr(self, "load_" + object_name)(event.position)
+                    self.load_object(object_name, event.position, mass, radius)
 
 
             elif self.placement == True and event.kind == 'PlacementSelection':
@@ -169,7 +186,8 @@ class MappingSystem(ecs.System):
                     self.selection_index = (self.selection_index - 1) % len(self.selections)
                 elif event.direction == 'down':
                     self.selection_index = (self.selection_index + 1) % len(self.selections)
-                ecs.Entity.find(self.selection_label_entity_id)['ui visual'].visuals[0].value.text = self.selections[self.selection_index]
+                object_name, mass, radius = self.selections[self.selection_index]
+                ecs.Entity.find(self.selection_label_entity_id)['ui visual'].visuals[0].value.text = object_name
 
         if not self.mapping:
             return
@@ -187,20 +205,10 @@ class MappingSystem(ecs.System):
             self.map_file.write(f'\n    {{"x": {position.x:.0f}, "y": {position.y:.0f}}}')
             self.last_mapped_point = position.copy
 
-    def load_red_planet(self, position):
-        entity = create_sprite(position, 0, ASSETS['red_planet'])
-        entity.attach(MassComponent(mass=100))
-        entity.attach(CollisionComponent(circle_radius=220))
-
-    def load_moon(self, position):
-        entity = create_sprite(position, 0, ASSETS['moon'])
-        entity.attach(MassComponent(mass=15))
-        entity.attach(CollisionComponent(circle_radius=56))
-
-    def load_earth(self, position):
-        entity = create_sprite(position, 0, ASSETS['earth'])
-        entity.attach(MassComponent(mass=400))
-        entity.attach(CollisionComponent(circle_radius=500))
+    def load_object(self, name, position, mass, radius):
+        entity = create_sprite(position, 0, ASSETS[name])
+        entity.attach(MassComponent(mass=mass))
+        entity.attach(CollisionComponent(circle_radius=radius))
 
     def load_checkpoint(self, position, rotation, cp_order):
         cp = Entity()
@@ -278,12 +286,12 @@ class MappingSystem(ecs.System):
         map_objects = json.loads(map_objects_data)
 
         for item in map_objects:
-            if item['object'] == 'moon':
-                self.load_moon(V2(item['x'], item['y']))
-            elif item['object'] == 'earth':
-                self.load_earth(V2(item['x'], item['y']))
-            elif item['object'] == 'red_planet':
-                self.load_red_planet(V2(item['x'], item['y']))
+            object_name, mass, radius = [
+                s for s in self.selections
+                if s[0] == item['object']
+            ][0]
+            position = V2(item['x'], item['y'])
+            self.load_object(object_name, position, mass, radius)
 
         flight_path = Entity()
 

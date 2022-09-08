@@ -38,7 +38,7 @@
         * [X] Large - 175
         * [X] Medium - 100
         * [X] Small - 60
-    * [X] Satellites
+    * [X] Satellites - 80
     * [ ] Additional moons
     * [X] New art for flares
     * [X] Boost Power Up

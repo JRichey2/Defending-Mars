@@ -44,16 +44,19 @@ class Entity:
 
     @classmethod
     def find(cls, entity_id):
-        return cls.entity_index[entity_id]
+        if entity_id not in cls.entity_index:
+            return None
+        else:
+            return cls.entity_index[entity_id]
 
     def __getitem__(self, attr):
         return self.components.get(attr)
 
     def destroy(self):
-        print(f"Destroying entity {self}")
         for component_name in self.components:
             self.component_index[component_name].remove(self)
-        del self.entity_index[self.entity_id]
+        if self.entity_id in self.entity_index:
+            del self.entity_index[self.entity_id]
 
 
 class System:

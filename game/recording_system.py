@@ -19,6 +19,7 @@ from .components import (
 class RecordingSystem(ecs.System):
 
     def setup(self):
+        self.subscribe('MapLoaded')
         self.subscribe('Countdown')
         self.subscribe('MapComplete')
         self.start_time = None
@@ -78,7 +79,6 @@ class RecordingSystem(ecs.System):
         entity.attach(GameVisualComponent(visuals=visuals))
         self.flight_path_entity_id = entity.entity_id
 
-
     def create_pb_ghost(self):
         if self.ghost_entity_id is not None:
             ecs.Entity.find(self.ghost_entity_id).destroy()
@@ -102,6 +102,8 @@ class RecordingSystem(ecs.System):
             return
         i, p = ghost_point[0]
         ghost = ecs.Entity.find(self.ghost_entity_id)
+        if ghost is None:
+            return
         physics = ghost['physics']
         if i == 0:
             physics.position = V2(p['x'], p['y'])
@@ -137,6 +139,10 @@ class RecordingSystem(ecs.System):
                 self.record_point(time.monotonic(), final_point=True)
                 with open(os.path.join('records', 'pb.json'), 'w') as f:
                     f.write(json.dumps(self.points))
+                self.points = None
+                self.start_time = None
+                self.last_mapped_point = None
+            elif event.kind == 'MapLoaded':
                 self.points = None
                 self.start_time = None
                 self.last_mapped_point = None

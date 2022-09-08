@@ -35,7 +35,7 @@ class TimingSystem(ecs.System):
         x_half = window.window.width // 2
 
         for event in events:
-            
+
             if event.kind == 'MapLoaded':
                 entity = Entity()
                 self.selection_label_entity_id = entity.entity_id
@@ -53,12 +53,13 @@ class TimingSystem(ecs.System):
                 clock.schedule_once(lambda x:ecs.System.inject(CountdownEvent(kind='Countdown', countdown_index=2)),4)
                 clock.schedule_once(lambda x:ecs.System.inject(CountdownEvent(kind='Countdown', countdown_index=3)),5)
                 clock.schedule_once(self.initiate_gravity_acc,5)
-                clock.schedule_once(lambda x:ecs.Entity.find(self.selection_label_entity_id).destroy(),6)
-            if event.kind == 'Countdown':
+                clock.schedule_once(lambda x:ecs.System.inject(ecs.Event(kind='RaceStart')), 6)
+
+            elif event.kind == 'Countdown':
                 countdown_index = event.countdown_index
                 entity = ecs.Entity.find(self.selection_label_entity_id)
                 label = entity['ui visual'].visuals[0].value
-                label.text = self.countdown[countdown_index]   
+                label.text = self.countdown[countdown_index]
 
             if event.kind == 'MapComplete':
                 ship = ecs.Entity.with_component("map timer")[0]
@@ -75,5 +76,8 @@ class TimingSystem(ecs.System):
                     with open(os.path.join('maps','map_record.json'), 'w') as f:
                         f.write(json.dumps(data, indent=2))
 
+            elif event.kind == 'RaceStart':
+                entity = ecs.Entity.find(self.selection_label_entity_id)
+                if entity:
+                    entity.destroy()
 
-               
