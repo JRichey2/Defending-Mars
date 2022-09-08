@@ -65,5 +65,4 @@ class CheckpointSystem(ecs.System):
                 bottom_visual = visuals[0]
                 top_visual.value.image = cp.finish_image_top
                 bottom_visual.value.image = cp.finish_image_bottom
-            
 
