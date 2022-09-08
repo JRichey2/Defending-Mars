@@ -1,4 +1,5 @@
 from . import ecs
+from .ecs import Event
 from . import settings
 from .settings import MOUSE_TURNING, CAMERA_SPRING
 from .vector import V2
@@ -11,6 +12,7 @@ class PhysicsSystem(ecs.System):
 
     def setup(self):
         self.subscribe('CenterCamera')
+        self.subscribe('Respawn')
 
     def update(self):
         events, self.events = self.events, []
@@ -19,6 +21,20 @@ class PhysicsSystem(ecs.System):
                 window_entity = ecs.Entity.with_component("window")[0]
                 ship_entity = ecs.Entity.with_component("input")[0]
                 window_entity['window'].camera_position = ship_entity['physics'].position.copy
+            elif event.kind == 'Respawn':
+                ship_entity = ecs.Entity.with_component("input")[0]
+                checkpoints = ecs.Entity.with_component("checkpoint")
+                completed_checkpoint = None
+                for entity in checkpoints:
+                    checkpoint = entity['checkpoint']
+                    if checkpoint.completed:
+                        completed_checkpoint = entity
+                if completed_checkpoint:
+                    physics = completed_checkpoint['physics']
+                    pos = physics.position.copy
+                    ship_entity['physics'].position = pos
+                    ship_entity['physics'].velocity = V2(0, 0)
+                    #ecs.System.inject(Event(kind='CenterCamera'))
 
         self.update_player_ship()
         enemies = ecs.Entity.with_component("enemy")
@@ -181,7 +197,7 @@ class PhysicsSystem(ecs.System):
                 if target_camera_vector.length != 0:
                     camera_adjustment = (
                             target_camera_vector.normalized
-                            * min(target_camera_vector.length * 0.05, 20 * time_factor)
+                            * min(target_camera_vector.length * 0.05, 60 * time_factor)
                     )
 
                     window.camera_position = window.camera_position + camera_adjustment

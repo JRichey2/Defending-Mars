@@ -6,7 +6,14 @@ from . import ecs
 from .assets import ASSETS
 from .ecs import Entity, Event, field
 from .vector import V2
-from .events import MapEvent
+from .events import (
+    MapEvent,
+    KeyEvent,
+    MouseMotionEvent,
+    MouseButtonEvent,
+    MouseScrollEvent,
+)
+
 
 # Component Imports
 from .components import (
@@ -45,39 +52,6 @@ def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
     if anchor_y != 0:
         image.anchor_y = anchor_y
     return image
-
-
-class KeyEvent(Event):
-    key_symbol = field(mandatory=True)
-    pressed = field(type=bool, mandatory=True)
-
-
-class MouseMotionEvent(Event):
-    x = field(type=int, mandatory=True)
-    y = field(type=int, mandatory=True)
-    dx = field(type=int, mandatory=True)
-    dy = field(type=int, mandatory=True)
-
-
-class MouseClickEvent(Event):
-    x = field(type=int, mandatory=True)
-    y = field(type=int, mandatory=True)
-    button = field(mandatory=True)
-    pressed = field(type=bool, mandatory=True)
-
-
-class MouseReleaseEvent(Event):
-    x = field(type=int, mandatory=True)
-    y = field(type=int, mandatory=True)
-    button = field(mandatory=True)
-    pressed = field(type=bool, mandatory=True)
-
-
-class MouseScrollEvent(Event):
-    x = field(type=int, mandatory=True)
-    y = field(type=int, mandatory=True)
-    scroll_x = field(type=int, mandatory=True)
-    scroll_y = field(type=float, mandatory=True)
 
 
 class DefendingMarsWindow(pyglet.window.Window):
@@ -169,10 +143,10 @@ class DefendingMarsWindow(pyglet.window.Window):
         ecs.System.inject(MouseMotionEvent(kind='MouseMotion', x=x, y=y, dx=dx, dy=dy))
 
     def on_mouse_press(self, x, y, button, modifiers):
-        ecs.System.inject(MouseClickEvent(kind='MouseClick', x=x, y=y, button=button, pressed=True))
+        ecs.System.inject(MouseButtonEvent(kind='MouseClick', x=x, y=y, button=button, pressed=True))
 
     def on_mouse_release(self, x, y, button, modifiers):
-        ecs.System.inject(MouseReleaseEvent(kind='MouseRelease', x=x, y=y, button=button, pressed=False))
+        ecs.System.inject(MouseButtonEvent(kind='MouseRelease', x=x, y=y, button=button, pressed=False))
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y ):
         ecs.System.inject(MouseScrollEvent(kind='MouseScroll', x=x, y=y, scroll_x=scroll_x, scroll_y=scroll_y ))

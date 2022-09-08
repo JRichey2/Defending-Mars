@@ -143,9 +143,22 @@ class MappingSystem(ecs.System):
                     ]
                     closest_distance = min(x[0] for x in points)
                     closest_point = [p for d, p in points if d == closest_distance][0]
-                    closest_point['checkpoint'] = True
+                    if 'check_point' not in closest_point:
+                        closest_point['checkpoint'] = True
 
-                    
+                        point_index = self.flight_path.index(closest_point)
+                        if point_index == 0:
+                            p1 = self.flight_path[point_index + 1]
+                            p2 = self.flight_path[point_index]
+                        else:
+                            p1 = self.flight_path[point_index]
+                            p2 = self.flight_path[point_index - 1]
+
+                        p1 = V2(p1['x'], p1['y'])
+                        p2 = V2(p2['x'], p2['y'])
+                        rotation = (p1 - p2).degrees - 90
+                        num_points = sum(1 for p in self.flight_path if 'checkpoint' in p)
+                        self.load_checkpoint(V2(closest_point['x'], closest_point['y']), rotation, num_points)
                 else:
                     self.placements.append({"object": object_name, "x": event.position.x, "y": event.position.y})
                     getattr(self, "load_" + object_name)(event.position)
@@ -188,6 +201,58 @@ class MappingSystem(ecs.System):
         entity = create_sprite(position, 0, ASSETS['earth'])
         entity.attach(MassComponent(mass=400))
         entity.attach(CollisionComponent(circle_radius=500))
+
+    def load_checkpoint(self, position, rotation, cp_order):
+        cp = Entity()
+
+        cp.attach(PhysicsComponent(position=position, rotation=rotation))
+
+        top_cp_image = 'checkpoint_top' if cp_order == 0 else 'checkpoint_next_top'
+        top_cp_sprite=pyglet.sprite.Sprite(ASSETS[top_cp_image], x=position.x, y=position.y)
+
+        bottom_cp_image = 'checkpoint_bottom' if cp_order == 0 else 'checkpoint_next_bottom'
+        bottom_cp_sprite=pyglet.sprite.Sprite(ASSETS[bottom_cp_image], x=position.x, y=position.y)
+
+        top_cp_sprite.rotation = rotation
+        bottom_cp_sprite.rotation = rotation
+
+        cp.attach(
+            GameVisualComponent(
+                visuals=[
+                    Visual(
+                        kind="sprite",
+                        z_sort=-9.0,
+                        value=top_cp_sprite
+                    ),
+                    Visual(
+                        kind="sprite",
+                        z_sort=-12.0,
+                        value=bottom_cp_sprite
+                    ),
+                ]
+            )
+        )
+
+        cp.attach(
+            UIVisualComponent(
+                visuals=[
+                    Visual(
+                        kind="checkpoint arrow",
+                        z_sort=1.0,
+                        value=pyglet.sprite.Sprite(ASSETS['checkpoint_arrow']),
+                    )
+                ]
+            )
+        )
+
+        cp.attach(SpriteCheckpointComponent(
+            next_image_bottom=ASSETS['checkpoint_bottom'],
+            passed_image_bottom=ASSETS['checkpoint_passed_bottom'],
+            next_image_top=ASSETS['checkpoint_top'],
+            passed_image_top=ASSETS['checkpoint_passed_top'],
+            cp_order=cp_order,
+        ))
+
 
     def clear_map(self):
         mass_entities = list(ecs.Entity.with_component("mass"))
@@ -239,59 +304,9 @@ class MappingSystem(ecs.System):
         ]
 
         for cp_order, checkpoint in enumerate(checkpoints):
-
-            cp = Entity()
-
             position = checkpoint['center']
             rotation = checkpoint['rotation']
-            cp.attach(PhysicsComponent(position=position, rotation=rotation))
-
-            top_cp_image = 'checkpoint_top' if cp_order == 0 else 'checkpoint_next_top'
-            top_cp_sprite=pyglet.sprite.Sprite(ASSETS[top_cp_image], x=position.x, y=position.y)
-
-            bottom_cp_image = 'checkpoint_bottom' if cp_order == 0 else 'checkpoint_next_bottom'
-            bottom_cp_sprite=pyglet.sprite.Sprite(ASSETS[bottom_cp_image], x=position.x, y=position.y)
-
-            top_cp_sprite.rotation = rotation
-            bottom_cp_sprite.rotation = rotation
-
-            cp.attach(
-                GameVisualComponent(
-                    visuals=[
-                        Visual(
-                            kind="sprite",
-                            z_sort=-9.0,
-                            value=top_cp_sprite
-                        ),
-                        Visual(
-                            kind="sprite",
-                            z_sort=-12.0,
-                            value=bottom_cp_sprite
-                        ),
-                    ]
-                )
-            )
-
-            cp.attach(
-                UIVisualComponent(
-                    visuals=[
-                        Visual(
-                            kind="checkpoint arrow",
-                            z_sort=1.0,
-                            value=pyglet.sprite.Sprite(ASSETS['checkpoint_arrow']),
-                        )
-                    ]
-                )
-            )
-
-            #TODO UI Visual cp.attach(create_sprite_locator(ASSETS['checkpoint_arrow']))
-            cp.attach(SpriteCheckpointComponent(
-                next_image_bottom=ASSETS['checkpoint_bottom'],
-                passed_image_bottom=ASSETS['checkpoint_passed_bottom'],
-                next_image_top=ASSETS['checkpoint_top'],
-                passed_image_top=ASSETS['checkpoint_passed_top'],
-                cp_order=cp_order,
-            ))
+            self.load_checkpoint(position, rotation, cp_order)
 
         points_p = []
         for p in points:

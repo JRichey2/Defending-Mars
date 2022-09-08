@@ -41,7 +41,7 @@ class EventSystem(ecs.System):
                 if MOUSE_TURNING:
                     physics.rotation = (mouse_position - physics.position).degrees - 90
 
-            if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D, key.LSHIFT, key.F)):
+            if (event.kind == 'Key' and event.key_symbol in (key.W, key.A, key.S, key.D, key.LSHIFT, key.F, key.R)):
                 inputs = ecs.Entity.with_component("input")
                 for i in inputs:
                     ic = i['input']
@@ -61,6 +61,8 @@ class EventSystem(ecs.System):
                             ecs.System.inject(ecs.Event(kind='StartMapping'))
                         else:
                             ecs.System.inject(ecs.Event(kind='StopMapping'))
+                    elif event.key_symbol == key.R:
+                        ecs.System.inject(ecs.Event(kind='Respawn'))
 
             if (event.kind == 'MouseClick'):
                 window_entity = list(ecs.Entity.with_component("window"))[0]
