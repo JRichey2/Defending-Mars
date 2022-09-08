@@ -1,5 +1,5 @@
 from . import ecs
-
+import time
 
 class CheckpointSystem(ecs.System):
 
@@ -43,6 +43,8 @@ class CheckpointSystem(ecs.System):
                 bottom_visual.value.image = cp.passed_image_bottom
                 got_checkpoint = True
                 cp.is_next = False
+                if cp.cp_order == last_cp:
+                    ecs.System.inject(ecs.Event(kind='MapComplete'))
 
         if got_checkpoint:
             # If we picked up a checkpoint, we need to re-calculate what the next checkpoint is
@@ -65,5 +67,6 @@ class CheckpointSystem(ecs.System):
                 bottom_visual = visuals[0]
                 top_visual.value.image = cp.finish_image_top
                 bottom_visual.value.image = cp.finish_image_bottom
+                end_time = time.monotonic()
             
 

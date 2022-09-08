@@ -163,6 +163,9 @@ def run_game():
     # quikli as possible
     EventSystem()
 
+    # Temporary for us to create maps with
+    MappingSystem()
+
     # Physics system handles movement an collision
     PhysicsSystem()
 
@@ -171,9 +174,6 @@ def run_game():
 
     # Timing System to handle turning on and off movement/gravity/ freezing things
     TimingSystem()
-
-    # Temporary for us to create maps with
-    MappingSystem()
 
     # The render system draws things to the Window
     RenderSystem()
