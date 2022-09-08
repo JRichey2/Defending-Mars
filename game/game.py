@@ -32,6 +32,7 @@ from .event_system import EventSystem
 from .render_system import RenderSystem
 from .mapping_system import MappingSystem
 from .physics_system import PhysicsSystem
+from .placement_system import PlacementSystem
 
 
 def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
@@ -56,6 +57,27 @@ class MouseMotionEvent(Event):
     y = field(type=int, mandatory=True)
     dx = field(type=int, mandatory=True)
     dy = field(type=int, mandatory=True)
+
+
+class MouseClickEvent(Event):
+    x = field(type=int, mandatory=True)
+    y = field(type=int, mandatory=True)
+    button = field(mandatory=True)
+    pressed = field(type=bool, mandatory=True)
+
+
+class MouseReleaseEvent(Event):
+    x = field(type=int, mandatory=True)
+    y = field(type=int, mandatory=True)
+    button = field(mandatory=True)
+    pressed = field(type=bool, mandatory=True)
+
+
+class MouseScrollEvent(Event):
+    x = field(type=int, mandatory=True)
+    y = field(type=int, mandatory=True)
+    scroll_x = field(type=int, mandatory=True)
+    scroll_y = field(type=float, mandatory=True)
 
 
 class MapEvent(Event):
@@ -150,6 +172,15 @@ class DefendingMarsWindow(pyglet.window.Window):
     def on_mouse_motion(self, x, y, dx, dy):
         ecs.System.inject(MouseMotionEvent(kind='MouseMotion', x=x, y=y, dx=dx, dy=dy))
 
+    def on_mouse_press(self, x, y, button, modifiers):
+        ecs.System.inject(MouseClickEvent(kind='MouseClick', x=x, y=y, button=button, pressed=True))
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        ecs.System.inject(MouseReleaseEvent(kind='MouseRelease', x=x, y=y, button=button, pressed=False))
+
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y ):
+        ecs.System.inject(MouseScrollEvent(kind='MouseScroll', x=x, y=y, scroll_x=scroll_x, scroll_y=scroll_y ))
+
     def on_close(self):
         ecs.System.inject(Event(kind='Quit'))
 
@@ -169,6 +200,9 @@ def run_game():
 
     # Temporary for us to create maps with
     MappingSystem()
+
+    # Temporary for us to map out our positional components with
+    PlacementSystem()
 
     # The render system draws things to the Window
     RenderSystem()

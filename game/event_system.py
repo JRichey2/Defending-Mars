@@ -5,12 +5,15 @@ from . import ecs
 from .settings import MOUSE_TURNING
 from .vector import V2
 
+class PlaceEvent(ecs.Event):
+    position = ecs.field(type=V2, mandatory=True)
 
 class EventSystem(ecs.System):
 
     def setup(self):
         self.subscribe('Key')
         self.subscribe('MouseMotion')
+        self.subscribe('MouseClick')
         self.subscribe('Quit')
 
     def update(self):
@@ -57,3 +60,23 @@ class EventSystem(ecs.System):
                         else:
                             ecs.System.inject(ecs.Event(kind='StopMapping'))
 
+            if (event.kind == 'MouseClick'):
+                window_entity = list(ecs.Entity.with_component("window"))[0]
+                window = window_entity['window']
+                camera = window.camera_position
+                width, height = window.window.width, window.window.height
+                ox = width // 2 - camera.x
+                oy = height // 2 - camera.y
+                mouse_position = V2(event.x - ox, event.y - oy)
+                inputs = ecs.Entity.with_component("input")
+                for i in inputs:
+                    ic = i['input']
+                if event.button == 2 and event.pressed:
+                    ic.placement = not ic.placement
+                    if ic.placement:
+                        ecs.System.inject(ecs.Event(kind='StartPlacements'))
+                    else:
+                        ecs.System.inject(ecs.Event(kind='StopPlacements'))
+                if event.button == 1 and event.pressed:
+                    ecs.System.inject(PlaceEvent(kind='Place', position=mouse_position))
+                
