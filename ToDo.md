@@ -24,6 +24,8 @@
 
 * [ ] Clock timer(physics frozen until you can go)(3,2,1 go)
 * [ ] Loading and Rendering Personal best line/ghost (toggleable)
+* [ ] Zooming
+* [ ] FPS Meter
 * [ ] Art
     * [ ] Black hole
     * [ ] Additional planets
@@ -32,3 +34,7 @@
     * [ ] Satellites
     * [ ] Additional moons
     * [ ] New art for flares
+    * [ ] Boost Power Up
+    * [ ] Speed Limit Strips
+    * [ ] Particle effects for checkpoints, finish, and power ups/downs
+
