@@ -2,6 +2,8 @@ import os
 import pyglet
 import sys
 import json
+from . import settings
+from .events import MapEvent
 
 from . import ecs
 from itertools import cycle
@@ -64,9 +66,16 @@ class MappingSystem(ecs.System):
         self.subscribe('StartMapping')
         self.subscribe('StopMapping')
         self.subscribe('LoadMap')
+        self.subscribe('StartPlacements')
+        self.subscribe('StopPlacements')
+        self.subscribe('PlacementSelection')
+        self.subscribe('Place')
+        self.placement = False
         self.map_file = None
         self.last_mapped_point = None
         self.mapping = False
+        self.selections = ['moon', 'red_planet', 'earth']
+        self.selection_index = 0
 
     def update(self):
         events, self.events = self.events, []
@@ -90,6 +99,34 @@ class MappingSystem(ecs.System):
             elif event.kind == 'LoadMap':
                 self.clear_map()
                 self.load_map(event.map_name)
+
+            elif event.kind == 'StartPlacements':
+                print('Started Placements')
+                with open(os.path.join('maps', 'wip_objects.json'), 'r') as f:
+                    data = f.read()
+                self.placements = json.loads(data)
+                self.placement = True
+                settings.GRAVITY = False
+
+            elif event.kind == 'StopPlacements':
+                print('Stopped Placements')
+                settings.GRAVITY = True
+                self.placement = False
+                with open(os.path.join('maps', 'wip_objects.json'), 'w') as f:
+                    f.write(json.dumps(self.placements, indent=2))
+                ecs.System.inject(MapEvent(kind='LoadMap', map_name='wip'))
+
+            elif self.placement == True and event.kind == 'Place':
+                object_name = self.selections[self.selection_index]
+                self.placements.append({"object": object_name, "x": event.position.x, "y": event.position.y})
+                getattr(self, "load_" + object_name)(event.position)
+
+            elif event.kind == 'PlacementSelection':
+                if event.direction == 'up':
+                    self.selection_index = (self.selection_index - 1) % len(self.selections)
+                elif event.direction == 'down':
+                    self.selection_index = (self.selection_index + 1) % len(self.selections)
+                print(self.selections[self.selection_index])
 
         if not self.mapping:
             return
@@ -118,7 +155,7 @@ class MappingSystem(ecs.System):
         entity.attach(CollisionComponent(circle_radius=56))
 
     def load_earth(self, position):
-        entity = create_sprite(V2(1900.0, 2100.0), 0, ASSETS['earth'])
+        entity = create_sprite(position, 0, ASSETS['earth'])
         entity.attach(MassComponent(mass=400))
         entity.attach(CollisionComponent(circle_radius=500))
 

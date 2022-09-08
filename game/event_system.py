@@ -4,6 +4,7 @@ from pyglet.window import key
 from . import ecs
 from .settings import MOUSE_TURNING
 from .vector import V2
+from .events import PlacementSelectionEvent
 
 class PlaceEvent(ecs.Event):
     position = ecs.field(type=V2, mandatory=True)
@@ -14,6 +15,7 @@ class EventSystem(ecs.System):
         self.subscribe('Key')
         self.subscribe('MouseMotion')
         self.subscribe('MouseClick')
+        self.subscribe('MouseScroll')
         self.subscribe('Quit')
 
     def update(self):
@@ -79,4 +81,9 @@ class EventSystem(ecs.System):
                         ecs.System.inject(ecs.Event(kind='StopPlacements'))
                 if event.button == 1 and event.pressed:
                     ecs.System.inject(PlaceEvent(kind='Place', position=mouse_position))
-                
+
+            if (event.kind == 'MouseScroll'):
+                if event.scroll_y > 0:
+                    ecs.System.inject(PlacementSelectionEvent(kind='PlacementSelection', direction='up'))
+                else:
+                    ecs.System.inject(PlacementSelectionEvent(kind='PlacementSelection', direction='down'))
