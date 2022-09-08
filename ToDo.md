@@ -26,11 +26,15 @@
 * [ ] Loading and Rendering Personal best line/ghost (toggleable)
 * [ ] Zooming
 * [ ] FPS Meter
-* [ ] Art
-    * [ ] Black hole
-    * [ ] Additional planets
+* [.] Art
+    * [X] Black hole - 332
+    * [X] Additional planets
+        * [X] Dwarf Gas - 150
+        * [X] Medium Gas - 240
     * [ ] New checkpoint images
-    * [ ] Asteroids
+    * [o] Asteroids
+        * [X] Large - 175
+        * [ ] 
     * [ ] Satellites
     * [ ] Additional moons
     * [ ] New art for flares
