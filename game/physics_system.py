@@ -16,11 +16,14 @@ class PhysicsSystem(ecs.System):
 
     def update(self):
         events, self.events = self.events, []
+
         for event in events:
+
             if event.kind == 'CenterCamera':
                 window_entity = ecs.Entity.with_component("window")[0]
                 ship_entity = ecs.Entity.with_component("input")[0]
                 window_entity['window'].camera_position = ship_entity['physics'].position.copy
+
             elif event.kind == 'Respawn':
                 ship_entity = ecs.Entity.with_component("input")[0]
                 checkpoints = ecs.Entity.with_component("checkpoint")
@@ -34,7 +37,6 @@ class PhysicsSystem(ecs.System):
                     pos = physics.position.copy
                     ship_entity['physics'].position = pos
                     ship_entity['physics'].velocity = V2(0, 0)
-                    #ecs.System.inject(Event(kind='CenterCamera'))
 
         self.update_player_ship()
         enemies = ecs.Entity.with_component("enemy")
