@@ -74,7 +74,7 @@ class MappingSystem(ecs.System):
         self.map_file = None
         self.last_mapped_point = None
         self.mapping = False
-        self.selections = ['moon', 'red_planet', 'earth']
+        self.selections = ['moon', 'red_planet', 'earth', 'checkpoint']
         self.selection_index = 0
 
     def update(self):
@@ -118,6 +118,9 @@ class MappingSystem(ecs.System):
                         Visual(kind='label', z_sort=0, value=label)
                     ]
                 ))
+                with open(os.path.join('maps', f"wip_path.json"), "r") as f:
+                    map_path_data = f.read()
+                self.flight_path = json.loads(map_path_data)
 
             elif event.kind == 'StopPlacements':
                 print('Stopped Placements')
@@ -125,13 +128,28 @@ class MappingSystem(ecs.System):
                 self.placement = False
                 with open(os.path.join('maps', 'wip_objects.json'), 'w') as f:
                     f.write(json.dumps(self.placements, indent=2))
+                with open(os.path.join('maps', 'wip_path.json'), 'w') as f:
+                    f.write(json.dumps(self.flight_path, indent=2))
                 ecs.System.inject(MapEvent(kind='LoadMap', map_name='wip'))
                 ecs.Entity.find(self.selection_label_entity_id).destroy()
 
             elif self.placement == True and event.kind == 'Place':
                 object_name = self.selections[self.selection_index]
-                self.placements.append({"object": object_name, "x": event.position.x, "y": event.position.y})
-                getattr(self, "load_" + object_name)(event.position)
+                if object_name == 'checkpoint':
+                    print('something')
+                    points = [
+                        ((event.position - V2(p['x'],p['y'])).length_squared, p)
+                        for p in self.flight_path
+                    ]
+                    closest_distance = min(x[0] for x in points)
+                    closest_point = [p for d, p in points if d == closest_distance][0]
+                    closest_point['checkpoint'] = True
+
+                    
+                else:
+                    self.placements.append({"object": object_name, "x": event.position.x, "y": event.position.y})
+                    getattr(self, "load_" + object_name)(event.position)
+
 
             elif self.placement == True and event.kind == 'PlacementSelection':
                 if event.direction == 'up':
