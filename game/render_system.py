@@ -8,7 +8,6 @@ import math
 
 class RenderSystem(ecs.System):
 
-
     def setup(self):
         pyglet.gl.glEnable(pyglet.gl.GL_LINE_SMOOTH)
         pyglet.gl.glHint(pyglet.gl.GL_LINE_SMOOTH_HINT, pyglet.gl.GL_NICEST)

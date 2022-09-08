@@ -7,6 +7,8 @@ from pyrsistent import PClass, field
 
 DELTA_TIME = 0.01667
 
+NEXT_ENTITY = 1
+
 
 class Event(PClass):
     kind = field(type=str, mandatory=True)
@@ -17,14 +19,20 @@ class Entity:
     component_index = {}
 
     def __init__(self):
-        self.entity_id = str(uuid.uuid4())
+        global NEXT_ENTITY
+        self.entity_id = NEXT_ENTITY
+        NEXT_ENTITY += 1
         self.components = {}
         self.entity_index[self.entity_id] = self
+
+    def __eq__(self, other):
+        return self.entity_id == other.entity_id
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.entity_id}>"
 
     def attach(self, component):
+        #print(f"Adding component {component.component_name} to {self}")
         self.components[component.component_name] = component
         if component.component_name not in self.component_index:
             self.component_index[component.component_name] = []
@@ -40,6 +48,12 @@ class Entity:
 
     def __getitem__(self, attr):
         return self.components.get(attr)
+
+    def destroy(self):
+        print(f"Destroying entity {self}")
+        for component_name in self.components:
+            self.component_index[component_name].remove(self)
+        del self.entity_index[self.entity_id]
 
 
 class System:
