@@ -180,9 +180,10 @@ class RenderSystem(ecs.System):
 
                 intersections = [(i, p + V2(ox, oy)) for i, p in intersections if p is not None]
 
+                e = 1.0
                 intersections = [
                     p for i, p in intersections
-                    if i and (0 <= p.x <= width) and (0 <= p.y <= height)
+                    if i and (0 - e <= p.x <= width + e) and (0 - e <= p.y <= height + e)
                 ]
 
                 if len(intersections) > 0:
