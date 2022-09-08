@@ -128,5 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-wip_objects.json
-wip_path.json
+maps/wip_objects.json
+maps/wip_path.json
