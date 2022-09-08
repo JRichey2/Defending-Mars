@@ -2,6 +2,8 @@ import os
 import pyglet
 import sys
 import json
+from . import settings
+from .events import MapEvent
 
 from . import ecs
 from itertools import cycle
@@ -64,9 +66,16 @@ class MappingSystem(ecs.System):
         self.subscribe('StartMapping')
         self.subscribe('StopMapping')
         self.subscribe('LoadMap')
+        self.subscribe('StartPlacements')
+        self.subscribe('StopPlacements')
+        self.subscribe('PlacementSelection')
+        self.subscribe('Place')
+        self.placement = False
         self.map_file = None
         self.last_mapped_point = None
         self.mapping = False
+        self.selections = ['moon', 'red_planet', 'earth', 'checkpoint']
+        self.selection_index = 0
 
     def update(self):
         events, self.events = self.events, []
@@ -90,6 +99,64 @@ class MappingSystem(ecs.System):
             elif event.kind == 'LoadMap':
                 self.clear_map()
                 self.load_map(event.map_name)
+
+            elif event.kind == 'StartPlacements':
+                print('Started Placements')
+                with open(os.path.join('maps', 'wip_objects.json'), 'r') as f:
+                    data = f.read()
+                self.placements = json.loads(data)
+                self.placement = True
+                settings.GRAVITY = False
+                entity = Entity()
+                self.selection_label_entity_id = entity.entity_id
+                label = pyglet.text.Label(self.selections[self.selection_index],
+                          font_size=36,
+                          x=20, y=20,
+                          anchor_x="left", anchor_y="bottom")
+                entity.attach(UIVisualComponent(
+                    visuals=[
+                        Visual(kind='label', z_sort=0, value=label)
+                    ]
+                ))
+                with open(os.path.join('maps', f"wip_path.json"), "r") as f:
+                    map_path_data = f.read()
+                self.flight_path = json.loads(map_path_data)
+
+            elif event.kind == 'StopPlacements':
+                print('Stopped Placements')
+                settings.GRAVITY = True
+                self.placement = False
+                with open(os.path.join('maps', 'wip_objects.json'), 'w') as f:
+                    f.write(json.dumps(self.placements, indent=2))
+                with open(os.path.join('maps', 'wip_path.json'), 'w') as f:
+                    f.write(json.dumps(self.flight_path, indent=2))
+                ecs.System.inject(MapEvent(kind='LoadMap', map_name='wip'))
+                ecs.Entity.find(self.selection_label_entity_id).destroy()
+
+            elif self.placement == True and event.kind == 'Place':
+                object_name = self.selections[self.selection_index]
+                if object_name == 'checkpoint':
+                    print('something')
+                    points = [
+                        ((event.position - V2(p['x'],p['y'])).length_squared, p)
+                        for p in self.flight_path
+                    ]
+                    closest_distance = min(x[0] for x in points)
+                    closest_point = [p for d, p in points if d == closest_distance][0]
+                    closest_point['checkpoint'] = True
+
+                    
+                else:
+                    self.placements.append({"object": object_name, "x": event.position.x, "y": event.position.y})
+                    getattr(self, "load_" + object_name)(event.position)
+
+
+            elif self.placement == True and event.kind == 'PlacementSelection':
+                if event.direction == 'up':
+                    self.selection_index = (self.selection_index - 1) % len(self.selections)
+                elif event.direction == 'down':
+                    self.selection_index = (self.selection_index + 1) % len(self.selections)
+                ecs.Entity.find(self.selection_label_entity_id)['ui visual'].visuals[0].value.text = self.selections[self.selection_index]
 
         if not self.mapping:
             return
@@ -118,7 +185,7 @@ class MappingSystem(ecs.System):
         entity.attach(CollisionComponent(circle_radius=56))
 
     def load_earth(self, position):
-        entity = create_sprite(V2(1900.0, 2100.0), 0, ASSETS['earth'])
+        entity = create_sprite(position, 0, ASSETS['earth'])
         entity.attach(MassComponent(mass=400))
         entity.attach(CollisionComponent(circle_radius=500))
 

@@ -6,6 +6,7 @@ from . import ecs
 from .assets import ASSETS
 from .ecs import Entity, Event, field
 from .vector import V2
+from .events import MapEvent
 
 # Component Imports
 from .components import (
@@ -32,7 +33,6 @@ from .event_system import EventSystem
 from .render_system import RenderSystem
 from .mapping_system import MappingSystem
 from .physics_system import PhysicsSystem
-from .placement_system import PlacementSystem
 
 
 def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
@@ -78,10 +78,6 @@ class MouseScrollEvent(Event):
     y = field(type=int, mandatory=True)
     scroll_x = field(type=int, mandatory=True)
     scroll_y = field(type=float, mandatory=True)
-
-
-class MapEvent(Event):
-    map_name = field(type=str, mandatory=True)
 
 
 class DefendingMarsWindow(pyglet.window.Window):
@@ -200,9 +196,6 @@ def run_game():
 
     # Temporary for us to create maps with
     MappingSystem()
-
-    # Temporary for us to map out our positional components with
-    PlacementSystem()
 
     # The render system draws things to the Window
     RenderSystem()
