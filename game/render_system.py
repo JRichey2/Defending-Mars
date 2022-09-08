@@ -58,6 +58,9 @@ class RenderSystem(ecs.System):
             sprite.rotation = float(-physics.rotation)
         sprite.draw()
 
+    def draw_label(self, window, entity, visual):
+        visual.value.draw()
+
     def draw_boost_meter(self, window, entity, visual):
         boost = entity["boost"]
         base = visual.value['base']
@@ -225,4 +228,6 @@ class RenderSystem(ecs.System):
                 self.draw_checkpoint_arrow(window, entity, visual)
             elif visual.kind == 'boost':
                 self.draw_boost_meter(window, entity, visual)
+            elif visual.kind == 'label':
+                self.draw_label(window, entity, visual)
 

@@ -107,6 +107,17 @@ class MappingSystem(ecs.System):
                 self.placements = json.loads(data)
                 self.placement = True
                 settings.GRAVITY = False
+                entity = Entity()
+                self.selection_label_entity_id = entity.entity_id
+                label = pyglet.text.Label(self.selections[self.selection_index],
+                          font_size=36,
+                          x=20, y=20,
+                          anchor_x="left", anchor_y="bottom")
+                entity.attach(UIVisualComponent(
+                    visuals=[
+                        Visual(kind='label', z_sort=0, value=label)
+                    ]
+                ))
 
             elif event.kind == 'StopPlacements':
                 print('Stopped Placements')
@@ -115,18 +126,19 @@ class MappingSystem(ecs.System):
                 with open(os.path.join('maps', 'wip_objects.json'), 'w') as f:
                     f.write(json.dumps(self.placements, indent=2))
                 ecs.System.inject(MapEvent(kind='LoadMap', map_name='wip'))
+                ecs.Entity.find(self.selection_label_entity_id).destroy()
 
             elif self.placement == True and event.kind == 'Place':
                 object_name = self.selections[self.selection_index]
                 self.placements.append({"object": object_name, "x": event.position.x, "y": event.position.y})
                 getattr(self, "load_" + object_name)(event.position)
 
-            elif event.kind == 'PlacementSelection':
+            elif self.placement == True and event.kind == 'PlacementSelection':
                 if event.direction == 'up':
                     self.selection_index = (self.selection_index - 1) % len(self.selections)
                 elif event.direction == 'down':
                     self.selection_index = (self.selection_index + 1) % len(self.selections)
-                print(self.selections[self.selection_index])
+                ecs.Entity.find(self.selection_label_entity_id)['ui visual'].visuals[0].value.text = self.selections[self.selection_index]
 
         if not self.mapping:
             return
