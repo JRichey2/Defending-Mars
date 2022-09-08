@@ -43,7 +43,7 @@ class EventSystem(ecs.System):
                 )
                 mouse_position = V2(x, y)
                 ship_position = ecs.Entity.with_component("input")[0]["physics"].position
-                print(mouse_position, ship_position)
+                # print(mouse_position, ship_position)
                 player = list(ecs.Entity.with_component("input"))[0]
                 physics = player['physics']
                 if MOUSE_TURNING:

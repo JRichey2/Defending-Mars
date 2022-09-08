@@ -11,7 +11,7 @@
 * [x] add final checkpoint in red
 * [x] Clock timer(physics frozen until you can go)(3,2,1 go)
 * [ ] Count start ... Count End at Red
-* [ ] saving of maps/times
+* [x] saving of maps/times
 * [ ] sound effects(thrust(idle, reg, boost), checkpoint, finish, collision, maybe background type/menu, (3,2,1 go))
 
 

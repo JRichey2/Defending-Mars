@@ -44,6 +44,9 @@ class CheckpointSystem(ecs.System):
                 got_checkpoint = True
                 cp.is_next = False
                 if cp.cp_order == last_cp:
+                    timer = time.monotonic()
+                    ship = ecs.Entity.with_component("map timer")[0]
+                    ship['map timer'].end_time = timer
                     ecs.System.inject(ecs.Event(kind='MapComplete'))
 
         if got_checkpoint:
@@ -67,5 +70,4 @@ class CheckpointSystem(ecs.System):
                 bottom_visual = visuals[0]
                 top_visual.value.image = cp.finish_image_top
                 bottom_visual.value.image = cp.finish_image_bottom
-                end_time = time.monotonic()
 
