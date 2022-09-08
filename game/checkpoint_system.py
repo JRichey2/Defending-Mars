@@ -10,11 +10,20 @@ class CheckpointSystem(ecs.System):
         else:
             return -1
 
+    def get_last_cp(self, entities):
+        all_checkpoints = [e for e in entities if e['checkpoint']]
+        if len(all_checkpoints) > 0:
+            return max(e['checkpoint'].cp_order for e in all_checkpoints)
+        else:
+            return -1
+
+    # def get_last_cp(self, entities):
     def update(self):
         ship_entity = ecs.Entity.with_component("input")[0]
         ship_physics = ship_entity['physics']
         entities = ecs.Entity.with_component("checkpoint")
         next_cp = self.get_next_cp(entities)
+        last_cp = self.get_last_cp(entities)
         got_checkpoint = False
 
         # Check for passing through checkpoint and update checkpoints if complete
@@ -41,7 +50,7 @@ class CheckpointSystem(ecs.System):
 
         for entity in entities:
             cp = entity['checkpoint']
-            if not cp.completed and cp.cp_order == next_cp:
+            if not cp.completed and cp.cp_order == next_cp and cp.cp_order != last_cp:
                 game_visual = entity['game visual']
                 visuals = list(sorted(game_visual.visuals, key=lambda v: v.z_sort))
                 top_visual = visuals[1]
@@ -49,4 +58,12 @@ class CheckpointSystem(ecs.System):
                 top_visual.value.image = cp.next_image_top
                 bottom_visual.value.image = cp.next_image_bottom
                 cp.is_next = True
+            if cp.cp_order == last_cp:
+                game_visual = entity['game visual']
+                visuals = list(sorted(game_visual.visuals, key=lambda v: v.z_sort))
+                top_visual = visuals[1]
+                bottom_visual = visuals[0]
+                top_visual.value.image = cp.finish_image_top
+                bottom_visual.value.image = cp.finish_image_bottom
+            
 

@@ -7,18 +7,19 @@
 - Credits(bottom left)
 
 # gameplay
-- shift make w go SHEEEESHHHH
-- coins(economy), gold, silver, bronze
-- saving of maps/times
-* Recording and Saving Personal best line/ghost
-- sound effects(thrust(idle, reg, boost), checkpoint, finish, collision, maybe background type/menu, (3,2,1 go))
-- Adding collision for side of rings
-- Count start ... Count End at Red
-  - Pop up(best time: , Current time: , new personal best, bonus coins?, gold-silver-bronze)
-- gold, silver, bronze timings 
-- restart
-- leaderboard(best times)
-- Freeplay
+* [x] shift make w go SHEEEESHHHH
+* [x] add final checkpoint in red
+* [ ] saving of maps/times
+* [ ] coins(economy), gold, silver, bronze
+* [ ] Recording and Saving Personal best line/ghost
+* [ ] sound effects(thrust(idle, reg, boost), checkpoint, finish, collision, maybe background type/menu, (3,2,1 go))
+* [ ] Adding collision for side of rings
+* [ ] Count start ... Count End at Red
+  * [ ] Pop up(best time: , Current time: , new personal best, bonus coins?, gold-silver-bronze)
+* [ ] gold, silver, bronze timings 
+* [ ] restart
+* [ ] leaderboard(best times)
+* [ ] Freeplay
 
 # Quikli
 

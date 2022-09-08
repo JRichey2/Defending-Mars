@@ -250,6 +250,8 @@ class MappingSystem(ecs.System):
             passed_image_bottom=ASSETS['checkpoint_passed_bottom'],
             next_image_top=ASSETS['checkpoint_top'],
             passed_image_top=ASSETS['checkpoint_passed_top'],
+            finish_image_top=ASSETS['checkpoint_finish_top'],
+            finish_image_bottom=ASSETS['checkpoint_finish_bottom'],
             cp_order=cp_order,
         ))
 
