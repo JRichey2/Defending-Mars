@@ -108,7 +108,10 @@ class PhysicsSystem(ecs.System):
             GRAV_CONSTANT = 200.0
         else:
             GRAV_CONSTANT = 0.0
-        ACC_CONSTANT = 0.25
+        if settings.ACCELERATION:
+            ACC_CONSTANT = 0.25
+        else:
+            ACC_CONSTANT = 0.0
         BOOST_CONSTANT = 1.75
         DRAG_CONSTANT = 0.015
         MAX_GRAV_ACC = 0.24
@@ -159,7 +162,7 @@ class PhysicsSystem(ecs.System):
                 #acceleration.normalize()
                 acceleration *= ACC_CONSTANT
             boost = entity['boost']
-            if inputs.boost:
+            if inputs.boost and settings.BOOST:
                 if boost.boost > 0:
                     acceleration *= BOOST_CONSTANT
                     boost.boost -= 0.5 * time_factor

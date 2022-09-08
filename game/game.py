@@ -40,6 +40,7 @@ from .event_system import EventSystem
 from .render_system import RenderSystem
 from .mapping_system import MappingSystem
 from .physics_system import PhysicsSystem
+from .timing_system import TimingSystem
 
 
 def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
@@ -167,6 +168,9 @@ def run_game():
 
     # Updates checkpoints
     CheckpointSystem()
+
+    # Timing System to handle turning on and off movement/gravity/ freezing things
+    TimingSystem()
 
     # Temporary for us to create maps with
     MappingSystem()

@@ -1,4 +1,6 @@
 MOUSE_TURNING = True
 CAMERA_SPRING = True
-GRAVITY = True
+GRAVITY = False
+ACCELERATION = False
+BOOST = False
 
