@@ -26,25 +26,6 @@ class PhysicsSystem(ecs.System):
             self.update_enemy_ship(enemy)
         self.update_flares()
 
-
-    def update_enemy_ship(self, ship):
-        physics = ship['physics']
-        enemy = ship['enemy']
-        flight_path = ecs.Entity.find(enemy.flight_path)["flight path"]
-        if enemy.path_index >= len(flight_path.path):
-            return
-        enemy.target =  flight_path.path[-(enemy.path_index + 1)]
-        physics.position -= enemy.offset
-        distance_to_target = enemy.target - physics.position
-        physics.rotation = distance_to_target.degrees - 90
-        if distance_to_target.length < enemy.speed:
-            physics.postion = enemy.target
-            enemy.path_index += 1
-        else:
-            physics.position += distance_to_target.normalized * enemy.speed
-        physics.position += enemy.offset
-
-
     def update_flares(self):
         dt = ecs.DELTA_TIME
         time_factor = dt / 0.01667
@@ -57,7 +38,7 @@ class PhysicsSystem(ecs.System):
                 if v.kind == 'emitter'
             ]
 
-            if entity.entity_id in [e.entity_id for e in ecs.Entity.with_component("input")]:
+            if entity.entity_id == ship.entity_id:
                 # Skip the ship
                 continue
 
@@ -73,7 +54,6 @@ class PhysicsSystem(ecs.System):
                     emitter.rate = distance / 750
                 else:
                     emitter.enabled = False
-
 
                 if not emitter.enabled:
                     for sprite in emitter.sprites:

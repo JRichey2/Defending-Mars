@@ -1,3 +1,4 @@
+import os
 import pyglet
 import sys
 import json
@@ -12,6 +13,7 @@ from .components import (
     Emitter,
     EmitterBoost,
     FlightPath,
+    MapComponent,
     Visual,
     GameVisualComponent,
     UIVisualComponent,
@@ -73,7 +75,7 @@ class MappingSystem(ecs.System):
 
             if event.kind == 'StartMapping':
                 print('Started Mapping')
-                self.map_file = open('map.json', 'w')
+                self.map_file = open(os.path.join('maps', 'wip_path.json'), 'w')
                 self.mapping = True
                 self.map_file.write('[')
 
@@ -86,6 +88,7 @@ class MappingSystem(ecs.System):
                 self.mapping = False
 
             elif event.kind == 'LoadMap':
+                self.clear_map()
                 self.load_map(event.map_name)
 
         if not self.mapping:
@@ -119,9 +122,24 @@ class MappingSystem(ecs.System):
         entity.attach(MassComponent(mass=400))
         entity.attach(CollisionComponent(circle_radius=500))
 
-    def load_map(self, map_name):
+    def clear_map(self):
+        mass_entities = list(ecs.Entity.with_component("mass"))
+        for entity in mass_entities:
+            entity.destroy()
 
-        with open(f"{map_name}_objects.json", "r") as f:
+        ship_id = ecs.Entity.with_component("input")[0].entity_id
+
+        physics_entities = list(ecs.Entity.with_component("physics"))
+        for entity in physics_entities:
+            if entity.entity_id != ship_id:
+                entity.destroy()
+
+        map_entities = list(ecs.Entity.with_component("map"))
+        for entity in map_entities:
+            entity.destroy()
+
+    def load_map(self, map_name):
+        with open(os.path.join('maps', f"{map_name}_objects.json"), "r") as f:
             map_objects_data = f.read()
         map_objects = json.loads(map_objects_data)
 
@@ -135,7 +153,7 @@ class MappingSystem(ecs.System):
 
         flight_path = Entity()
 
-        with open(f"{map_name}_path.json", "r") as f:
+        with open(os.path.join('maps', f"{map_name}_path.json"), "r") as f:
             map_path_data = f.read()
         map_path = json.loads(map_path_data)
 
@@ -214,6 +232,7 @@ class MappingSystem(ecs.System):
             points_p.append(p.y)
 
         infinite_magenta = cycle((255, 0, 255, 50))
+        flight_path.attach(MapComponent(map_name=map_name))
         flight_path.attach(
             GameVisualComponent(
                 visuals=[
@@ -243,8 +262,8 @@ class MappingSystem(ecs.System):
                 v = points[i] - points[i-1]
                 a = V2.from_degrees_and_length(v.degrees + 90, 150) + point
                 b = V2.from_degrees_and_length(v.degrees - 90, 150) + point
-                create_flare(ASSETS['particle_flare'], a)
-                create_flare(ASSETS['particle_flare'], b)
+                entity = create_flare(ASSETS['particle_flare'], a)
+                entity = create_flare(ASSETS['particle_flare'], b)
 
         player = ecs.Entity.with_component('input')[0]
         player['physics'].position = points[0].copy

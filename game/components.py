@@ -95,6 +95,12 @@ class FlightPath:
 
 
 @dataclass
+class MapComponent:
+    map_name: str
+    component_name: str = "map"
+
+
+@dataclass
 class EnemyComponent(pyglet.sprite.Sprite):
     component_name = "enemy"
     flight_path: str
