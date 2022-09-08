@@ -105,7 +105,7 @@ class PhysicsSystem(ecs.System):
         entities = ecs.Entity.with_component("mass")
 
         if settings.GRAVITY:
-            GRAV_CONSTANT = 200.0
+            GRAV_CONSTANT = 150.0
         else:
             GRAV_CONSTANT = 0.0
         if settings.ACCELERATION:

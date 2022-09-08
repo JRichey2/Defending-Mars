@@ -68,6 +68,7 @@ class WindowComponent:
     window: pyglet.window.Window
     component_name: str = "window"
     camera_position: V2 = V2(0.0, 0.0)
+    camera_zoom: float = 1.5
     background_layers: list[SpriteComponent] = field(default_factory=list)
 
 

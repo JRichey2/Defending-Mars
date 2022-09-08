@@ -68,5 +68,4 @@ class CheckpointSystem(ecs.System):
                 top_visual.value.image = cp.finish_image_top
                 bottom_visual.value.image = cp.finish_image_bottom
                 end_time = time.monotonic()
-            
 

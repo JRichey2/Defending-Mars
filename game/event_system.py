@@ -5,9 +5,11 @@ from . import ecs
 from .settings import MOUSE_TURNING
 from .vector import V2
 from .events import PlacementSelectionEvent
+from .coordinates import screen_to_world
 
 class PlaceEvent(ecs.Event):
     position = ecs.field(type=V2, mandatory=True)
+
 
 class EventSystem(ecs.System):
 
@@ -33,9 +35,15 @@ class EventSystem(ecs.System):
                 window = window_entity['window']
                 camera = window.camera_position
                 width, height = window.window.width, window.window.height
-                ox = width // 2 - camera.x
-                oy = height // 2 - camera.y
-                mouse_position = V2(event.x - ox, event.y - oy)
+                x, y = screen_to_world(
+                    event.x, event.y,
+                    width, height,
+                    camera.x, camera.y,
+                    window.camera_zoom
+                )
+                mouse_position = V2(x, y)
+                ship_position = ecs.Entity.with_component("input")[0]["physics"].position
+                print(mouse_position, ship_position)
                 player = list(ecs.Entity.with_component("input"))[0]
                 physics = player['physics']
                 if MOUSE_TURNING:
@@ -69,9 +77,13 @@ class EventSystem(ecs.System):
                 window = window_entity['window']
                 camera = window.camera_position
                 width, height = window.window.width, window.window.height
-                ox = width // 2 - camera.x
-                oy = height // 2 - camera.y
-                mouse_position = V2(event.x - ox, event.y - oy)
+                x, y = screen_to_world(
+                    event.x, event.y,
+                    width, height,
+                    camera.x, camera.y,
+                    window.camera_zoom
+                )
+                mouse_position = V2(x, y)
                 inputs = ecs.Entity.with_component("input")
                 for i in inputs:
                     ic = i['input']
@@ -85,7 +97,11 @@ class EventSystem(ecs.System):
                     ecs.System.inject(PlaceEvent(kind='Place', position=mouse_position))
 
             if (event.kind == 'MouseScroll'):
+                window_entity = list(ecs.Entity.with_component("window"))[0]
+                window = window_entity['window']
                 if event.scroll_y > 0:
+                    window.camera_zoom /= 1.1
                     ecs.System.inject(PlacementSelectionEvent(kind='PlacementSelection', direction='up'))
                 else:
+                    window.camera_zoom *= 1.1
                     ecs.System.inject(PlacementSelectionEvent(kind='PlacementSelection', direction='down'))

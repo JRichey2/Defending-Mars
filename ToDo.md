@@ -27,19 +27,21 @@
 * [ ] Loading and Rendering Personal best line/ghost (toggleable)
 * [ ] Zooming
 * [ ] FPS Meter
-* [.] Art
+* [O] Art
     * [X] Black hole - 332
     * [X] Additional planets
         * [X] Dwarf Gas - 150
         * [X] Medium Gas - 240
-    * [ ] New checkpoint images
-    * [o] Asteroids
+        * [X] Gas Giant - 500
+    * [X] New checkpoint images
+    * [X] Asteroids
         * [X] Large - 175
-        * [ ] 
-    * [ ] Satellites
+        * [X] Medium - 100
+        * [X] Small - 60
+    * [X] Satellites
     * [ ] Additional moons
-    * [ ] New art for flares
-    * [ ] Boost Power Up
-    * [ ] Speed Limit Strips
+    * [X] New art for flares
+    * [X] Boost Power Up
+    * [X] Speed Limit Strips
     * [ ] Particle effects for checkpoints, finish, and power ups/downs
 

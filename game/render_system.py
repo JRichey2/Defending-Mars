@@ -1,5 +1,6 @@
 from . import ecs
 from .vector import V2
+from .coordinates import world_to_screen
 
 import pyglet
 import os
@@ -40,8 +41,29 @@ class RenderSystem(ecs.System):
     def camera_offset(self, window):
         camera = window.camera_position
         width, height = window.window.width, window.window.height
+
+        zoom = window.camera_zoom
+        th = height / 2 - height * zoom / 2
+        tw = width / 2 - width * zoom / 2
+        l = camera.x + tw - width / 2
+        t = camera.y + th - height / 2
+        r = camera.x + (width * zoom) + tw - width / 2
+        b = camera.y + (height * zoom) + th - height / 2
+
+        pyglet.gl.glMatrixMode(pyglet.gl.GL_PROJECTION)
+        pyglet.gl.glLoadIdentity()
+        pyglet.gl.glOrtho(l, r, t, b, -1.0, 1.0)
         pyglet.gl.glMatrixMode(pyglet.gl.GL_MODELVIEW)
-        pyglet.gl.glTranslatef(width / 2 - camera.x, height / 2 - camera.y, 0.0)
+        pyglet.gl.glLoadIdentity()
+        pyglet.gl.glTranslatef(0.375, 0.375, 0.0)
+
+    def reset_camera(self, window):
+        width, height = window.window.width, window.window.height
+        pyglet.gl.glMatrixMode(pyglet.gl.GL_PROJECTION)
+        pyglet.gl.glLoadIdentity()
+        pyglet.gl.glOrtho(0, width, 0, height, -1.0, 1.0)
+        pyglet.gl.glMatrixMode(pyglet.gl.GL_MODELVIEW)
+        pyglet.gl.glLoadIdentity()
 
     def draw_flight_path(self, window, entity, visual):
         visual.value.points.draw(pyglet.gl.GL_LINE_STRIP)
@@ -113,72 +135,78 @@ class RenderSystem(ecs.System):
     def draw_checkpoint_arrow(self, window, entity, visual):
         width, height = window.window.width, window.window.height
         camera = window.camera_position
-        ox = width / 2 - camera.x
-        oy = height / 2 - camera.y
-        points = [
-            (0.0  , 0.0   ),
-            (width, 0.0   ),
-            (0.0  , height),
-            (width, height),
-        ]
-        vecs = [V2(p[0] - ox, p[1] - oy) for p in points]
         cp = entity['checkpoint']
         physics = entity['physics']
         arrow = entity['ui visual'].visuals[0].value
 
+        zoom = window.camera_zoom
+
         if cp.is_next:
-            x_ob = physics.position.x + ox
-            y_ob = physics.position.y + oy
-            half_sprite_x = 128
-            half_sprite_y = 128
-            half_arrow_x = 64
-            half_arrow_y = 64
+            arrow_x, arrow_y = world_to_screen(
+                physics.position.x, physics.position.y,
+                width, height,
+                camera.x, camera.y,
+                zoom
+            )
+
+            half_sprite_x = 128 / zoom
+            half_sprite_y = 128 / zoom
 
             # Check if original sprite was off the screen, and draw if so
-            if (     y_ob < -half_sprite_y
-                  or y_ob >  half_sprite_y + height
-                  or x_ob < -half_sprite_x
-                  or x_ob >  half_sprite_x + width):
+            if (     arrow_y < -half_sprite_y
+                  or arrow_y >  half_sprite_y + height
+                  or arrow_x < -half_sprite_x
+                  or arrow_x >  half_sprite_x + width):
                 # Clamp arrow to on the screen edge
 
                 ship = ecs.Entity.with_component("input")[0]
                 ship_physics = ship["physics"]
 
+                ship_x, ship_y = world_to_screen(
+                    ship_physics.position.x, ship_physics.position.y,
+                    width, height,
+                    camera.x, camera.y,
+                    zoom
+                )
+
+                arrow_point = V2(arrow_x, arrow_y)
+                ship_point = V2(ship_x, ship_y)
+
                 intersections = []
 
                 intersections.append(self.calculate_line_intersection(
-                    ship_physics.position,
-                    physics.position,
+                    ship_point,
+                    arrow_point,
                     V2(-1.0, 0.0),
-                    (height - oy),
+                    height,
                     vertical=False
                 ))
 
                 intersections.append(self.calculate_line_intersection(
-                    ship_physics.position,
-                    physics.position,
+                    ship_point,
+                    arrow_point,
                     V2(1.0, 0.0),
-                    (0 - oy),
+                    0,
                     vertical=False
                 ))
 
                 intersections.append(self.calculate_line_intersection(
-                    ship_physics.position,
-                    physics.position,
+                    ship_point,
+                    arrow_point,
                     V2(0.0, -1.0),
-                    (width - ox),
+                    width,
                     vertical=True
                 ))
 
                 intersections.append(self.calculate_line_intersection(
-                    ship_physics.position,
-                    physics.position,
+                    ship_point,
+                    arrow_point,
                     V2(0.0, 1.0),
-                    (0 - ox),
+                    0,
                     vertical=True
                 ))
 
-                intersections = [(i, p + V2(ox, oy)) for i, p in intersections if p is not None]
+                intersections = [(i, p) for i, p in intersections if p is not None]
 
                 e = 1.0
                 intersections = [
@@ -216,7 +244,7 @@ class RenderSystem(ecs.System):
             elif visual.kind == 'sprite':
                 self.draw_sprite(window, entity, visual)
 
-        pyglet.gl.glLoadIdentity()
+        self.reset_camera(window)
 
         entities = ecs.Entity.with_component("ui visual")
         visuals = []
