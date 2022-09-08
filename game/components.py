@@ -133,3 +133,8 @@ class BoostComponent:
     boost: float = 100.0
 
 
+@dataclass
+class MapTimerComponent:
+    component_name = "map timer"
+    start_time: float = 0.0
+    end_time: float = 0.0

@@ -32,6 +32,7 @@ from .components import (
     BoostComponent,
     SpriteCheckpointComponent,
     CollisionComponent,
+    MapTimerComponent,
 )
 
 # System Imports
@@ -97,6 +98,7 @@ class DefendingMarsWindow(pyglet.window.Window):
         entity.attach(PhysicsComponent(position=V2(0, 0), rotation=0))
         entity.attach(InputComponent())
         entity.attach(BoostComponent())
+        entity.attach(MapTimerComponent())
         entity.attach(CollisionComponent(circle_radius=24))
 
         # Game Visuals

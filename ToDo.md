@@ -6,26 +6,26 @@
 - HELP/Getting Started(Tutorial?)
 - Credits(bottom left)
 
-# gameplay
+# gameplay(Today)
 * [x] shift make w go SHEEEESHHHH
 * [x] add final checkpoint in red
-* [ ] saving of maps/times
-* [ ] coins(economy), gold, silver, bronze
-* [ ] Recording and Saving Personal best line/ghost
-* [ ] sound effects(thrust(idle, reg, boost), checkpoint, finish, collision, maybe background type/menu, (3,2,1 go))
-* [ ] Adding collision for side of rings
+* [x] Clock timer(physics frozen until you can go)(3,2,1 go)
 * [ ] Count start ... Count End at Red
+* [x] saving of maps/times
+* [ ] sound effects(thrust(idle, reg, boost), checkpoint, finish, collision, maybe background type/menu, (3,2,1 go))
+
+
+* [ ] Adding collision for side of rings
   * [ ] Pop up(best time: , Current time: , new personal best, bonus coins?, gold-silver-bronze)
 * [ ] gold, silver, bronze timings 
 * [ ] restart
 * [ ] leaderboard(best times)
 * [ ] Freeplay
+* [ ] coins(economy), gold, silver, bronze
 
 # Quikli
-
-* [ ] Clock timer(physics frozen until you can go)(3,2,1 go)
 * [ ] Loading and Rendering Personal best line/ghost (toggleable)
-* [ ] Zooming
+* [X] Zooming
 * [ ] FPS Meter
 * [O] Art
     * [X] Black hole - 332

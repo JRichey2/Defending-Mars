@@ -81,6 +81,10 @@ class RenderSystem(ecs.System):
         sprite.draw()
 
     def draw_label(self, window, entity, visual):
+        countdown_list = ['GET READY', '3', '2', '1', 'GO']
+        if visual.value.text in countdown_list:
+            visual.value.x = window.window.width // 2
+            visual.value.y = window.window.height
         visual.value.draw()
 
     def draw_boost_meter(self, window, entity, visual):
