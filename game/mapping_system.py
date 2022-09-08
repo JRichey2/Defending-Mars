@@ -341,6 +341,8 @@ class MappingSystem(ecs.System):
             )
         )
 
+        flight_path.destroy()
+
         for i, point in enumerate(points):
             if i % 2 == 1:
                 v = points[i] - points[i-1]
