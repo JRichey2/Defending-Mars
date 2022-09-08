@@ -8,6 +8,10 @@ class PlacementSelectionEvent(Event):
     direction = field(type=str, mandatory=True)
 
 
+class CountdownEvent(Event):
+    countdown_index = field(type=int, mandatory=True)
+
+
 class KeyEvent(Event):
     key_symbol = field(mandatory=True)
     pressed = field(type=bool, mandatory=True)

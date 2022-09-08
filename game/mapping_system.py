@@ -99,6 +99,7 @@ class MappingSystem(ecs.System):
             elif event.kind == 'LoadMap':
                 self.clear_map()
                 self.load_map(event.map_name)
+                ecs.System.inject(ecs.Event(kind='MapLoaded'))
 
             elif event.kind == 'StartPlacements':
                 print('Started Placements')
@@ -136,7 +137,6 @@ class MappingSystem(ecs.System):
             elif self.placement == True and event.kind == 'Place':
                 object_name = self.selections[self.selection_index]
                 if object_name == 'checkpoint':
-                    print('something')
                     points = [
                         ((event.position - V2(p['x'],p['y'])).length_squared, p)
                         for p in self.flight_path
