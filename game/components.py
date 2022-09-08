@@ -56,6 +56,8 @@ class SpriteCheckpointComponent:
     passed_image_bottom: pyglet.image.AbstractImage
     next_image_top: pyglet.image.AbstractImage
     passed_image_top: pyglet.image.AbstractImage
+    finish_image_top: pyglet.image.AbstractImage
+    finish_image_bottom: pyglet.image.AbstractImage
     completed: bool = False
     is_next: bool = False
     cp_order: int = 0

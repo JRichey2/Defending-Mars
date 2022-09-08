@@ -8,7 +8,7 @@
 
 # gameplay
 * [x] shift make w go SHEEEESHHHH
-* [ ] add final checkpoint in red
+* [x] add final checkpoint in red
 * [ ] saving of maps/times
 * [ ] coins(economy), gold, silver, bronze
 * [ ] Recording and Saving Personal best line/ghost
