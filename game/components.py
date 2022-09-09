@@ -51,7 +51,6 @@ class PhysicsComponent:
 @dataclass
 class ShipComponent:
     component_name: str = "ship"
-    frozen: bool = True
     boost: float = 100.0
     boosting: bool = False
 

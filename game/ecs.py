@@ -100,7 +100,18 @@ class System:
     @classmethod
     def inject(cls, event):
         for subscriber in cls.subscriptions.get(event.kind, []):
-            subscriber.handle_event(event)
+            subscriber.reload()
+            if subscriber.disabled:
+                continue
+            try:
+                subscriber.handle_event(event)
+            except SystemExit:
+                # Exit exceptions should be allowed through
+                pass
+            except:
+                # All other exceptions should disable the system until next reload
+                traceback.print_exc()
+                subscriber.disabled = True
 
     def reload(self):
         # Get a reference to the module containing the system

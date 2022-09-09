@@ -36,11 +36,8 @@ class PhysicsSystem(System):
                 entity['physics'].position = pos
                 entity['physics'].velocity = V2(0, 0)
 
-
     def update(self):
         self.update_ship_controls()
-        entity = get_ship_entity()
-        physics = entity['physics']
         self.update_all_physics_objects()
         self.update_ship_thrust_emitter()
         self.update_ship_collision()
@@ -107,9 +104,8 @@ class PhysicsSystem(System):
         mass_points = []
         for entity in Entity.with_component("physics"):
             physics = entity['physics']
-            if physics is None or physics.mass == 0.0:
-                continue
-            mass_points.append((physics.position, physics.mass))
+            if physics.mass != 0.0:
+                mass_points.append((physics.position, physics.mass))
         return mass_points
 
     def update_all_physics_objects(self):
@@ -122,7 +118,7 @@ class PhysicsSystem(System):
             # Don't calculate velocity, position, acceleration,
             # boost, gravity, etc. for static objects
             if physics.static:
-                return
+                continue
 
             mass_points = self.get_all_masses()
 
@@ -141,11 +137,6 @@ class PhysicsSystem(System):
             if grav_acc.length_squared > 0.0:
                 grav_acc = grav_acc.normalized * acc_magnitude
                 physics.acceleration += grav_acc
-
-            if (physics.acceleration.length_squared == 0.0 and
-                    physics.velocity.length_squared == 0.0):
-                # Nothing to move
-                continue
 
             physics.velocity *= 1 - (settings.DRAG_CONSTANT * time_factor)
             physics.velocity += physics.acceleration * time_factor
