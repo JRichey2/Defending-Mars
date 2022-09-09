@@ -69,7 +69,7 @@ class CartographySystem(System):
     def handle_stop_mapping(self, **kwargs):
         map_entity = get_active_map_entity()
         map_ = map_entity["map"]
-        with open(os.path.join('maps', 'wip_path.json'), 'w') as f:
+        with open(os.path.join('maps', f'{map_.map_name}_path.json'), 'w') as f:
             f.write(json.dumps(map_.flight_path ,indent=2))
         map_.flight_path = []
         map_.mode = "freeplay"
@@ -88,10 +88,10 @@ class CartographySystem(System):
         )
 
     def handle_start_placements(self, **kwargs):
-        with open(os.path.join('maps', 'wip_objects.json'), 'r') as f:
-            data = f.read()
         map_entity = get_active_map_entity()
         map_ = map_entity["map"]
+        with open(os.path.join('maps', f'{map_.map_name}_objects.json'), 'r') as f:
+            data = f.read()
         map_.map_objects = json.loads(data)
         map_.mode = "editing"
         settings.GRAVITY = False
@@ -127,15 +127,15 @@ class CartographySystem(System):
         map_.mode = "freeplay"
         print("Entered freeplay mode")
 
-        with open(os.path.join('maps', 'wip_objects.json'), 'w') as f:
+        with open(os.path.join('maps', f'{map_.map_name}_objects.json'), 'w') as f:
             f.write(json.dumps(map_.map_objects, indent=2))
         print("wrote wip_objects.json")
 
-        with open(os.path.join('maps', 'wip_path.json'), 'w') as f:
+        with open(os.path.join('maps', f'{map_.map_name}_path.json'), 'w') as f:
             f.write(json.dumps(map_.flight_path, indent=2))
         print("wrote wip_path.json")
 
-        System.dispatch(event='LoadMap', map_name='wip', mode="freeplay")
+        System.dispatch(event='LoadMap', map_name=map_.map_name, mode="freeplay")
         Entity.find(map_.edit_selection_id).destroy()
 
     def handle_place(self, *, position, map_entity_id, **kwargs):

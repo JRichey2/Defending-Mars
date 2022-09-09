@@ -64,8 +64,12 @@ class RacingSystem(System):
         map_.race_countdown_id = countdown_entity.entity_id
 
         # Open the PB line file and load in the line
-        with open(os.path.join('records', 'pb.json'), 'r') as f:
-            map_.pb_racing_line = json.loads(f.read())
+        try:
+            with open(os.path.join('records', '{map_.map_name}_pb_line.json'), 'r') as f:
+                map_.pb_racing_line = json.loads(f.read())
+        except:
+            # No PB on this map yet
+            return
 
         map_.pb_line_entity_id = self.create_pb_line(map_)
         map_.pb_ghost_entity_id = self.create_pb_ghost()
@@ -91,13 +95,30 @@ class RacingSystem(System):
         map_entity = Entity.find(map_entity_id)
         if not map_entity:
             return
-        self.update_race_completion(map_entity)
-
-        # Record the final racing line point
         map_ = map_entity["map"]
+
         self.record_racing_line_point(map_, map_.race_end_time, final_point=True)
-        with open(os.path.join('records', 'pb.json'), 'w') as f:
-            f.write(json.dumps(map_.racing_line))
+
+        # Calculate race duration
+        new_time = (map_.race_end_time - map_.race_start_time)
+
+        # Read the current records
+        with open(os.path.join('records', 'pb_times.json'), 'r') as f:
+            records = json.loads(f.read())
+
+        # Find the record we need to check
+        current_record = records.get(map_.map_name)
+
+        # Check the record and update it if we've beaten it
+        if current_record is None or new_time < current_record:
+            print(f'NEW RECORD - {new_time}')
+            records[map_.map_name] = new_time
+            with open(os.path.join('records', 'pb_times.json'), 'w') as f:
+                f.write(json.dumps(records, indent=2))
+
+            # Record the final racing line point
+            with open(os.path.join('records', f'{map_.map_name}_pb_line.json'), 'w') as f:
+                f.write(json.dumps(map_.racing_line))
 
     def update(self):
         for map_entity in Entity.with_component("map"):
@@ -182,29 +203,6 @@ class RacingSystem(System):
                     )
             else:
                 entity.destroy()
-
-    def update_race_completion(self, map_entity):
-        map_ = map_entity["map"]
-
-        # Calculate race duration
-        new_time = (map_.race_end_time - map_.race_start_time)
-
-        # Read the current records
-        with open(os.path.join('maps', 'map_record.json'), 'r') as f:
-            data = json.loads(f.read())
-
-        # Find the record we need to check
-        for i, record in enumerate(data):
-            if record['Map']== 'Default':
-                map_index = i
-                current_record = record['Record']
-
-        # Check the record and update it if we've beaten it
-        if new_time < current_record:
-            print('NEW RECORD')
-            data[map_index]['Record'] = new_time
-            with open(os.path.join('maps','map_record.json'), 'w') as f:
-                f.write(json.dumps(data, indent=2))
 
     def record_racing_line_point(self, map_, at_time, final_point=False):
         entity = get_ship_entity()
