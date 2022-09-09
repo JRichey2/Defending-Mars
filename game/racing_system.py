@@ -5,9 +5,9 @@ import time
 
 from itertools import cycle
 
-from . import settings
+from .settings import settings
 from .assets import ASSETS
-from .common import get_ship_entity, get_window
+from .common import *
 from .components import (
     PhysicsComponent,
     GameVisualComponent,

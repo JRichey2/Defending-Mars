@@ -5,7 +5,7 @@ import sys
 import json
 
 from . import ecs
-from . import settings
+from .settings import settings
 from .assets import ASSETS
 from .common import *
 from .components import (

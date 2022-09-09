@@ -1,10 +1,19 @@
-ACCELERATION = True
-ACC_CONSTANT = 0.25
-BOOST = True
-BOOST_CONSTANT = 1.75
-CAMERA_SPRING = True
-DRAG_CONSTANT = 0.015
-GRAVITY = True
-GRAV_CONSTANT = 100.0
-MAX_GRAV_ACC = 0.18
-MOUSE_TURNING = False
+import json
+
+
+class Settings:
+    def __init__(self):
+        with open("settings.json", "r") as f:
+            object.__setattr__(self, "_settings", json.loads(f.read()))
+
+    def __setattr__(self, name, value):
+        s = object.__getattribute__(self, "_settings")
+        s[name.lower()] = value
+        with open("settings.json", "w") as f:
+            f.write(json.dumps(self._settings, indent=2))
+
+    def __getattr__(self, name):
+        return object.__getattribute__(self, "_settings")[name.lower()]
+
+
+settings = Settings()

@@ -46,6 +46,8 @@ class PhysicsComponent:
     rotation: float = 0.0
     velocity: V2 = field(default_factory=V2)
     acceleration: V2 = field(default_factory=V2)
+    acc_constant: float = 0.25
+    drag_constant: float = 0.015
     mass: float = 0.0
     static: bool = True
 
@@ -55,6 +57,7 @@ class ShipComponent:
     component_name: str = "ship"
     boost: float = 100.0
     boosting: bool = False
+    boost_constant: float = 1.75
 
 
 @dataclass
@@ -183,3 +186,13 @@ class CollisionComponent:
     component_name = "collision"
     collider_shape: str = "circle"
     circle_radius: float = 0.0
+
+
+@dataclass
+class MenuComponent:
+    component_name: str = "menu"
+    menu_name: str = ""
+    option_labels: list = field(default_factory=list)
+    option_callbacks: dict = field(default_factory=dict)
+    selected_option: int = 0
+    displayed: bool = False

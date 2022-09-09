@@ -7,7 +7,7 @@ from pyglet.window import key
 
 # ECS Import
 from . import ecs
-from . import settings
+from .settings import settings
 from .assets import ASSETS
 from .common import *
 from .coordinates import *
@@ -35,6 +35,7 @@ from .cartography_system import CartographySystem
 from .physics_system import PhysicsSystem
 from .racing_system import RacingSystem
 from .audio_system import AudioSystem
+from .menu_system import MenuSystem
 
 
 def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
@@ -204,10 +205,12 @@ class DefendingMarsWindow(pyglet.window.Window):
         inputs = get_inputs()
         if symbol == key.W:
             inputs.w = True
+            System.dispatch(event="MenuSelection", direction="up")
         elif symbol == key.A:
             inputs.a = True
         elif symbol == key.S:
             inputs.s = True
+            System.dispatch(event="MenuSelection", direction="down")
         elif symbol == key.D:
             inputs.d = True
         elif symbol == key.LSHIFT:
@@ -232,6 +235,14 @@ class DefendingMarsWindow(pyglet.window.Window):
             System.dispatch(event="PlacementSelection", direction="up")
         elif symbol == key.RIGHT:
             System.dispatch(event="PlacementSelection", direction="down")
+        elif symbol == key.UP:
+            System.dispatch(event="MenuSelection", direction="up")
+        elif symbol == key.DOWN:
+            System.dispatch(event="MenuSelection", direction="down")
+        elif symbol == key.RETURN:
+            System.dispatch(event="MenuAccept")
+        elif symbol == key.SPACE:
+            System.dispatch(event="MenuAccept")
 
     def on_key_release(self, symbol, modifiers):
         inputs = get_inputs()
@@ -290,6 +301,9 @@ class DefendingMarsWindow(pyglet.window.Window):
 
 def run_game():
 
+    # Handle all of our menus
+    MenuSystem()
+
     # Make, load, and manage maps
     CartographySystem()
 
@@ -318,7 +332,7 @@ def run_game():
             ],
         )
     )
-    System.dispatch(event="LoadMap", map_name="default")
+    System.dispatch(event="DisplayMenu", menu_name="main menu")
 
     def update(dt, *args, **kwargs):
         ecs.DELTA_TIME = dt

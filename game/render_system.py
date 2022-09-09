@@ -4,10 +4,11 @@ import math
 import pyglet
 
 from . import ecs
+from .settings import settings
 from .ecs import *
 from .common import *
 from .coordinates import *
-from .vector import V2
+from .vector import *
 
 
 class RenderSystem(System):
@@ -112,7 +113,29 @@ class RenderSystem(System):
             visual.value.y = window.window.height * ui_vis.top
         visual.value.draw()
 
+    def draw_menu_options(self, window, entity, visual):
+        menu = entity["menu"]
+        if not menu.displayed:
+            return
+
+        ui_vis = entity["ui visual"]
+        labels = visual.value
+
+        w, h = window.window.width, window.window.height
+        origin_x, origin_y = w * ui_vis.right, h * ui_vis.top
+
+        for i, label in enumerate(labels):
+            label.x = origin_x
+            label.y = origin_y - 64 * i
+            if i == menu.selected_option:
+                label.color = (0, 200, 255, 225)
+            else:
+                label.color = (255, 255, 255, 160)
+            label.draw()
+
     def draw_boost_meter(self, window, entity, visual):
+        if settings.PHYSICS_FROZEN:
+            return
         ship = entity["ship"]
         base = visual.value["base"]
         ticks = visual.value["ticks"]
@@ -291,3 +314,5 @@ class RenderSystem(System):
                 self.draw_label(window, entity, visual)
             elif visual.kind == "real time label":
                 self.draw_real_time_label(window, entity, visual)
+            elif visual.kind == "menu options":
+                self.draw_menu_options(window, entity, visual)

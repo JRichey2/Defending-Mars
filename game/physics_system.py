@@ -3,10 +3,9 @@ from random import random
 import pyglet
 
 from . import ecs
-from . import settings
+from .settings import settings
 from .common import *
 from .ecs import *
-from .settings import MOUSE_TURNING, CAMERA_SPRING
 from .vector import V2
 
 
@@ -16,12 +15,16 @@ class PhysicsSystem(System):
         self.subscribe("Respawn", self.handle_respawn)
 
     def handle_center_camera(self, **kwargs):
+        if settings.PHYSICS_FROZEN:
+            return
         window = get_window()
         ship_entity = get_ship_entity()
         ship_physics = ship_entity["physics"]
         window.camera_position = ship_physics.position
 
     def handle_respawn(self, **kwargs):
+        if settings.PHYSICS_FROZEN:
+            return
         ship_entity = get_ship_entity()
         ship_physics = ship_entity["physics"]
         checkpoints = Entity.with_component("checkpoint")
@@ -39,6 +42,8 @@ class PhysicsSystem(System):
             )
 
     def update(self):
+        if settings.PHYSICS_FROZEN:
+            return
         self.update_ship_controls()
         self.update_all_physics_objects()
         self.update_ship_thrust_emitter()
@@ -139,7 +144,7 @@ class PhysicsSystem(System):
                 grav_acc = grav_acc.normalized * acc_magnitude
                 physics.acceleration += grav_acc
 
-            physics.velocity *= 1 - (settings.DRAG_CONSTANT * time_factor)
+            physics.velocity *= 1 - (physics.drag_constant * time_factor)
             physics.velocity += physics.acceleration * time_factor
             physics.position += physics.velocity * time_factor
 
@@ -175,12 +180,12 @@ class PhysicsSystem(System):
         if not settings.MOUSE_TURNING:
             physics.rotation = rotation
 
-        acc_constant = settings.ACC_CONSTANT if settings.ACCELERATION else 0.0
+        acc_constant = physics.acc_constant if settings.ACCELERATION else 0.0
         physics.acceleration *= acc_constant
 
         ship = entity["ship"]
 
-        boost_constant = settings.BOOST_CONSTANT if settings.BOOST else 0.0
+        boost_constant = ship.boost_constant if settings.BOOST else 0.0
 
         if inputs.boost and settings.BOOST:
             if ship.boost > 0:
