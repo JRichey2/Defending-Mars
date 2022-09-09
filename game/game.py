@@ -1,5 +1,6 @@
 import pyglet
 import os
+import sys
 
 # ECS Import
 from . import ecs
@@ -161,8 +162,10 @@ class DefendingMarsWindow(pyglet.window.Window):
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y ):
         System.inject(MouseScrollEvent(kind='MouseScroll', x=x, y=y, scroll_x=scroll_x, scroll_y=scroll_y ))
 
-    def on_close(self):
-        System.inject(Event(kind='Quit'))
+    # def on_close(self):
+    #     sys.exit(0)
+    #     self.has_exit = True
+    #     System.inject(Event(kind='Quit'))
 
 
 def run_game():
