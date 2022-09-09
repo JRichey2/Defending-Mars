@@ -34,12 +34,12 @@ class Entity:
     def attach(self, component):
         self.components[component.component_name] = component
         if component.component_name not in self.component_index:
-            self.component_index[component.component_name] = []
-        self.component_index[component.component_name].append(self)
+            self.component_index[component.component_name] = set()
+        self.component_index[component.component_name].add(self)
 
     @classmethod
     def with_component(cls, component_name):
-        return cls.component_index.get(component_name, [])
+        return list(cls.component_index.get(component_name, set()))
 
     @classmethod
     def find(cls, entity_id):
@@ -57,17 +57,11 @@ class Entity:
 
     @classmethod
     def clean_pending_destruction(cls):
-        for component_name in cls.component_index:
-            cls.component_index[component_name] = [
-                e
-                for e in cls.component_index[component_name]
-                if e not in cls.pending_destruction
-            ]
-        cls.entity_index = {
-            k: v
-            for k, v in cls.entity_index.items()
-            if k not in {e.entity_id for e in cls.pending_destruction}
-        }
+        for entity in cls.pending_destruction:
+            for component_name in entity.components:
+                cls.component_index[component_name].discard(entity)
+            cls.entity_index.pop(entity.entity_id, None)
+        cls.pending_destruction = set()
 
 
 class System:
