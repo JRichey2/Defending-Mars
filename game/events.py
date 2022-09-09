@@ -1,7 +1,15 @@
 from .ecs import Event, field
+from .vector import V2
+
+
+class PlaceEvent(Event):
+    position = field(type=V2, mandatory=True)
+    map_entity_id = field(type=int)
+
 
 class MapEvent(Event):
     map_name = field(type=str, mandatory=True)
+    map_entity_id = field(type=int)
 
 
 class PlacementSelectionEvent(Event):

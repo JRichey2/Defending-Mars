@@ -144,27 +144,27 @@ class V3:
 
     @property
     def x_radians(self):
-        return V2(self.y, self.z).radians
+        return self.__class__(self.y, self.z).radians
 
     @property
     def x_degrees(self):
-        return V2(self.y, self.z).degrees
+        return self.__class__(self.y, self.z).degrees
 
     @property
     def y_radians(self):
-        return V2(self.z, self.x).radians
+        return self.__class__(self.z, self.x).radians
 
     @property
     def y_degrees(self):
-        return V2(self.z, self.x).degrees
+        return self.__class__(self.z, self.x).degrees
 
     @property
     def z_radians(self):
-        return V2(self.x, self.y).radians
+        return self.__class__(self.x, self.y).radians
 
     @property
     def z_degrees(self):
-        return V2(self.x, self.y).degrees
+        return self.__class__(self.x, self.y).degrees
 
     def __neg__(self):
         return self.__class__(-self.x, -self.y, -self.z)
@@ -299,24 +299,16 @@ class V2:
                               self.y / other)
 
     def __iadd__(self, other):
-        self.x += other.x
-        self.y += other.y
-        return self
+        return V2(self.x + other.x, self.y + other.y)
 
     def __isub__(self, other):
-        self.x -= other.x
-        self.y -= other.y
-        return self
+        return V2(self.x - other.x, self.y - other.y)
 
     def __imul__(self, other):
-        self.x *= other
-        self.y *= other
-        return self
+        return V2(self.x * other, self.y * other)
 
     def __itruediv__(self, other):
-        self.x /= other
-        self.y /= other
-        return self
+        return V2(self.x / other, self.y / other)
 
     def __neg__(self):
         return self.__class__(-self.x, -self.y)

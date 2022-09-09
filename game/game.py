@@ -4,7 +4,7 @@ import os
 # ECS Import
 from . import ecs
 from .assets import ASSETS
-from .ecs import Entity, Event, field
+from .ecs import *
 from .vector import V2
 from .events import (
     MapEvent,
@@ -18,31 +18,24 @@ from .events import (
 # Component Imports
 from .components import (
     WindowComponent,
-    SpriteComponent,
     PhysicsComponent,
     InputComponent,
     Emitter,
     EmitterBoost,
-    FlightPath,
     Visual,
     GameVisualComponent,
     UIVisualComponent,
-    EnemyComponent,
-    MassComponent,
-    BoostComponent,
-    SpriteCheckpointComponent,
+    ShipComponent,
     CollisionComponent,
-    MapTimerComponent,
 )
 
 # System Imports
 from .checkpoint_system import CheckpointSystem
 from .event_system import EventSystem
 from .render_system import RenderSystem
-from .mapping_system import MappingSystem
+from .cartography_system import CartographySystem
 from .physics_system import PhysicsSystem
-from .timing_system import TimingSystem
-from .recording_system import RecordingSystem
+from .racing_system import RacingSystem
 
 
 def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
@@ -63,7 +56,6 @@ class DefendingMarsWindow(pyglet.window.Window):
         super().__init__(*args, **kwargs)
         self.load_assets()
         self.create_ship()
-        ecs.System.inject(MapEvent(kind='LoadMap', map_name='default'))
 
     def load_assets(self):
         ASSETS['asteroid_large'] = load_image('large-asteroid-512x512.png')
@@ -102,14 +94,17 @@ class DefendingMarsWindow(pyglet.window.Window):
         ASSETS['satellite'] = load_image('satellite-256x256.png')
         ASSETS['slowdown'] = load_image('slowdown-256x256.png')
         ASSETS['star_field'] = load_image('starfield-2048x2048.png', center=False)
+        Entity().attach(InputComponent())
 
     def create_ship(self):
         # Entity Components
         entity = Entity()
-        entity.attach(PhysicsComponent(position=V2(0, 0), rotation=0))
-        entity.attach(InputComponent())
-        entity.attach(BoostComponent())
-        entity.attach(MapTimerComponent())
+        entity.attach(PhysicsComponent(
+            position=V2(0, 0),
+            rotation=0,
+            static=False,
+        ))
+        entity.attach(ShipComponent())
         entity.attach(CollisionComponent(circle_radius=24))
 
         # Game Visuals
@@ -149,25 +144,25 @@ class DefendingMarsWindow(pyglet.window.Window):
         entity.attach(UIVisualComponent(visuals=ui_visuals))
 
     def on_key_press(self, symbol, modifiers):
-        ecs.System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=True))
+        System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=True))
 
     def on_key_release(self, symbol, modifiers):
-        ecs.System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=False))
+        System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=False))
 
     def on_mouse_motion(self, x, y, dx, dy):
-        ecs.System.inject(MouseMotionEvent(kind='MouseMotion', x=x, y=y, dx=dx, dy=dy))
+        System.inject(MouseMotionEvent(kind='MouseMotion', x=x, y=y, dx=dx, dy=dy))
 
     def on_mouse_press(self, x, y, button, modifiers):
-        ecs.System.inject(MouseButtonEvent(kind='MouseClick', x=x, y=y, button=button, pressed=True))
+        System.inject(MouseButtonEvent(kind='MouseClick', x=x, y=y, button=button, pressed=True))
 
     def on_mouse_release(self, x, y, button, modifiers):
-        ecs.System.inject(MouseButtonEvent(kind='MouseRelease', x=x, y=y, button=button, pressed=False))
+        System.inject(MouseButtonEvent(kind='MouseRelease', x=x, y=y, button=button, pressed=False))
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y ):
-        ecs.System.inject(MouseScrollEvent(kind='MouseScroll', x=x, y=y, scroll_x=scroll_x, scroll_y=scroll_y ))
+        System.inject(MouseScrollEvent(kind='MouseScroll', x=x, y=y, scroll_x=scroll_x, scroll_y=scroll_y ))
 
     def on_close(self):
-        ecs.System.inject(Event(kind='Quit'))
+        System.inject(Event(kind='Quit'))
 
 
 def run_game():
@@ -177,8 +172,8 @@ def run_game():
     # quikli as possible
     EventSystem()
 
-    # Temporary for us to create maps with
-    MappingSystem()
+    # Make, load, and manage maps
+    CartographySystem()
 
     # Physics system handles movement an collision
     PhysicsSystem()
@@ -186,11 +181,8 @@ def run_game():
     # Updates checkpoints
     CheckpointSystem()
 
-    # Timing System to handle turning on and off movement/gravity/ freezing things
-    TimingSystem()
-
-    # Used to record PB lines/replays
-    RecordingSystem()
+    # System for managing a race
+    RacingSystem()
 
     # The render system draws things to the Window
     RenderSystem()
@@ -206,19 +198,12 @@ def run_game():
             pyglet.sprite.Sprite(ASSETS['nebula'], x=0, y=0),
         ]
     ))
+    System.inject(MapEvent(kind='LoadMap', map_name='default'))
 
     def update(dt, *args, **kwargs):
         ecs.DELTA_TIME = dt
         window.clear()
-        ecs.System.update_all()
-
-    # Music: https://www.chosic.com/free-music/all/
-    # background_audio = pyglet.media.load(os.path.join('assets', 'background_music_test.mp3'))
-
-    # player = pyglet.media.Player()
-    # player.loop = True
-    # player.queue(background_audio)
-    # player.play()
+        System.update_all()
 
     pyglet.clock.schedule(update, 1/60.0)
     pyglet.app.run()

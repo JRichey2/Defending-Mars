@@ -40,17 +40,24 @@ class InputComponent:
 @dataclass
 class PhysicsComponent:
     component_name: str = "physics"
-    position: V2 = V2(0.0, 0.0)
-    rotation: int = 0
-    velocity: V2 = V2(0.0, 0.0)
-
-
-class SpriteComponent(pyglet.sprite.Sprite):
-    component_name = "sprite"
+    position: V2 = field(default_factory=V2)
+    rotation: float = 0.0
+    velocity: V2 = field(default_factory=V2)
+    acceleration: V2 = field(default_factory=V2)
+    mass: float = 0.0
+    static: bool = True
 
 
 @dataclass
-class SpriteCheckpointComponent:
+class ShipComponent:
+    component_name: str = "ship"
+    frozen: bool = True
+    boost: float = 100.0
+    boosting: bool = False
+
+
+@dataclass
+class CheckpointComponent:
     component_name = "checkpoint"
     next_image_bottom: pyglet.image.AbstractImage
     passed_image_bottom: pyglet.image.AbstractImage
@@ -61,6 +68,7 @@ class SpriteCheckpointComponent:
     completed: bool = False
     is_next: bool = False
     cp_order: int = 0
+    map_entity_id: int = None
 
 
 @dataclass
@@ -69,7 +77,7 @@ class WindowComponent:
     component_name: str = "window"
     camera_position: V2 = V2(0.0, 0.0)
     camera_zoom: float = 1.5
-    background_layers: list[SpriteComponent] = field(default_factory=list)
+    background_layers: list = field(default_factory=list)
 
 
 @dataclass
@@ -100,24 +108,68 @@ class FlightPath:
 
 @dataclass
 class MapComponent:
-    map_name: str
     component_name: str = "map"
 
+    # Name of the map for easier recording of records
+    map_name: str = "default"
+
+    # Whether or not the entity with this component is the active map
+    is_active: bool = True
+
+    ## RECORDING Section ##
+    # Used for determining whether we're actively recording a flight path
+    flight_recording_mode: bool = False
+
+    # Used to capture the flight path data as we're recording it
+    flight_path: list[dict] = None
+
+    ## EDITING Section ##
+    # Used for determining whether we're actively editing the map
+    map_editing_mode: bool = False
+
+    # Used to capture objects during mapping
+    map_objects: list[dict] = None
+
+    ## RACING Section ##
+    racing_mode: bool = True
+
+    # countdown label entity id
+    race_countdown_id: int = None
+
+    # Covers our start time for the race
+    race_start_time: float = None
+
+    # Covers our end time for the race
+    race_end_time: float = None
+
+    # Stores the flight path/racing line during a race
+    racing_line: list[dict] = field(default_factory=list)
+
+    # Stores the personal best racing line
+    pb_racing_line: list[dict] = field(default_factory=list)
+
+    # Stores the personal best ghost entity ID
+    pb_ghost_entity_id: int = None
+
+    # Stores the personal best racing line entity ID
+    pb_line_entity_id: int = None
+
 
 @dataclass
-class EnemyComponent(pyglet.sprite.Sprite):
-    component_name = "enemy"
-    flight_path: str
-    target: V2 = V2(0.0, 0.0)
-    path_index: int = 0
-    speed: float = 0.5
-    offset: V2 = V2(0.0, 0.0)
+class CountdownComponent:
+    component_name: str = "countdown"
 
+    # Used to select what the countdown is for
+    purpose: str = None
 
-@dataclass
-class MassComponent:
-    component_name = "mass"
-    mass: float
+    # Time the countdown started
+    started_at: float = None
+
+    # Duration of the countdown
+    duration: float = None
+
+    # Used to determine if countdown has completed
+    completed: bool = False
 
 
 @dataclass
@@ -126,15 +178,3 @@ class CollisionComponent:
     collider_shape: str = "circle"
     circle_radius: float = 0.0
 
-
-@dataclass
-class BoostComponent:
-    component_name = "boost"
-    boost: float = 100.0
-
-
-@dataclass
-class MapTimerComponent:
-    component_name = "map timer"
-    start_time: float = 0.0
-    end_time: float = 0.0

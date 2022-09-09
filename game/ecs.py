@@ -17,6 +17,7 @@ class Event(PClass):
 class Entity:
     entity_index = {}
     component_index = {}
+    pending_destruction = set()
 
     def __init__(self):
         global NEXT_ENTITY
@@ -24,6 +25,10 @@ class Entity:
         NEXT_ENTITY += 1
         self.components = {}
         self.entity_index[self.entity_id] = self
+        self.destroyed = False
+
+    def __hash__(self):
+        return hash(self.entity_id)
 
     def __eq__(self, other):
         return self.entity_id == other.entity_id
@@ -53,10 +58,17 @@ class Entity:
         return self.components.get(attr)
 
     def destroy(self):
-        for component_name in self.components:
-            self.component_index[component_name].remove(self)
-        if self.entity_id in self.entity_index:
-            del self.entity_index[self.entity_id]
+        self.destroyed = True
+        self.pending_destruction.add(self)
+
+    @classmethod
+    def clean_pending_destruction(cls):
+        for entity in cls.pending_destruction:
+            for component_name in entity.components:
+                cls.component_index[component_name].remove(entity)
+            if entity.entity_id in cls.entity_index:
+                del cls.entity_index[entity.entity_id]
+        cls.pending_destruction = set()
 
 
 class System:
@@ -64,7 +76,6 @@ class System:
     subscriptions = {}
 
     def __init__(self):
-        self.events = []
         self.systems[self.name] = self
         self.disabled = False
         module = importlib.import_module(name=self.__module__)
@@ -72,6 +83,9 @@ class System:
         self.setup()
 
     def setup(self):
+        pass
+
+    def handle_event(self, event):
         pass
 
     @property
@@ -86,7 +100,7 @@ class System:
     @classmethod
     def inject(cls, event):
         for subscriber in cls.subscriptions.get(event.kind, []):
-            subscriber.events.append(event)
+            subscriber.handle_event(event)
 
     def reload(self):
         # Get a reference to the module containing the system
@@ -123,5 +137,6 @@ class System:
                 # All other exceptions should disable the system until next reload
                 traceback.print_exc()
                 system.disabled = True
+        Entity.clean_pending_destruction()
 
 

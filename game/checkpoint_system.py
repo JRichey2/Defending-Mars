@@ -1,7 +1,10 @@
 from . import ecs
+from .ecs import *
+from .common import get_ship_entity
+from .events import MapEvent
 import time
 
-class CheckpointSystem(ecs.System):
+class CheckpointSystem(System):
 
     def get_next_cp(self, entities):
         incomplete_cps = [e for e in entities if not e['checkpoint'].completed]
@@ -19,9 +22,9 @@ class CheckpointSystem(ecs.System):
 
     # def get_last_cp(self, entities):
     def update(self):
-        ship_entity = ecs.Entity.with_component("input")[0]
+        ship_entity = get_ship_entity()
         ship_physics = ship_entity['physics']
-        entities = ecs.Entity.with_component("checkpoint")
+        entities = Entity.with_component("checkpoint")
         next_cp = self.get_next_cp(entities)
         last_cp = self.get_last_cp(entities)
         got_checkpoint = False
@@ -44,10 +47,15 @@ class CheckpointSystem(ecs.System):
                 got_checkpoint = True
                 cp.is_next = False
                 if cp.cp_order == last_cp:
-                    timer = time.monotonic()
-                    ship = ecs.Entity.with_component("map timer")[0]
-                    ship['map timer'].end_time = timer
-                    ecs.System.inject(ecs.Event(kind='MapComplete'))
+                    # TODO: get the active map
+                    map_entity = Entity.with_component("map")[0]
+                    map_ = map_entity["map"]
+                    map_.race_end_time = time.monotonic()
+                    System.inject(MapEvent(
+                        kind='RaceComplete',
+                        map_name=map_.map_name,
+                        map_entity_id=map_entity.entity_id,
+                    ))
 
         if got_checkpoint:
             # If we picked up a checkpoint, we need to re-calculate what the next checkpoint is

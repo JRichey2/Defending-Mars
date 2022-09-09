@@ -1,13 +1,16 @@
-from . import ecs
-from .vector import V2
-from .coordinates import world_to_screen
-
-import pyglet
 import os
 import math
 
+import pyglet
 
-class RenderSystem(ecs.System):
+from . import ecs
+from .ecs import *
+from .common import get_ship_entity
+from .coordinates import world_to_screen
+from .vector import V2
+
+
+class RenderSystem(System):
 
     def setup(self):
         pyglet.gl.glEnable(pyglet.gl.GL_LINE_SMOOTH)
@@ -88,12 +91,10 @@ class RenderSystem(ecs.System):
         visual.value.draw()
 
     def draw_boost_meter(self, window, entity, visual):
-        boost = entity["boost"]
+        ship = entity["ship"]
         base = visual.value['base']
         ticks = visual.value['ticks']
         base.opacity = 127
-        boost.blend_src=pyglet.gl.GL_SRC_ALPHA,
-        boost.blend_dest=pyglet.gl.GL_ONE,
         base.x = window.window.width - 160
         base.y = 50
         base.draw()
@@ -101,7 +102,7 @@ class RenderSystem(ecs.System):
         for i, tick in enumerate(ticks):
             lb = i * 20
             ub = i * 20 + 20
-            ab = min(max(boost.boost, lb),ub)
+            ab = min(max(ship.boost, lb),ub)
             alpha = (ab - lb) / 20
             tick.opacity = int(127 * alpha)
             tick.x = window.window.width - 56
@@ -163,8 +164,8 @@ class RenderSystem(ecs.System):
                   or arrow_x >  half_sprite_x + width):
                 # Clamp arrow to on the screen edge
 
-                ship = ecs.Entity.with_component("input")[0]
-                ship_physics = ship["physics"]
+                entity = get_ship_entity()
+                ship_physics = entity["physics"]
 
                 ship_x, ship_y = world_to_screen(
                     ship_physics.position.x, ship_physics.position.y,
@@ -225,16 +226,15 @@ class RenderSystem(ecs.System):
                     arrow.y = intersections[0].y
                     arrow.draw()
 
-
     def update(self):
-        window_entity = ecs.Entity.with_component("window")[0]
+        window_entity = Entity.with_component("window")[0]
         window = window_entity['window']
 
         self.render_bg(window)
 
         self.camera_offset(window)
 
-        entities = ecs.Entity.with_component("game visual")
+        entities = Entity.with_component("game visual")
         visuals = []
         for entity in entities:
             for visual in entity['game visual'].visuals:
@@ -250,7 +250,7 @@ class RenderSystem(ecs.System):
 
         self.reset_camera(window)
 
-        entities = ecs.Entity.with_component("ui visual")
+        entities = Entity.with_component("ui visual")
         visuals = []
         for entity in entities:
             for visual in entity['ui visual'].visuals:
