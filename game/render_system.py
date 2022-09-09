@@ -125,6 +125,7 @@ class RenderSystem(System):
         origin_x, origin_y = w * ui_vis.right, h * ui_vis.top
 
         for i, label in enumerate(labels):
+            label.text = menu.option_labels[i]
             label.x = origin_x
             label.y = origin_y - 64 * i
             if i == menu.selected_option:
