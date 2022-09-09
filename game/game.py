@@ -54,6 +54,7 @@ class DefendingMarsWindow(pyglet.window.Window):
         super().__init__(*args, **kwargs)
         self.load_assets()
         self.create_ship()
+        self.create_fps_meter()
 
     def load_assets(self):
         ASSETS['asteroid_large'] = load_image('large-asteroid-512x512.png')
@@ -93,6 +94,47 @@ class DefendingMarsWindow(pyglet.window.Window):
         ASSETS['slowdown'] = load_image('slowdown-256x256.png')
         ASSETS['star_field'] = load_image('starfield-2048x2048.png', center=False)
         Entity().attach(InputComponent())
+
+    def create_fps_meter(self):
+
+        def get_avg_fps(over_ticks):
+            ticks = list(0 for _ in range(over_ticks))
+            tick = 0
+            def inner():
+                nonlocal ticks
+                nonlocal tick
+                if ecs.DELTA_TIME > 0:
+                    FPS = 1.0 / ecs.DELTA_TIME
+                else:
+                    FPS = 60
+                ticks[tick] = int(FPS)
+                tick = (tick + 1) % over_ticks
+                avg_FPS = int(sum(ticks) / over_ticks)
+                min_FPS = int(min(ticks))
+                max_FPS = int(max(ticks))
+                return f'FPS: {avg_FPS} [{min_FPS}, {max_FPS}]'
+            return inner
+
+        fps_entity = Entity()
+        label = pyglet.text.Label(
+            'FPS',
+            font_size=24,
+            x=0, y=0,
+            anchor_x="left",
+            anchor_y="top"
+        )
+        fps_entity.attach(UIVisualComponent(
+            top=0.985,
+            right=0.0,
+            visuals=[Visual(
+                kind='real time label',
+                z_sort=1.0,
+                value={
+                    "fn": get_avg_fps(10),
+                    'label': label,
+                }
+            )]
+        ))
 
     def create_ship(self):
         # Entity Components
