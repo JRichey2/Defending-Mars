@@ -21,7 +21,7 @@ def get_window():
     if len(windows) == 0:
         return None
     else:
-        return windows[0]['window']
+        return windows[0]["window"]
 
 
 def get_ship_entity():
@@ -35,7 +35,7 @@ def get_ship_entity():
 def get_active_map_entity():
     map_entities = Entity.with_component("map")
     for map_entity in map_entities:
-        if map_entity['map'].is_active:
+        if map_entity["map"].is_active:
             return map_entity
     return None
 
@@ -43,19 +43,12 @@ def get_active_map_entity():
 def create_sprite(position, rotation, image, scale=1.0, subpixel=True, z_sort=0.0):
     entity = Entity()
     entity.attach(PhysicsComponent(position=position, rotation=rotation))
-    sprite=pyglet.sprite.Sprite(image, x=position.x, y=position.y, subpixel=subpixel)
+    sprite = pyglet.sprite.Sprite(image, x=position.x, y=position.y, subpixel=subpixel)
     sprite.scale = scale
     sprite.rotation = rotation
     entity.attach(
         GameVisualComponent(
-            visuals=[
-                Visual(
-                    kind="sprite",
-                    z_sort=z_sort,
-                    value=sprite
-                )
-            ]
+            visuals=[Visual(kind="sprite", z_sort=z_sort, value=sprite)]
         )
     )
     return entity
-

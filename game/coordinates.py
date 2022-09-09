@@ -8,4 +8,3 @@ def world_to_screen(x, y, width, height, pan_x, pan_y, zoom):
     x_s = (x - pan_x) / zoom + width / 2
     y_s = (y - pan_y) / zoom + height / 2
     return x_s, y_s
-

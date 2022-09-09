@@ -59,11 +59,13 @@ class Entity:
     def clean_pending_destruction(cls):
         for component_name in cls.component_index:
             cls.component_index[component_name] = [
-                e for e in cls.component_index[component_name]
+                e
+                for e in cls.component_index[component_name]
                 if e not in cls.pending_destruction
             ]
         cls.entity_index = {
-            k: v for k, v in cls.entity_index.items()
+            k: v
+            for k, v in cls.entity_index.items()
             if k not in {e.entity_id for e in cls.pending_destruction}
         }
 
@@ -147,5 +149,3 @@ class System:
                 system.disabled = True
                 print(f"Disabled system {system} during update")
         Entity.clean_pending_destruction()
-
-

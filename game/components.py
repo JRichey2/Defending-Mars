@@ -174,10 +174,12 @@ class CountdownComponent:
     # Used to determine if countdown has completed
     completed: bool = False
 
+    # used to capture when we last looked at this value
+    last_evaluated: float = None
+
 
 @dataclass
 class CollisionComponent:
     component_name = "collision"
     collider_shape: str = "circle"
     circle_radius: float = 0.0
-
