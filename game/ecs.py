@@ -2,16 +2,11 @@ import os
 import uuid
 import importlib
 import traceback
-from pyrsistent import PClass, field
 
 
 DELTA_TIME = 0.01667
 
 NEXT_ENTITY = 1
-
-
-class Event(PClass):
-    kind = field(type=str, mandatory=True)
 
 
 class Entity:
@@ -37,7 +32,6 @@ class Entity:
         return f"<{self.__class__.__name__}: {self.entity_id}>"
 
     def attach(self, component):
-        #print(f"Adding component {component.component_name} to {self}")
         self.components[component.component_name] = component
         if component.component_name not in self.component_index:
             self.component_index[component.component_name] = []
@@ -63,17 +57,21 @@ class Entity:
 
     @classmethod
     def clean_pending_destruction(cls):
-        for entity in cls.pending_destruction:
-            for component_name in entity.components:
-                cls.component_index[component_name].remove(entity)
-            if entity.entity_id in cls.entity_index:
-                del cls.entity_index[entity.entity_id]
-        cls.pending_destruction = set()
+        for component_name in cls.component_index:
+            cls.component_index[component_name] = [
+                e for e in cls.component_index[component_name]
+                if e not in cls.pending_destruction
+            ]
+        cls.entity_index = {
+            k: v for k, v in cls.entity_index.items()
+            if k not in {e.entity_id for e in cls.pending_destruction}
+        }
 
 
 class System:
     systems = {}
     subscriptions = {}
+    later_event = []
 
     def __init__(self):
         self.systems[self.name] = self
@@ -85,33 +83,32 @@ class System:
     def setup(self):
         pass
 
-    def handle_event(self, event):
-        pass
-
     @property
     def name(self):
         return self.__class__.__name__
 
-    def subscribe(self, event_kind):
-        if event_kind not in self.subscriptions:
-            self.subscriptions[event_kind] = []
-        self.subscriptions[event_kind].append(self)
+    def subscribe(self, event, handler):
+        if event not in self.subscriptions:
+            self.subscriptions[event] = []
+        # TODO: Reloaded systems trying to handle the same events?
+        self.subscriptions[event].append((self, handler))
 
     @classmethod
-    def inject(cls, event):
-        for subscriber in cls.subscriptions.get(event.kind, []):
+    def dispatch(cls, event, **kwargs):
+        for subscriber, handler in cls.subscriptions.get(event, []):
             subscriber.reload()
             if subscriber.disabled:
                 continue
             try:
-                subscriber.handle_event(event)
+                handler(**kwargs)
             except SystemExit:
                 # Exit exceptions should be allowed through
-                pass
+                raise
             except:
                 # All other exceptions should disable the system until next reload
                 traceback.print_exc()
                 subscriber.disabled = True
+                print(f"Disabled system {subscriber} during {event} with args {kwargs}")
 
     def reload(self):
         # Get a reference to the module containing the system
@@ -148,6 +145,7 @@ class System:
                 # All other exceptions should disable the system until next reload
                 traceback.print_exc()
                 system.disabled = True
+                print(f"Disabled system {system} during update")
         Entity.clean_pending_destruction()
 
 

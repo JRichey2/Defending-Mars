@@ -4,7 +4,7 @@ import pyglet
 
 from . import ecs
 from . import settings
-from .common import get_ship_entity
+from .common import *
 from .ecs import *
 from .settings import MOUSE_TURNING, CAMERA_SPRING
 from .vector import V2
@@ -13,28 +13,28 @@ from .vector import V2
 class PhysicsSystem(System):
 
     def setup(self):
-        self.subscribe('CenterCamera')
-        self.subscribe('Respawn')
+        self.subscribe('CenterCamera', self.handle_center_camera)
+        self.subscribe('Respawn', self.handle_respawn)
 
-    def handle_event(self, event):
-        if event.kind == 'CenterCamera':
-            window_entity = Entity.with_component("window")[0]
-            entity = get_ship_entity()
-            window_entity['window'].camera_position = entity['physics'].position
+    def handle_center_camera(self, **kwargs):
+        window = get_window()
+        ship_entity = get_ship_entity()
+        ship_physics = ship_entity['physics']
+        window.camera_position = ship_physics.position
 
-        elif event.kind == 'Respawn':
-            entity = get_ship_entity()
-            checkpoints = Entity.with_component("checkpoint")
-            completed_checkpoint = None
-            for entity in checkpoints:
-                checkpoint = entity['checkpoint']
-                if checkpoint.completed:
-                    completed_checkpoint = entity
-            if completed_checkpoint:
-                physics = completed_checkpoint['physics']
-                pos = physics.position
-                entity['physics'].position = pos
-                entity['physics'].velocity = V2(0, 0)
+    def handle_respawn(self, **kwargs):
+        ship_entity = get_ship_entity()
+        ship_physics = ship_entity['physics']
+        checkpoints = Entity.with_component("checkpoint")
+        completed_checkpoint = None
+        for entity in checkpoints:
+            checkpoint = entity['checkpoint']
+            if checkpoint.completed:
+                completed_checkpoint = entity
+        if completed_checkpoint:
+            checkpoint_physics = completed_checkpoint['physics']
+            ship_physics.position = checkpoint_physics.position
+            ship_physics.velocity = V2(0, 0)
 
     def update(self):
         self.update_ship_controls()

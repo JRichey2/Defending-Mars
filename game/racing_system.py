@@ -17,7 +17,6 @@ from .components import (
     FlightPath,
 )
 from .ecs import *
-from .events import CountdownEvent, MapEvent
 from .vector import *
 
 from pyglet import clock
@@ -26,73 +25,79 @@ from pyglet import clock
 class RacingSystem(System):
 
     def setup(self):
-        self.subscribe('MapLoaded')
-        self.subscribe('RaceStart')
-        self.subscribe('RaceComplete')
+        self.subscribe('MapLoaded', self.handle_map_loaded)
+        self.subscribe('RaceStart', self.handle_race_start)
+        self.subscribe('RaceComplete', self.handle_race_complete)
 
-    def handle_event(self, event):
-        if event.kind == 'MapLoaded':
-            # Freeze the ship
-            ship_entity = get_ship_entity()
-            ship_entity['physics'].static = True
+    def handle_map_loaded(self, *, map_entity_id, **kwargs):
+        ship_entity = get_ship_entity()
 
-            # Create a countdown label
-            countdown_entity = Entity()
-            countdown_entity.attach(CountdownComponent(
-                purpose="race",
-                started_at=time.monotonic(),
-                duration=6.0,
-            ))
-            window = get_window()
-            x, y = window.window.width / 2, window.window.height
-            label = pyglet.text.Label('GET READY', font_size=36, x=x, y=y, anchor_x="center", anchor_y="top")
-            visual = Visual(kind='label', z_sort=0, value=label)
-            countdown_entity.attach(UIVisualComponent(
-                visuals=[visual],
-                top = .90,
-                right = 0.5,
-            ))
+        # Update the map component that was loaded to know about the countdown label
+        map_entity = Entity.find(map_entity_id)
+        map_ = map_entity['map']
 
-            # Update the map component that was loaded to know about the countdown label
-            map_entity = Entity.find(event.map_entity_id)
-            map_ = map_entity['map']
-            map_.race_countdown_id = countdown_entity.entity_id
-
-            # Open the PB line file and load in the line
-            with open(os.path.join('records', 'pb.json'), 'r') as f:
-                map_.pb_racing_line = json.loads(f.read())
-
-            map_.pb_line_entity_id = self.create_pb_line(map_)
-            map_.pb_ghost_entity_id = self.create_pb_ghost()
-
-        elif event.kind == 'RaceStart':
+        if map_.mode != "racing":
             # Unfreeze the ship
-            ship_entity = get_ship_entity()
             ship_entity['physics'].static = False
+            return
 
-            # Set the race start time if map exists
-            map_entity = Entity.find(event.map_entity_id)
-            if not map_entity:
-                return
-            map_ = map_entity["map"]
-            start_time = time.monotonic()
-            map_.race_start_time = start_time
+        ship_entity['physics'].static = True
 
-            # Record the first racing line point
-            self.record_racing_line_point(map_, start_time)
 
-        elif event.kind == 'RaceComplete':
-            # Update the race completion if the map exists
-            map_entity = Entity.find(event.map_entity_id)
-            if not map_entity:
-                return
-            self.update_race_completion(map_entity)
+        # Create a countdown label
+        countdown_entity = Entity()
+        countdown_entity.attach(CountdownComponent(
+            purpose="race",
+            started_at=time.monotonic(),
+            duration=6.0,
+        ))
+        window = get_window()
+        x, y = window.window.width / 2, window.window.height
+        label = pyglet.text.Label('GET READY', font_size=36, x=x, y=y, anchor_x="center", anchor_y="top")
+        visual = Visual(kind='label', z_sort=0, value=label)
+        countdown_entity.attach(UIVisualComponent(
+            visuals=[visual],
+            top = .90,
+            right = 0.5,
+        ))
 
-            # Record the final racing line point
-            map_ = map_entity["map"]
-            self.record_racing_line_point(map_, map_.race_end_time, final_point=True)
-            with open(os.path.join('records', 'pb.json'), 'w') as f:
-                f.write(json.dumps(map_.racing_line))
+        map_.race_countdown_id = countdown_entity.entity_id
+
+        # Open the PB line file and load in the line
+        with open(os.path.join('records', 'pb.json'), 'r') as f:
+            map_.pb_racing_line = json.loads(f.read())
+
+        map_.pb_line_entity_id = self.create_pb_line(map_)
+        map_.pb_ghost_entity_id = self.create_pb_ghost()
+
+    def handle_race_start(self, *, map_entity_id, **kwargs):
+        # Unfreeze the ship
+        ship_entity = get_ship_entity()
+        ship_entity['physics'].static = False
+
+        # Set the race start time if map exists
+        map_entity = Entity.find(map_entity_id)
+        if not map_entity:
+            return
+        map_ = map_entity["map"]
+        start_time = time.monotonic()
+        map_.race_start_time = start_time
+
+        # Record the first racing line point
+        self.record_racing_line_point(map_, start_time)
+
+    def handle_race_complete(self, *, map_entity_id, **kwargs):
+        # Update the race completion if the map exists
+        map_entity = Entity.find(map_entity_id)
+        if not map_entity:
+            return
+        self.update_race_completion(map_entity)
+
+        # Record the final racing line point
+        map_ = map_entity["map"]
+        self.record_racing_line_point(map_, map_.race_end_time, final_point=True)
+        with open(os.path.join('records', 'pb.json'), 'w') as f:
+            f.write(json.dumps(map_.racing_line))
 
     def update(self):
         for map_entity in Entity.with_component("map"):
@@ -104,6 +109,7 @@ class RacingSystem(System):
 
             if map_.pb_ghost_entity_id is not None and map_.race_start_time is not None:
                 self.update_ghost(map_, current_time)
+            self.update_checkpoints(map_entity)
 
 
     def update_ghost(self, map_, current_time):
@@ -169,11 +175,11 @@ class RacingSystem(System):
                 label.text = "Go"
                 if not countdown.completed:
                     countdown.completed = True
-                    System.inject(MapEvent(
-                        kind='RaceStart',
+                    System.dispatch(
+                        event='RaceStart',
                         map_name=map_entity['map'].map_name,
                         map_entity_id=map_entity.entity_id,
-                    ))
+                    )
             else:
                 entity.destroy()
 
@@ -254,3 +260,76 @@ class RacingSystem(System):
         entity.attach(GameVisualComponent(visuals=visuals))
         return entity.entity_id
 
+    def update_checkpoints(self, map_entity):
+        entities = Entity.with_component("checkpoint")
+        ship_entity = get_ship_entity()
+        ship_physics = ship_entity['physics']
+        next_cp = self.get_next_cp(entities)
+        last_cp = self.get_last_cp(entities)
+
+        # Check for passing through checkpoint and update checkpoints if complete
+        got_checkpoint = False
+        for entity in entities:
+            cp = entity['checkpoint']
+
+            if cp.map_entity_id != map_entity.entity_id:
+                continue
+
+            if cp.cp_order != next_cp:
+                continue
+
+            physics = entity['physics']
+            if (ship_physics.position - physics.position).length < 100:
+                cp.completed = True
+                game_visual = entity['game visual']
+                visuals = list(sorted(game_visual.visuals, key=lambda v: v.z_sort))
+                top_visual = visuals[1]
+                bottom_visual = visuals[0]
+                top_visual.value.image = cp.passed_image_top
+                bottom_visual.value.image = cp.passed_image_bottom
+                got_checkpoint = True
+                cp.is_next = False
+                if cp.cp_order == last_cp:
+                    map_ = map_entity["map"]
+                    map_.race_end_time = time.monotonic()
+                    System.dispatch(
+                        event='RaceComplete',
+                        map_name=map_.map_name,
+                        map_entity_id=map_entity.entity_id,
+                    )
+
+        if got_checkpoint:
+            # If we picked up a checkpoint, we need to re-calculate what the next checkpoint is
+            next_cp = self.get_next_cp(entities)
+
+        for entity in entities:
+            cp = entity['checkpoint']
+            if not cp.completed and cp.cp_order == next_cp and cp.cp_order != last_cp:
+                game_visual = entity['game visual']
+                visuals = list(sorted(game_visual.visuals, key=lambda v: v.z_sort))
+                top_visual = visuals[1]
+                bottom_visual = visuals[0]
+                top_visual.value.image = cp.next_image_top
+                bottom_visual.value.image = cp.next_image_bottom
+                cp.is_next = True
+            if cp.cp_order == last_cp:
+                game_visual = entity['game visual']
+                visuals = list(sorted(game_visual.visuals, key=lambda v: v.z_sort))
+                top_visual = visuals[1]
+                bottom_visual = visuals[0]
+                top_visual.value.image = cp.finish_image_top
+                bottom_visual.value.image = cp.finish_image_bottom
+
+    def get_next_cp(self, entities):
+        incomplete_cps = [e for e in entities if not e['checkpoint'].completed]
+        if len(incomplete_cps) > 0:
+            return min(e['checkpoint'].cp_order for e in incomplete_cps)
+        else:
+            return -1
+
+    def get_last_cp(self, entities):
+        all_checkpoints = [e for e in entities if e['checkpoint']]
+        if len(all_checkpoints) > 0:
+            return max(e['checkpoint'].cp_order for e in all_checkpoints)
+        else:
+            return -1

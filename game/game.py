@@ -1,19 +1,18 @@
-import pyglet
 import os
 import sys
 
+
+import pyglet
+from pyglet.window import key
+
 # ECS Import
 from . import ecs
+from . import settings
 from .assets import ASSETS
+from .common import *
+from .coordinates import *
 from .ecs import *
 from .vector import V2
-from .events import (
-    MapEvent,
-    KeyEvent,
-    MouseMotionEvent,
-    MouseButtonEvent,
-    MouseScrollEvent,
-)
 
 
 # Component Imports
@@ -31,8 +30,6 @@ from .components import (
 )
 
 # System Imports
-from .checkpoint_system import CheckpointSystem
-from .event_system import EventSystem
 from .render_system import RenderSystem
 from .cartography_system import CartographySystem
 from .physics_system import PhysicsSystem
@@ -145,44 +142,106 @@ class DefendingMarsWindow(pyglet.window.Window):
         entity.attach(UIVisualComponent(visuals=ui_visuals))
 
     def on_key_press(self, symbol, modifiers):
-        System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=True))
+        inputs = get_inputs()
+        if symbol == key.W:
+            inputs.w = True
+        elif symbol == key.A:
+            inputs.a = True
+        elif symbol == key.S:
+            inputs.s = True
+        elif symbol == key.D:
+            inputs.d = True
+        elif symbol == key.LSHIFT:
+            inputs.boost = True
+        elif symbol == key.R:
+            System.dispatch(event='Respawn')
+        elif symbol == key.P:
+            inputs.mapping = not inputs.mapping
+            if inputs.mapping:
+                System.dispatch(event='StartMapping')
+            else:
+                System.dispatch(event='StopMapping')
+        elif symbol == key.M:
+            inputs.placement = not inputs.placement
+            if inputs.placement:
+                System.dispatch(event='StartPlacements')
+            else:
+                System.dispatch(event='StopPlacements')
+        elif symbol == key.LEFT:
+            System.dispatch(
+                event='PlacementSelection',
+                direction='up'
+            )
+        elif symbol == key.RIGHT:
+            System.dispatch(
+                event='PlacementSelection',
+                direction='down'
+            )
 
     def on_key_release(self, symbol, modifiers):
-        System.inject(KeyEvent(kind='Key', key_symbol=symbol, pressed=False))
+        inputs = get_inputs()
+        if symbol == key.W:
+            inputs.w = False
+        elif symbol == key.A:
+            inputs.a = False
+        elif symbol == key.S:
+            inputs.s = False
+        elif symbol == key.D:
+            inputs.d = False
+        elif symbol == key.LSHIFT:
+            inputs.boost = False
 
     def on_mouse_motion(self, x, y, dx, dy):
-        System.inject(MouseMotionEvent(kind='MouseMotion', x=x, y=y, dx=dx, dy=dy))
+        window = get_window()
+        camera = window.camera_position
+        width, height = window.window.width, window.window.height
+        w_x, w_y = screen_to_world(
+            x, y, width, height,
+            camera.x, camera.y,
+            window.camera_zoom
+        )
+        mouse_position = V2(w_x, w_y)
+        entity = get_ship_entity()
+        ship_physics = entity['physics']
+        ship_position = ship_physics.position
+
+        if settings.MOUSE_TURNING:
+            ship_physics.rotation = (mouse_position - ship_physics.position).degrees - 90
 
     def on_mouse_press(self, x, y, button, modifiers):
-        System.inject(MouseButtonEvent(kind='MouseClick', x=x, y=y, button=button, pressed=True))
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        System.inject(MouseButtonEvent(kind='MouseRelease', x=x, y=y, button=button, pressed=False))
+        window = get_window()
+        camera = window.camera_position
+        width, height = window.window.width, window.window.height
+        w_x, w_y = screen_to_world(
+            x, y, width, height,
+            camera.x, camera.y,
+            window.camera_zoom
+        )
+        mouse_position = V2(w_x, w_y)
+        if button == 1:
+            map_entity = get_active_map_entity()
+            if map_entity and map_entity['map'].is_active:
+                System.dispatch(
+                    event='Place',
+                    position=mouse_position,
+                    map_entity_id=map_entity.entity_id,
+                )
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y ):
-        System.inject(MouseScrollEvent(kind='MouseScroll', x=x, y=y, scroll_x=scroll_x, scroll_y=scroll_y ))
-
-    # def on_close(self):
-    #     sys.exit(0)
-    #     self.has_exit = True
-    #     System.inject(Event(kind='Quit'))
+        window = get_window()
+        if scroll_y > 0:
+            window.camera_zoom /= 1.1
+        else:
+            window.camera_zoom *= 1.1
 
 
 def run_game():
-
-    # Initialize our systems in the order we want them to run
-    # Events should come first, so we can react to input as 
-    # quikli as possible
-    EventSystem()
 
     # Make, load, and manage maps
     CartographySystem()
 
     # Physics system handles movement an collision
     PhysicsSystem()
-
-    # Updates checkpoints
-    CheckpointSystem()
 
     # System for managing a race
     RacingSystem()
@@ -201,7 +260,7 @@ def run_game():
             pyglet.sprite.Sprite(ASSETS['nebula'], x=0, y=0),
         ]
     ))
-    System.inject(MapEvent(kind='LoadMap', map_name='default'))
+    System.dispatch(event='LoadMap', map_name='default')
 
     def update(dt, *args, **kwargs):
         ecs.DELTA_TIME = dt

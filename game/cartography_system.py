@@ -7,7 +7,7 @@ import json
 from . import ecs
 from . import settings
 from .assets import ASSETS
-from .common import get_ship_entity
+from .common import *
 from .components import (
     PhysicsComponent,
     Emitter,
@@ -20,28 +20,7 @@ from .components import (
     CollisionComponent,
 )
 from .ecs import *
-from .events import MapEvent
 from .vector import V2
-
-
-def create_sprite(position, rotation, image, scale=1.0, subpixel=True, z_sort=0.0):
-    entity = Entity()
-    entity.attach(PhysicsComponent(position=position, rotation=rotation))
-    sprite=pyglet.sprite.Sprite(image, x=position.x, y=position.y, subpixel=subpixel)
-    sprite.scale = scale
-    sprite.rotation = rotation
-    entity.attach(
-        GameVisualComponent(
-            visuals=[
-                Visual(
-                    kind="sprite",
-                    z_sort=z_sort,
-                    value=sprite
-                )
-            ]
-        )
-    )
-    return entity
 
 
 def create_flare(image, position):
@@ -56,17 +35,13 @@ def create_flare(image, position):
 class CartographySystem(System):
 
     def setup(self):
-        self.subscribe('StartMapping')
-        self.subscribe('StopMapping')
-        self.subscribe('LoadMap')
-        self.subscribe('StartPlacements')
-        self.subscribe('StopPlacements')
-        self.subscribe('PlacementSelection')
-        self.subscribe('Place')
-        self.flight_points = None
-        self.placement = False
-        self.last_mapped_point = None
-        self.mapping = False
+        self.subscribe('StartMapping', self.handle_start_mapping)
+        self.subscribe('StopMapping', self.handle_stop_mapping)
+        self.subscribe('LoadMap', self.handle_load_map)
+        self.subscribe('StartPlacements', self.handle_start_placements)
+        self.subscribe('StopPlacements', self.handle_stop_placements)
+        self.subscribe('PlacementSelection', self.handle_placement_selection)
+        self.subscribe('Place', self.handle_place)
         # Name, Mass, Collision Radius
         self.selections = [
             ('satellite', 5, 80),
@@ -84,118 +59,172 @@ class CartographySystem(System):
             ('boost_powerup', None, None),
             ('slowdown', None, None),
         ]
-        self.selection_index = 0
 
-    def handle_event(self, event):
-        if event.kind == 'StartMapping':
-            print('Started Mapping')
-            self.flight_points = []
-            self.mapping = True
+    def handle_start_mapping(self, **kwargs):
+        map_entity = get_active_map_entity()
+        map_ = map_entity["map"]
+        map_.flight_path = []
+        map_.mode = "mapping"
 
-        elif event.kind == 'StopMapping':
-            print('Stopped Mapping')
-            with open(os.path.join('maps', 'wip_path.json'), 'w') as f:
-                f.write(json.dumps(self.flight_points ,indent=2))
-            self.last_mapped_point = None
-            self.mapping = False
+    def handle_stop_mapping(self, **kwargs):
+        map_entity = get_active_map_entity()
+        map_ = map_entity["map"]
+        with open(os.path.join('maps', 'wip_path.json'), 'w') as f:
+            f.write(json.dumps(map_.flight_path ,indent=2))
+        map_.flight_path = []
+        map_.mode = "freeplay"
 
-        elif event.kind == 'LoadMap':
-            self.clear_map()
-            map_entity_id = self.load_map(event.map_name)
-            System.inject(MapEvent(
-                kind='MapLoaded',
-                map_name=event.map_name,
-                map_entity_id=map_entity_id)
-            )
+    def handle_load_map(self, *, map_name, mode="racing", **kwargs):
+        print(f"Loading map {map_name}")
+        self.clear_map()
+        map_entity_id = self.load_map(map_name)
+        map_entity = Entity.find(map_entity_id)
+        map_ = map_entity["map"]
+        map_.mode = mode
+        System.dispatch(
+            event='MapLoaded',
+            map_name=map_name,
+            map_entity_id=map_entity_id,
+        )
 
-        elif event.kind == 'StartPlacements':
-            print('Started Placements')
-            with open(os.path.join('maps', 'wip_objects.json'), 'r') as f:
-                data = f.read()
-            self.placements = json.loads(data)
-            self.placement = True
-            settings.GRAVITY = False
-            entity = Entity()
-            self.selection_label_entity_id = entity.entity_id
-            selection = self.selections[self.selection_index]
-            label = pyglet.text.Label(selection[0],
-                      font_size=36,
-                      x=20, y=20,
-                      anchor_x="left", anchor_y="bottom")
-            entity.attach(UIVisualComponent(
-                visuals=[
-                    Visual(kind='label', z_sort=0, value=label)
-                ]
-            ))
-            with open(os.path.join('maps', f"wip_path.json"), "r") as f:
-                map_path_data = f.read()
-            self.flight_path = json.loads(map_path_data)
+    def handle_start_placements(self, **kwargs):
+        with open(os.path.join('maps', 'wip_objects.json'), 'r') as f:
+            data = f.read()
+        map_entity = get_active_map_entity()
+        map_ = map_entity["map"]
+        map_.map_objects = json.loads(data)
+        map_.mode = "editing"
+        settings.GRAVITY = False
 
-        elif event.kind == 'StopPlacements':
-            print('Stopped Placements')
-            settings.GRAVITY = True
-            self.placement = False
-            with open(os.path.join('maps', 'wip_objects.json'), 'w') as f:
-                f.write(json.dumps(self.placements, indent=2))
-            with open(os.path.join('maps', 'wip_path.json'), 'w') as f:
-                f.write(json.dumps(self.flight_path, indent=2))
-            System.inject(MapEvent(kind='LoadMap', map_name='wip'))
-            Entity.find(self.selection_label_entity_id).destroy()
+        entity = Entity()
+        map_.edit_selection_id = entity.entity_id
+        selection = self.selections[map_.edit_selection_index]
+        label = pyglet.text.Label(
+            selection[0], font_size=36,
+            x=20, y=20, anchor_x="left", anchor_y="bottom"
+        )
+        entity.attach(UIVisualComponent(
+            visuals=[
+                Visual(kind='label', z_sort=0, value=label)
+            ]
+        ))
 
-        elif self.placement == True and event.kind == 'Place':
-            object_name, mass, radius = self.selections[self.selection_index]
-            if object_name == 'checkpoint':
-                points = [
-                    ((event.position - V2(p['x'],p['y'])).length_squared, p)
-                    for p in self.flight_path
-                ]
-                closest_distance = min(x[0] for x in points)
-                closest_point = [p for d, p in points if d == closest_distance][0]
-                if 'check_point' not in closest_point:
-                    closest_point['checkpoint'] = True
+        # Load flight path data in so we can add checkpoints
+        with open(os.path.join('maps', f"wip_path.json"), "r") as f:
+            map_path_data = f.read()
+        map_.flight_path = json.loads(map_path_data)
 
-                    point_index = self.flight_path.index(closest_point)
-                    if point_index == 0:
-                        p1 = self.flight_path[point_index + 1]
-                        p2 = self.flight_path[point_index]
-                    else:
-                        p1 = self.flight_path[point_index]
-                        p2 = self.flight_path[point_index - 1]
+    def handle_stop_placements(self, **kwargs):
+        settings.GRAVITY = True
+        map_entity = get_active_map_entity()
+        if not map_entity:
+            return
 
-                    p1 = V2(p1['x'], p1['y'])
-                    p2 = V2(p2['x'], p2['y'])
-                    rotation = (p1 - p2).degrees - 90
-                    num_points = sum(1 for p in self.flight_path if 'checkpoint' in p)
-                    self.load_checkpoint(V2(closest_point['x'], closest_point['y']), rotation, num_points, event.map_entity_id)
-            elif mass is not None and radius is not None:
-                self.placements.append({"object": object_name, "x": event.position.x, "y": event.position.y})
-                self.load_object(object_name, event.position, mass, radius)
+        map_ = map_entity["map"]
+        if not map_.mode == "editing":
+            return
 
+        map_.mode = "freeplay"
+        print("Entered freeplay mode")
 
-        elif self.placement == True and event.kind == 'PlacementSelection':
-            if event.direction == 'up':
-                self.selection_index = (self.selection_index - 1) % len(self.selections)
-            elif event.direction == 'down':
-                self.selection_index = (self.selection_index + 1) % len(self.selections)
-            object_name, mass, radius = self.selections[self.selection_index]
-            Entity.find(self.selection_label_entity_id)['ui visual'].visuals[0].value.text = object_name
+        with open(os.path.join('maps', 'wip_objects.json'), 'w') as f:
+            f.write(json.dumps(map_.map_objects, indent=2))
+        print("wrote wip_objects.json")
 
+        with open(os.path.join('maps', 'wip_path.json'), 'w') as f:
+            f.write(json.dumps(map_.flight_path, indent=2))
+        print("wrote wip_path.json")
+
+        System.dispatch(event='LoadMap', map_name='wip', mode="freeplay")
+        Entity.find(map_.edit_selection_id).destroy()
+
+    def handle_place(self, *, position, map_entity_id, **kwargs):
+        map_entity = Entity.find(map_entity_id)
+        if not map_entity:
+            return
+
+        map_ = map_entity["map"]
+        if not map_.mode == "editing":
+            return
+
+        object_name, mass, radius = self.selections[map_.edit_selection_index]
+        if object_name == 'checkpoint':
+            points = [
+                ((position - V2(p['x'],p['y'])).length_squared, p)
+                for p in map_.flight_path
+            ]
+            closest_distance = min(x[0] for x in points)
+            closest_point = [p for d, p in points if d == closest_distance][0]
+            if 'check_point' not in closest_point:
+                closest_point['checkpoint'] = True
+
+                point_index = map_.flight_path.index(closest_point)
+                if point_index == 0:
+                    p1 = map_.flight_path[point_index + 1]
+                    p2 = map_.flight_path[point_index]
+                else:
+                    p1 = map_.flight_path[point_index]
+                    p2 = map_.flight_path[point_index - 1]
+
+                p1 = V2(p1['x'], p1['y'])
+                p2 = V2(p2['x'], p2['y'])
+                rotation = (p1 - p2).degrees - 90
+                num_points = sum(1 for p in map_.flight_path if 'checkpoint' in p)
+                self.load_checkpoint(
+                    V2(closest_point['x'], closest_point['y']),
+                    rotation,
+                    num_points,
+                    map_entity_id
+                )
+
+        elif mass is not None and radius is not None:
+            map_.map_objects.append({
+                "object": object_name,
+                "x": position.x,
+                "y": position.y
+            })
+            self.load_object(object_name, position, mass, radius)
+
+    def handle_placement_selection(self, *, direction, **kwargs):
+        map_entity = get_active_map_entity()
+        if not map_entity:
+            return
+
+        map_ = map_entity["map"]
+        if not map_.mode == "editing":
+            return
+
+        if direction == 'up':
+            map_.edit_selection_index = (map_.edit_selection_index - 1) % len(self.selections)
+        elif direction == 'down':
+            map_.edit_selection_index = (map_.edit_selection_index + 1) % len(self.selections)
+        object_name, mass, radius = self.selections[map_.edit_selection_index]
+        Entity.find(map_.edit_selection_id)['ui visual'].visuals[0].value.text = object_name
 
     def update(self):
-        if not self.mapping:
+        map_entity = get_active_map_entity()
+        if not map_entity:
+            return
+
+        map_ = map_entity["map"]
+
+        if not map_.mode == "mapping":
             return
 
         entity = get_ship_entity()
         position = entity['physics'].position
 
-        if self.last_mapped_point is None:
-            self.points.append({ "x": position.x, "y": position.y})
-            self.last_mapped_point = position
+        if len(map_.flight_path) == 0:
+            map_.flight_path.append({ "x": position.x, "y": position.y})
 
-        distance = (self.last_mapped_point - position).length
+        # Calculate distance to from the last mapped point to see
+        # if we have traveled far enough to warrant mapping another point
+        last_point = map_.flight_path[-1]
+        last_point = V2(last_point['x'], last_point['y'])
+        distance = (last_point - position).length
+
         if distance > 50:
-            self.points.append({ "x": position.x, "y": position.y})
-            self.last_mapped_point = position
+            map_.flight_path.append({ "x": position.x, "y": position.y})
 
     def load_object(self, name, position, mass, radius):
         entity = create_sprite(position, 0, ASSETS[name])
@@ -354,7 +383,7 @@ class CartographySystem(System):
 
         entity = get_ship_entity()
         entity['physics'].position = points[0]
-        System.inject(Event(kind='CenterCamera'))
+        System.dispatch(event='CenterCamera')
 
         return map_entity.entity_id
 

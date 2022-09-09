@@ -59,13 +59,13 @@ class ShipComponent:
 
 @dataclass
 class CheckpointComponent:
-    component_name = "checkpoint"
-    next_image_bottom: pyglet.image.AbstractImage
-    passed_image_bottom: pyglet.image.AbstractImage
-    next_image_top: pyglet.image.AbstractImage
-    passed_image_top: pyglet.image.AbstractImage
-    finish_image_top: pyglet.image.AbstractImage
-    finish_image_bottom: pyglet.image.AbstractImage
+    component_name: str = "checkpoint"
+    next_image_bottom: pyglet.image.AbstractImage = None
+    passed_image_bottom: pyglet.image.AbstractImage = None
+    next_image_top: pyglet.image.AbstractImage = None
+    passed_image_top: pyglet.image.AbstractImage = None
+    finish_image_top: pyglet.image.AbstractImage = None
+    finish_image_bottom: pyglet.image.AbstractImage = None
     completed: bool = False
     is_next: bool = False
     cp_order: int = 0
@@ -114,26 +114,26 @@ class MapComponent:
     # Name of the map for easier recording of records
     map_name: str = "default"
 
+    # Mode - "racing", "mapping", "editing", or "freeplay"
+    mode: str = "racing"
+
     # Whether or not the entity with this component is the active map
     is_active: bool = True
 
     ## RECORDING Section ##
-    # Used for determining whether we're actively recording a flight path
-    flight_recording_mode: bool = False
-
     # Used to capture the flight path data as we're recording it
     flight_path: list[dict] = None
 
     ## EDITING Section ##
-    # Used for determining whether we're actively editing the map
-    map_editing_mode: bool = False
-
     # Used to capture objects during mapping
     map_objects: list[dict] = None
 
-    ## RACING Section ##
-    racing_mode: bool = True
+    # Edit selection entity ID
+    edit_selection_id: int = None
 
+    edit_selection_index: int = 0
+
+    ## RACING Section ##
     # countdown label entity id
     race_countdown_id: int = None
 
