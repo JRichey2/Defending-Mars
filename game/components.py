@@ -23,6 +23,8 @@ class GameVisualComponent:
 class UIVisualComponent:
     component_name: str = "ui visual"
     visuals: list[Visual] = field(default_factory=list)
+    top: float = None
+    right: float = None
 
 
 @dataclass

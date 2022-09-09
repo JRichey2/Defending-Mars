@@ -47,7 +47,11 @@ class RacingSystem(System):
             x, y = window.window.width / 2, window.window.height
             label = pyglet.text.Label('GET READY', font_size=36, x=x, y=y, anchor_x="center", anchor_y="top")
             visual = Visual(kind='label', z_sort=0, value=label)
-            countdown_entity.attach(UIVisualComponent(visuals=[visual]))
+            countdown_entity.attach(UIVisualComponent(
+                visuals=[visual],
+                top = .90,
+                right = 0.5,
+            ))
 
             # Update the map component that was loaded to know about the countdown label
             map_entity = Entity.find(event.map_entity_id)
