@@ -58,11 +58,16 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.create_fps_meter()
 
     def load_assets(self):
+        # Ship Images
+        ASSETS["Avocado"] = load_image("ship-base-256x256.png")
+        ASSETS["Martian Express"] = load_image("ship-speed-256x256.png")
+        ASSETS["Sparrow"] = load_image("ship-speed-weapon-256x256.png")
+        ASSETS["BMS-12"] = load_image("ship-weapon-256x256.png")
+
         ASSETS["asteroid_large"] = load_image("large-asteroid-512x512.png")
         ASSETS["asteroid_medium"] = load_image("medium-asteroid-256x256.png")
         ASSETS["asteroid_small"] = load_image("asteroid-small-128x128.png")
         ASSETS["base_flare"] = load_image("base-flare-32x32.png")
-        ASSETS["base_ship"] = load_image("ship-base-256x256.png")
         ASSETS["black_hole"] = load_image("black-hole-1024x1024.png")
         ASSETS["boost_powerup"] = load_image("boost-powerup-256x256.png")
         ASSETS["boost_tick_blue"] = load_image("boost-tick-blue-48x48.png")
@@ -93,7 +98,6 @@ class DefendingMarsWindow(pyglet.window.Window):
         ASSETS["closer_stars"] = load_image("closer-stars-2048x2048.png", center=False)
         ASSETS["dwarf_gas_planet"] = load_image("dwarf-gas-planet-512x512.png")
         ASSETS["earth"] = load_image("earth-1024x1024.png")
-        ASSETS["enemy_ship"] = load_image("ship-speed-64x64.png")
         ASSETS["energy_particle_cyan"] = load_image("energy-particle-cyan-64x64.png")
         ASSETS["energy_particle_red"] = load_image("energy-particle-red-64x64.png")
         ASSETS["gas_giant"] = load_image("gas-giant-1024x1024.png")
@@ -166,7 +170,8 @@ class DefendingMarsWindow(pyglet.window.Window):
         entity.attach(CollisionComponent(circle_radius=24))
 
         # Game Visuals
-        sprite = pyglet.sprite.Sprite(ASSETS["base_ship"], x=0, y=0, subpixel=True)
+        ship_name = settings.selected_ship
+        sprite = pyglet.sprite.Sprite(ASSETS[ship_name], x=0, y=0, subpixel=True)
         sprite.scale = 0.25
         emitter = EmitterBoost(
             image=ASSETS["energy_particle_cyan"],

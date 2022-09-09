@@ -6,5 +6,6 @@
   "grav_constant": 100.0,
   "max_grav_acc": 0.18,
   "mouse_turning": false,
-  "physics_frozen": true
+  "physics_frozen": false,
+  "selected_ship": "Martian Express"
 }
