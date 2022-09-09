@@ -220,8 +220,6 @@ class DefendingMarsWindow(pyglet.window.Window):
             inputs.d = True
         elif symbol == key.LSHIFT:
             inputs.boost = True
-        elif symbol == key.I:
-            System.dispatch(event="LoadMap", map_name="wip", mode="racing")
         elif symbol == key.R:
             System.dispatch(event="Respawn")
         elif symbol == key.P:

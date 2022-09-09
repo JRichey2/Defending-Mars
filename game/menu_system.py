@@ -20,6 +20,7 @@ class MenuSystem(System):
         self.create_main_menu()
         self.create_ship_menu()
         self.create_settings_menu()
+        self.create_map_menu()
 
     def handle_menu_selection(self, *, direction, **kwargs):
         for entity in Entity.with_component("menu"):
@@ -44,7 +45,7 @@ class MenuSystem(System):
             callback()
             return
 
-    def play_game(self):
+    def play_game(self, map_name):
         print("Play Game selected")
         # Unlock physics
         settings.PHYSICS_FROZEN = False
@@ -54,7 +55,7 @@ class MenuSystem(System):
             menu.displayed = False
 
         # Load the map
-        System.dispatch(event="LoadMap", map_name="default")
+        System.dispatch(event="LoadMap", map_name=map_name, mode="racing")
 
     def change_ship(self):
         print("change ship")
@@ -71,6 +72,9 @@ class MenuSystem(System):
 
     def open_main(self):
         System.dispatch(event="DisplayMenu", menu_name="main menu")
+
+    def open_map_menu(self):
+        System.dispatch(event="DisplayMenu", menu_name="map menu")
 
     def change_turning_style(self):
         settings.mouse_turning = not settings.mouse_turning
@@ -89,6 +93,47 @@ class MenuSystem(System):
                 option_index = menu.selected_option
                 spring = "Camera Spring: On" if settings.camera_spring else "Camera Spring: Off"
                 menu.option_labels[option_index] = spring
+
+    def create_map_menu(self):
+        options = {
+            "Default Map": (lambda: self.play_game('default')),
+            "WIP Map": (lambda: self.play_game('wip')),
+            "Back to Menu": self.open_main,
+        }
+        option_labels = [l for l in options]
+
+        labels = []
+        for option in option_labels:
+            labels.append(
+                pyglet.text.Label(
+                    option,
+                    font_size=36,
+                    x=0,
+                    y=0,
+                    anchor_x="left",
+                    anchor_y="center",
+                )
+            )
+
+        visuals = [Visual(kind="menu options", z_sort=10, value=labels)]
+
+        entity = Entity()
+        entity.attach(
+            MenuComponent(
+                menu_name="map menu",
+                option_labels=option_labels,
+                option_callbacks=options,
+            )
+        )
+        entity.attach(
+            UIVisualComponent(
+                top=0.66,
+                right=0.33,
+                visuals=visuals,
+            )
+        )
+
+
 
     def create_settings_menu(self):
         options = {
@@ -138,7 +183,7 @@ class MenuSystem(System):
 
     def create_main_menu(self):
         options = {
-            "Play": self.play_game,
+            "Play": self.open_map_menu,
             "Change Ship": self.change_ship,
             "Settings": self.open_settings,
         }
