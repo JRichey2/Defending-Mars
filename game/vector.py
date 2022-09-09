@@ -1,14 +1,14 @@
 from struct import Struct
 from math import sqrt, sin, cos, radians, atan2, degrees
 
-__all__ = ['V2', 'V3']
+__all__ = ["V2", "V3"]
 
 
 class V3:
-    'Simple 3D vector type that does what you expect'
+    "Simple 3D vector type that does what you expect"
 
-    __slots__ = ['x', 'y', 'z']
-    packer = Struct('ddd')
+    __slots__ = ["x", "y", "z"]
+    packer = Struct("ddd")
 
     def __init__(self, x=0.0, y=0.0, z=0.0):
         self.x = float(x)
@@ -16,21 +16,22 @@ class V3:
         self.z = float(z)
 
     def __repr__(self):
-        return "{}({:.3f}, {:.3f}, {:.3f})".format(self.__class__.__name__,
-                                                   self.x, self.y, self.z)
+        return "{}({:.3f}, {:.3f}, {:.3f})".format(
+            self.__class__.__name__, self.x, self.y, self.z
+        )
 
     @classmethod
     def from_bytes(cls, packed_bytes):
-        '''Creates a new vector from a bytes object that is
-            in the format created by calling bytes(...) on
-            an instance of a V3.
+        """Creates a new vector from a bytes object that is
+        in the format created by calling bytes(...) on
+        an instance of a V3.
 
-            a = V3(10, 20, 30)
-            packed_bytes = bytes(a)
-            b = V3.from_bytes(packed_bytes)
-            assert a == b
+        a = V3(10, 20, 30)
+        packed_bytes = bytes(a)
+        b = V3.from_bytes(packed_bytes)
+        assert a == b
 
-        '''
+        """
         x, y, z = cls.packer.unpack(packed_bytes)
         return cls(x, y, z)
 
@@ -48,29 +49,21 @@ class V3:
             return True
 
     def __add__(self, other):
-        return self.__class__(self.x + other.x,
-                              self.y + other.y,
-                              self.z + other.z)
+        return self.__class__(self.x + other.x, self.y + other.y, self.z + other.z)
 
     def __sub__(self, other):
-        return self.__class__(self.x - other.x,
-                              self.y - other.y,
-                              self.z - other.z)
+        return self.__class__(self.x - other.x, self.y - other.y, self.z - other.z)
 
     def __mul__(self, other):
-        return self.__class__(self.x * other,
-                              self.y * other,
-                              self.z * other)
+        return self.__class__(self.x * other, self.y * other, self.z * other)
 
     def __truediv__(self, other):
-        return self.__class__(self.x / other,
-                              self.y / other,
-                              self.z / other)
+        return self.__class__(self.x / other, self.y / other, self.z / other)
 
     def __getitem__(self, key):
-        '''Allows vec[0] to provide the x component
-            and vec[1] to provide the y component.
-            this will be slower than using obj.x or obj.y'''
+        """Allows vec[0] to provide the x component
+        and vec[1] to provide the y component.
+        this will be slower than using obj.x or obj.y"""
         if key == 0:
             return self.x
         elif key == 1:
@@ -82,8 +75,8 @@ class V3:
             raise IndexError("3D Vectors only have 3 components, " + message)
 
     def __setitem__(self, key, value):
-        '''Allows vec[0] = x to set the x component
-            and vec[1] = y to set the y component'''
+        """Allows vec[0] = x to set the x component
+        and vec[1] = y to set the y component"""
         if key == 0:
             self.x = value
         elif key == 1:
@@ -99,12 +92,12 @@ class V3:
 
     @property
     def copy(self):
-        'Makes a copy of the vector'
+        "Makes a copy of the vector"
         return self.__class__(self.x, self.y, self.z)
 
     @property
     def length(self):
-        'The magnitude of the vector'
+        "The magnitude of the vector"
         x = self.x
         y = self.y
         z = self.z
@@ -119,7 +112,7 @@ class V3:
 
     @property
     def length_squared(self):
-        'The squared magnitude of the vector.  Fast for length compares'
+        "The squared magnitude of the vector.  Fast for length compares"
         x = self.x
         y = self.y
         z = self.z
@@ -189,7 +182,7 @@ class V3:
         yield self.x
 
     def __contains__(self, item):
-        'Returns true if either component matches the item'
+        "Returns true if either component matches the item"
         if abs(self.x - item) < 0.0001:
             return True
         elif abs(self.y - item) < 0.0001:
@@ -203,44 +196,44 @@ class V3:
         return self.x * other.x + self.y * other.y + self.z * other.z
 
     def write(self, writable):
-        'Writes itself to the file-like object passed in as binary'
+        "Writes itself to the file-like object passed in as binary"
         return writable.write(bytes(self))
 
 
 class V2:
-    'Simple 2D vector type that does what you expect'
+    "Simple 2D vector type that does what you expect"
 
-    __slots__ = ['x', 'y']
-    packer = Struct('dd')
+    __slots__ = ["x", "y"]
+    packer = Struct("dd")
 
     def __init__(self, x=0.0, y=0.0):
-        '''Most efficient way to make a V2: from x and y
+        """Most efficient way to make a V2: from x and y
 
-            # (0.0, 0.0)
-            a = V2()
+        # (0.0, 0.0)
+        a = V2()
 
-            # (10, 0.0)
-            b = V2(x=10)
+        # (10, 0.0)
+        b = V2(x=10)
 
-            # (0.0, 10.0)
-            c = V2(y=10)
+        # (0.0, 10.0)
+        c = V2(y=10)
 
-            # (3.0, 4.0)
-            d = V2(3.0, 4.0)
-        '''
+        # (3.0, 4.0)
+        d = V2(3.0, 4.0)
+        """
         self.x = float(x)
         self.y = float(y)
 
     @classmethod
     def from_degrees_and_length(cls, angle, length):
-        '''Creates a new vector from an angle in degrees and a length
+        """Creates a new vector from an angle in degrees and a length
 
-            # (10.0, 0.0)
-            V2.from_degrees_and_length(0, 10.0)
+        # (10.0, 0.0)
+        V2.from_degrees_and_length(0, 10.0)
 
-            # (0.707, 0.707)
-            V2.from_degrees_and_length(45, 10.0)
-        '''
+        # (0.707, 0.707)
+        V2.from_degrees_and_length(45, 10.0)
+        """
         angle = radians(angle)
         x = cos(angle) * length
         y = sin(angle) * length
@@ -248,55 +241,50 @@ class V2:
 
     @classmethod
     def from_radians_and_length(cls, angle, length):
-        '''Creates a new vector from an angle in radians and a length
+        """Creates a new vector from an angle in radians and a length
 
-            # (10.0, 0.0)
-            V2.from_radians_and_length(0, 10.0)
+        # (10.0, 0.0)
+        V2.from_radians_and_length(0, 10.0)
 
-            # (0.707, 0.707)
-            Vecor.from_radians_and_length(pi / 4, 1.0)
-        '''
+        # (0.707, 0.707)
+        Vecor.from_radians_and_length(pi / 4, 1.0)
+        """
         x = cos(angle) * length
         y = sin(angle) * length
         return cls(x, y)
 
     @classmethod
     def from_bytes(cls, packed_bytes):
-        '''Creates a new vector from a bytes object that is
-            in the format created by calling bytes(...) on
-            an instance of a V2.
+        """Creates a new vector from a bytes object that is
+        in the format created by calling bytes(...) on
+        an instance of a V2.
 
-            a = V2(10, 20)
-            packed_bytes = bytes(a)
-            b = V2.from_bytes(packed_bytes)
-            assert a == b
+        a = V2(10, 20)
+        packed_bytes = bytes(a)
+        b = V2.from_bytes(packed_bytes)
+        assert a == b
 
-        '''
+        """
         x, y = cls.packer.unpack(packed_bytes)
         return cls(x, y)
 
     def __repr__(self):
-        return "{}({:.3f}, {:.3f})".format(self.__class__.__name__,
-                                           self.x, self.y)
+        return "{}({:.3f}, {:.3f})".format(self.__class__.__name__, self.x, self.y)
 
     def __bytes__(self):
         return self.packer.pack(self.x, self.y)
 
     def __add__(self, other):
-        return self.__class__(self.x + other.x,
-                              self.y + other.y)
+        return self.__class__(self.x + other.x, self.y + other.y)
 
     def __sub__(self, other):
-        return self.__class__(self.x - other.x,
-                              self.y - other.y)
+        return self.__class__(self.x - other.x, self.y - other.y)
 
     def __mul__(self, other):
-        return self.__class__(self.x * other,
-                              self.y * other)
+        return self.__class__(self.x * other, self.y * other)
 
     def __truediv__(self, other):
-        return self.__class__(self.x / other,
-                              self.y / other)
+        return self.__class__(self.x / other, self.y / other)
 
     def __iadd__(self, other):
         return V2(self.x + other.x, self.y + other.y)
@@ -334,9 +322,9 @@ class V2:
         return True
 
     def __getitem__(self, key):
-        '''Allows vec[0] to provide the x component
-            and vec[1] to provide the y component.
-            this will be slower than using obj.x or obj.y'''
+        """Allows vec[0] to provide the x component
+        and vec[1] to provide the y component.
+        this will be slower than using obj.x or obj.y"""
         if key == 0:
             return self.x
         elif key == 1:
@@ -346,8 +334,8 @@ class V2:
             raise IndexError("2D Vectors only have 2 components, " + message)
 
     def __setitem__(self, key, value):
-        '''Allows vec[0] = x to set the x component
-            and vec[1] = y to set the y component'''
+        """Allows vec[0] = x to set the x component
+        and vec[1] = y to set the y component"""
         if key == 0:
             self.x = value
         elif key == 1:
@@ -368,7 +356,7 @@ class V2:
         yield self.x
 
     def __contains__(self, item):
-        'Returns true if either component matches the item'
+        "Returns true if either component matches the item"
         if abs(self.x - item) < 0.0001:
             return True
         elif abs(self.y - item) < 0.0001:
@@ -378,96 +366,95 @@ class V2:
 
     @property
     def length(self):
-        'The magnitude of the vector'
+        "The magnitude of the vector"
         x = self.x
         y = self.y
         return sqrt(x * x + y * y)
 
     @length.setter
     def length(self, value):
-        'Sets the magnitude of the vector'
+        "Sets the magnitude of the vector"
         current = self.length
-        self *= (value / current)
+        self *= value / current
 
     @property
     def length_squared(self):
-        'The squared magnitude of the vector.  Fast for length compares'
+        "The squared magnitude of the vector.  Fast for length compares"
         x = self.x
         y = self.y
         return x * x + y * y
 
     def normalize(self):
-        'Grows or Shrinks the vector to a size of 1.0 but maintains angle'
+        "Grows or Shrinks the vector to a size of 1.0 but maintains angle"
         self.length = 1
 
     @property
     def normalized(self):
-        'Returns a normalized copy of the vector'
+        "Returns a normalized copy of the vector"
         return self / self.length
 
     @normalized.setter
     def normalized(self, value):
-        '''Ensures the vector, when normalized, will match the normalized
-            version of the vector povided'''
+        """Ensures the vector, when normalized, will match the normalized
+        version of the vector povided"""
         self.radians = value.radians
 
     @property
     def degrees(self):
-        'Returns the angle of the vector in degrees'
+        "Returns the angle of the vector in degrees"
         return degrees(self.radians)
 
     @degrees.setter
     def degrees(self, value):
-        'Sets the angle of the vector in degrees'
+        "Sets the angle of the vector in degrees"
         self.radians = radians(value)
 
     @property
     def radians(self):
-        'Returns the angle of the vector in radians'
+        "Returns the angle of the vector in radians"
         return atan2(self.y, self.x)
 
     @radians.setter
     def radians(self, value):
-        'Sets the angle of the vector in radians'
+        "Sets the angle of the vector in radians"
         new_v = self.__class__.from_radians_and_length(value, self.length)
         self.x = new_v.x
         self.y = new_v.y
 
     @property
     def copy(self):
-        'Makes a copy of the vector'
+        "Makes a copy of the vector"
         return self.__class__(self.x, self.y)
 
     def dot_product(self, other):
-        'Returns the dot product'
+        "Returns the dot product"
         return self.x * other.x + self.y * other.y
 
     @property
     def x_vector(self):
-        'Returns a vector with only the x component'
+        "Returns a vector with only the x component"
         return self.__class__(self.x, 0)
 
     @property
     def y_vector(self):
-        'Returns a vector with only the y component'
+        "Returns a vector with only the y component"
         return self.__class__(0, self.y)
 
     @property
     def mirror(self):
-        'A copy of the vector mirrored over x and y. same as * -1 or -obj'
+        "A copy of the vector mirrored over x and y. same as * -1 or -obj"
         return -self
 
     @property
     def mirror_x(self):
-        'A copy of the vector mirrored over the x axis'
+        "A copy of the vector mirrored over the x axis"
         return self.__class__(self.x, -self.y)
 
     @property
     def mirror_y(self):
-        'A copy of the vector mirrored over the y axis'
+        "A copy of the vector mirrored over the y axis"
         return self.__class__(-self.x, self.y)
 
     def write(self, writable):
-        'Writes itself to the file-like object passed in as binary'
+        "Writes itself to the file-like object passed in as binary"
         return writable.write(bytes(self))
-

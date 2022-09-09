@@ -11,7 +11,6 @@ from .vector import V2
 
 
 class RenderSystem(System):
-
     def setup(self):
         pyglet.gl.glEnable(pyglet.gl.GL_LINE_SMOOTH)
         pyglet.gl.glHint(pyglet.gl.GL_LINE_SMOOTH_HINT, pyglet.gl.GL_NICEST)
@@ -75,8 +74,8 @@ class RenderSystem(System):
         visual.value.batch.draw()
 
     def draw_flare(self, window, entity, visual, ship_entity):
-        physics = entity['physics']
-        ship_physics = ship_entity['physics']
+        physics = entity["physics"]
+        ship_physics = ship_entity["physics"]
         sprite = visual.value
         distance = (ship_physics.position - physics.position).length
         fade_distance = 700
@@ -86,7 +85,7 @@ class RenderSystem(System):
         sprite.draw()
 
     def draw_sprite(self, window, entity, visual):
-        physics = entity['physics']
+        physics = entity["physics"]
         sprite = visual.value
         if physics is not None:
             sprite.x = physics.position.x
@@ -95,10 +94,10 @@ class RenderSystem(System):
         sprite.draw()
 
     def draw_real_time_label(self, window, entity, visual):
-        ui_vis = entity['ui visual']
+        ui_vis = entity["ui visual"]
         value = visual.value
-        label = value['label']
-        label.text = value['fn']()
+        label = value["label"]
+        label.text = value["fn"]()
         if ui_vis.right is not None:
             label.x = window.window.width * ui_vis.right
         if ui_vis.top is not None:
@@ -106,7 +105,7 @@ class RenderSystem(System):
         label.draw()
 
     def draw_label(self, window, entity, visual):
-        ui_vis = entity['ui visual']
+        ui_vis = entity["ui visual"]
         if ui_vis.right is not None:
             visual.value.x = window.window.width * ui_vis.right
         if ui_vis.top is not None:
@@ -115,8 +114,8 @@ class RenderSystem(System):
 
     def draw_boost_meter(self, window, entity, visual):
         ship = entity["ship"]
-        base = visual.value['base']
-        ticks = visual.value['ticks']
+        base = visual.value["base"]
+        ticks = visual.value["ticks"]
         base.opacity = 127
         base.x = window.window.width - 160
         base.y = 50
@@ -125,13 +124,12 @@ class RenderSystem(System):
         for i, tick in enumerate(ticks):
             lb = i * 20
             ub = i * 20 + 20
-            ab = min(max(ship.boost, lb),ub)
+            ab = min(max(ship.boost, lb), ub)
             alpha = (ab - lb) / 20
             tick.opacity = int(127 * alpha)
             tick.x = window.window.width - 56
             tick.y = 34 + (i + 1) * 34
             tick.draw()
-
 
     def calculate_line_intersection(self, p1, p2, normal, line_position, vertical=True):
         v = p2 - p1
@@ -163,38 +161,46 @@ class RenderSystem(System):
     def draw_checkpoint_arrow(self, window, entity, visual):
         width, height = window.window.width, window.window.height
         camera = window.camera_position
-        cp = entity['checkpoint']
-        physics = entity['physics']
-        arrow = entity['ui visual'].visuals[0].value
+        cp = entity["checkpoint"]
+        physics = entity["physics"]
+        arrow = entity["ui visual"].visuals[0].value
 
         zoom = window.camera_zoom
 
         if cp.is_next:
             arrow_x, arrow_y = world_to_screen(
-                physics.position.x, physics.position.y,
-                width, height,
-                camera.x, camera.y,
-                zoom
+                physics.position.x,
+                physics.position.y,
+                width,
+                height,
+                camera.x,
+                camera.y,
+                zoom,
             )
 
             half_sprite_x = 128 / zoom
             half_sprite_y = 128 / zoom
 
             # Check if original sprite was off the screen, and draw if so
-            if (     arrow_y < -half_sprite_y
-                  or arrow_y >  half_sprite_y + height
-                  or arrow_x < -half_sprite_x
-                  or arrow_x >  half_sprite_x + width):
+            if (
+                arrow_y < -half_sprite_y
+                or arrow_y > half_sprite_y + height
+                or arrow_x < -half_sprite_x
+                or arrow_x > half_sprite_x + width
+            ):
                 # Clamp arrow to on the screen edge
 
                 entity = get_ship_entity()
                 ship_physics = entity["physics"]
 
                 ship_x, ship_y = world_to_screen(
-                    ship_physics.position.x, ship_physics.position.y,
-                    width, height,
-                    camera.x, camera.y,
-                    zoom
+                    ship_physics.position.x,
+                    ship_physics.position.y,
+                    width,
+                    height,
+                    camera.x,
+                    camera.y,
+                    zoom,
                 )
 
                 arrow_point = V2(arrow_x, arrow_y)
@@ -202,44 +208,39 @@ class RenderSystem(System):
 
                 intersections = []
 
-                intersections.append(self.calculate_line_intersection(
-                    ship_point,
-                    arrow_point,
-                    V2(-1.0, 0.0),
-                    height,
-                    vertical=False
-                ))
+                intersections.append(
+                    self.calculate_line_intersection(
+                        ship_point, arrow_point, V2(-1.0, 0.0), height, vertical=False
+                    )
+                )
 
-                intersections.append(self.calculate_line_intersection(
-                    ship_point,
-                    arrow_point,
-                    V2(1.0, 0.0),
-                    0,
-                    vertical=False
-                ))
+                intersections.append(
+                    self.calculate_line_intersection(
+                        ship_point, arrow_point, V2(1.0, 0.0), 0, vertical=False
+                    )
+                )
 
-                intersections.append(self.calculate_line_intersection(
-                    ship_point,
-                    arrow_point,
-                    V2(0.0, -1.0),
-                    width,
-                    vertical=True
-                ))
+                intersections.append(
+                    self.calculate_line_intersection(
+                        ship_point, arrow_point, V2(0.0, -1.0), width, vertical=True
+                    )
+                )
 
-                intersections.append(self.calculate_line_intersection(
-                    ship_point,
-                    arrow_point,
-                    V2(0.0, 1.0),
-                    0,
-                    vertical=True
-                ))
+                intersections.append(
+                    self.calculate_line_intersection(
+                        ship_point, arrow_point, V2(0.0, 1.0), 0, vertical=True
+                    )
+                )
 
                 intersections = [(i, p) for i, p in intersections if p is not None]
 
                 e = 1.0
                 intersections = [
-                    p for i, p in intersections
-                    if i and (0 - e <= p.x <= width + e) and (0 - e <= p.y <= height + e)
+                    p
+                    for i, p in intersections
+                    if i
+                    and (0 - e <= p.x <= width + e)
+                    and (0 - e <= p.y <= height + e)
                 ]
 
                 if len(intersections) > 0:
@@ -260,17 +261,17 @@ class RenderSystem(System):
         entities = Entity.with_component("game visual")
         visuals = []
         for entity in entities:
-            for visual in entity['game visual'].visuals:
+            for visual in entity["game visual"].visuals:
                 visuals.append((entity, visual))
 
         for entity, visual in sorted(visuals, key=lambda x: x[1].z_sort):
-            if visual.kind == 'emitter':
+            if visual.kind == "emitter":
                 self.draw_emitter(window, entity, visual)
-            elif visual.kind == 'flare':
+            elif visual.kind == "flare":
                 self.draw_flare(window, entity, visual, ship_entity)
-            elif visual.kind == 'sprite':
+            elif visual.kind == "sprite":
                 self.draw_sprite(window, entity, visual)
-            elif visual.kind == 'flight path':
+            elif visual.kind == "flight path":
                 self.draw_flight_path(window, entity, visual)
 
         self.reset_camera(window)
@@ -278,16 +279,15 @@ class RenderSystem(System):
         entities = Entity.with_component("ui visual")
         visuals = []
         for entity in entities:
-            for visual in entity['ui visual'].visuals:
+            for visual in entity["ui visual"].visuals:
                 visuals.append((entity, visual))
 
         for entity, visual in sorted(visuals, key=lambda x: x[1].z_sort):
-            if visual.kind == 'checkpoint arrow':
+            if visual.kind == "checkpoint arrow":
                 self.draw_checkpoint_arrow(window, entity, visual)
-            elif visual.kind == 'boost':
+            elif visual.kind == "boost":
                 self.draw_boost_meter(window, entity, visual)
-            elif visual.kind == 'label':
+            elif visual.kind == "label":
                 self.draw_label(window, entity, visual)
-            elif visual.kind == 'real time label':
+            elif visual.kind == "real time label":
                 self.draw_real_time_label(window, entity, visual)
-

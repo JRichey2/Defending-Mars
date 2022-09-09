@@ -34,10 +34,11 @@ from .render_system import RenderSystem
 from .cartography_system import CartographySystem
 from .physics_system import PhysicsSystem
 from .racing_system import RacingSystem
+from .audio_system import AudioSystem
 
 
 def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
-    image = pyglet.image.load(os.path.join('assets', asset_name))
+    image = pyglet.image.load(os.path.join("assets", asset_name))
     if center:
         image.anchor_x = image.width // 2
         image.anchor_y = image.height // 2
@@ -49,7 +50,6 @@ def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
 
 
 class DefendingMarsWindow(pyglet.window.Window):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.load_assets()
@@ -57,49 +57,63 @@ class DefendingMarsWindow(pyglet.window.Window):
         self.create_fps_meter()
 
     def load_assets(self):
-        ASSETS['asteroid_large'] = load_image('large-asteroid-512x512.png')
-        ASSETS['asteroid_medium'] = load_image('medium-asteroid-256x256.png')
-        ASSETS['asteroid_small'] = load_image('asteroid-small-128x128.png')
-        ASSETS['base_flare'] = load_image('base-flare-32x32.png')
-        ASSETS['base_ship'] = load_image('ship-base-256x256.png')
-        ASSETS['black_hole'] = load_image('black-hole-1024x1024.png')
-        ASSETS['boost_powerup'] = load_image('boost-powerup-256x256.png')
-        ASSETS['boost_tick_blue'] = load_image('boost-tick-blue-48x48.png')
-        ASSETS['boost_tick_red'] = load_image('boost-tick-red-48x48.png')
-        ASSETS['boost_tick_yellow'] = load_image('boost-tick-yellow-48x48.png')
-        ASSETS['boost_ui_base'] = load_image('boost-ui-base-288x64.png')
-        ASSETS['checkpoint_arrow'] = load_image('checkpoint-arrow-128x128.png', anchor_x=128, anchor_y=64)
-        ASSETS['checkpoint_bottom'] = load_image('checkpoint-bottom-256x256.png')
-        ASSETS['checkpoint_finish_bottom'] = load_image('checkpoint-finish-bottom-256x256.png')
-        ASSETS['checkpoint_finish_top'] = load_image('checkpoint-finish-top-256x256.png')
-        ASSETS['checkpoint_next_bottom'] = load_image('checkpoint-next-bottom-256x256.png')
-        ASSETS['checkpoint_next_top'] = load_image('checkpoint-next-top-256x256.png')
-        ASSETS['checkpoint_passed_bottom'] = load_image('checkpoint-passed-bottom-256x256.png')
-        ASSETS['checkpoint_passed_top'] = load_image('checkpoint-passed-top-256x256.png')
-        ASSETS['checkpoint_top'] = load_image('checkpoint-top-256x256.png')
-        ASSETS['closer_stars'] = load_image('closer-stars-2048x2048.png', center=False)
-        ASSETS['dwarf_gas_planet'] = load_image('dwarf-gas-planet-512x512.png')
-        ASSETS['earth'] = load_image('earth-1024x1024.png')
-        ASSETS['enemy_ship'] = load_image('ship-speed-64x64.png')
-        ASSETS['energy_particle_cyan'] = load_image('energy-particle-cyan-64x64.png')
-        ASSETS['energy_particle_red'] = load_image('energy-particle-red-64x64.png')
-        ASSETS['gas_giant'] = load_image('gas-giant-1024x1024.png')
-        ASSETS['medium_gas_planet'] = load_image('medium-gas-planet-512x512.png')
-        ASSETS['moon'] = load_image('moon-128x128.png')
-        ASSETS['nebula'] = load_image('nebula-2048x2048.png', center=False)
-        ASSETS['particle_flare'] = load_image('particle-flare-32x32.png')
-        ASSETS['red_planet'] = load_image('red-planet-512x512.png')
-        ASSETS['red_planet_shield'] = load_image('red-planet-shield-512x512.png')
-        ASSETS['satellite'] = load_image('satellite-256x256.png')
-        ASSETS['slowdown'] = load_image('slowdown-256x256.png')
-        ASSETS['star_field'] = load_image('starfield-2048x2048.png', center=False)
+        ASSETS["asteroid_large"] = load_image("large-asteroid-512x512.png")
+        ASSETS["asteroid_medium"] = load_image("medium-asteroid-256x256.png")
+        ASSETS["asteroid_small"] = load_image("asteroid-small-128x128.png")
+        ASSETS["base_flare"] = load_image("base-flare-32x32.png")
+        ASSETS["base_ship"] = load_image("ship-base-256x256.png")
+        ASSETS["black_hole"] = load_image("black-hole-1024x1024.png")
+        ASSETS["boost_powerup"] = load_image("boost-powerup-256x256.png")
+        ASSETS["boost_tick_blue"] = load_image("boost-tick-blue-48x48.png")
+        ASSETS["boost_tick_red"] = load_image("boost-tick-red-48x48.png")
+        ASSETS["boost_tick_yellow"] = load_image("boost-tick-yellow-48x48.png")
+        ASSETS["boost_ui_base"] = load_image("boost-ui-base-288x64.png")
+        ASSETS["checkpoint_arrow"] = load_image(
+            "checkpoint-arrow-128x128.png", anchor_x=128, anchor_y=64
+        )
+        ASSETS["checkpoint_bottom"] = load_image("checkpoint-bottom-256x256.png")
+        ASSETS["checkpoint_finish_bottom"] = load_image(
+            "checkpoint-finish-bottom-256x256.png"
+        )
+        ASSETS["checkpoint_finish_top"] = load_image(
+            "checkpoint-finish-top-256x256.png"
+        )
+        ASSETS["checkpoint_next_bottom"] = load_image(
+            "checkpoint-next-bottom-256x256.png"
+        )
+        ASSETS["checkpoint_next_top"] = load_image("checkpoint-next-top-256x256.png")
+        ASSETS["checkpoint_passed_bottom"] = load_image(
+            "checkpoint-passed-bottom-256x256.png"
+        )
+        ASSETS["checkpoint_passed_top"] = load_image(
+            "checkpoint-passed-top-256x256.png"
+        )
+        ASSETS["checkpoint_top"] = load_image("checkpoint-top-256x256.png")
+        ASSETS["closer_stars"] = load_image("closer-stars-2048x2048.png", center=False)
+        ASSETS["dwarf_gas_planet"] = load_image("dwarf-gas-planet-512x512.png")
+        ASSETS["earth"] = load_image("earth-1024x1024.png")
+        ASSETS["enemy_ship"] = load_image("ship-speed-64x64.png")
+        ASSETS["energy_particle_cyan"] = load_image("energy-particle-cyan-64x64.png")
+        ASSETS["energy_particle_red"] = load_image("energy-particle-red-64x64.png")
+        ASSETS["gas_giant"] = load_image("gas-giant-1024x1024.png")
+        ASSETS["medium_gas_planet"] = load_image("medium-gas-planet-512x512.png")
+        ASSETS["moon"] = load_image("moon-128x128.png")
+        ASSETS["nebula"] = load_image("nebula-2048x2048.png", center=False)
+        ASSETS["particle_flare"] = load_image("particle-flare-32x32.png")
+        ASSETS["red_planet"] = load_image("red-planet-512x512.png")
+        ASSETS["red_planet_shield"] = load_image("red-planet-shield-512x512.png")
+        ASSETS["satellite"] = load_image("satellite-256x256.png")
+        ASSETS["slowdown"] = load_image("slowdown-256x256.png")
+        ASSETS["star_field"] = load_image("starfield-2048x2048.png", center=False)
+        ASSETS["3_2_1"] = pyglet.media.load(os.path.join("assets", "3_2_1.wav"))
+        ASSETS["go"] = pyglet.media.load(os.path.join("assets", "go.wav"))
         Entity().attach(InputComponent())
 
     def create_fps_meter(self):
-
         def get_avg_fps(over_ticks):
             ticks = list(0 for _ in range(over_ticks))
             tick = 0
+
             def inner():
                 nonlocal ticks
                 nonlocal tick
@@ -112,47 +126,50 @@ class DefendingMarsWindow(pyglet.window.Window):
                 avg_FPS = int(sum(ticks) / over_ticks)
                 min_FPS = int(min(ticks))
                 max_FPS = int(max(ticks))
-                return f'FPS: {avg_FPS} [{min_FPS}, {max_FPS}]'
+                return f"FPS: {avg_FPS} [{min_FPS}, {max_FPS}]"
+
             return inner
 
         fps_entity = Entity()
         label = pyglet.text.Label(
-            'FPS',
-            font_size=24,
-            x=0, y=0,
-            anchor_x="left",
-            anchor_y="top"
+            "FPS", font_size=24, x=0, y=0, anchor_x="left", anchor_y="top"
         )
-        fps_entity.attach(UIVisualComponent(
-            top=0.985,
-            right=0.0,
-            visuals=[Visual(
-                kind='real time label',
-                z_sort=1.0,
-                value={
-                    "fn": get_avg_fps(10),
-                    'label': label,
-                }
-            )]
-        ))
+        fps_entity.attach(
+            UIVisualComponent(
+                top=0.985,
+                right=0.0,
+                visuals=[
+                    Visual(
+                        kind="real time label",
+                        z_sort=1.0,
+                        value={
+                            "fn": get_avg_fps(10),
+                            "label": label,
+                        },
+                    )
+                ],
+            )
+        )
 
     def create_ship(self):
         # Entity Components
         entity = Entity()
-        entity.attach(PhysicsComponent(
-            position=V2(0, 0),
-            rotation=0,
-            static=False,
-        ))
+        entity.attach(
+            PhysicsComponent(
+                position=V2(0, 0),
+                rotation=0,
+                static=False,
+            )
+        )
         entity.attach(ShipComponent())
         entity.attach(CollisionComponent(circle_radius=24))
 
         # Game Visuals
-        sprite=pyglet.sprite.Sprite(ASSETS['base_ship'], x=0, y=0, subpixel=True)
+        sprite = pyglet.sprite.Sprite(ASSETS["base_ship"], x=0, y=0, subpixel=True)
         sprite.scale = 0.25
         emitter = EmitterBoost(
-            image=ASSETS['energy_particle_cyan'],
-            boost_image=ASSETS['energy_particle_red'],
+            image=ASSETS["energy_particle_cyan"],
+            boost_image=ASSETS["energy_particle_red"],
             batch=pyglet.graphics.Batch(),
             rate=0.1,
         )
@@ -164,22 +181,22 @@ class DefendingMarsWindow(pyglet.window.Window):
 
         # UI Visuals
         boost_visual = {
-            'base': pyglet.sprite.Sprite(ASSETS['boost_ui_base']),
-            'ticks': [
-                pyglet.sprite.Sprite(ASSETS['boost_tick_red']),
-                pyglet.sprite.Sprite(ASSETS['boost_tick_yellow']),
-                pyglet.sprite.Sprite(ASSETS['boost_tick_yellow']),
-                pyglet.sprite.Sprite(ASSETS['boost_tick_yellow']),
-                pyglet.sprite.Sprite(ASSETS['boost_tick_yellow']),
-                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
-                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
-                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
-                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
-                pyglet.sprite.Sprite(ASSETS['boost_tick_blue']),
-            ]
+            "base": pyglet.sprite.Sprite(ASSETS["boost_ui_base"]),
+            "ticks": [
+                pyglet.sprite.Sprite(ASSETS["boost_tick_red"]),
+                pyglet.sprite.Sprite(ASSETS["boost_tick_yellow"]),
+                pyglet.sprite.Sprite(ASSETS["boost_tick_yellow"]),
+                pyglet.sprite.Sprite(ASSETS["boost_tick_yellow"]),
+                pyglet.sprite.Sprite(ASSETS["boost_tick_yellow"]),
+                pyglet.sprite.Sprite(ASSETS["boost_tick_blue"]),
+                pyglet.sprite.Sprite(ASSETS["boost_tick_blue"]),
+                pyglet.sprite.Sprite(ASSETS["boost_tick_blue"]),
+                pyglet.sprite.Sprite(ASSETS["boost_tick_blue"]),
+                pyglet.sprite.Sprite(ASSETS["boost_tick_blue"]),
+            ],
         }
         ui_visuals = [
-            Visual(kind='boost', z_sort=0.0, value=boost_visual),
+            Visual(kind="boost", z_sort=0.0, value=boost_visual),
         ]
         entity.attach(UIVisualComponent(visuals=ui_visuals))
 
@@ -196,31 +213,25 @@ class DefendingMarsWindow(pyglet.window.Window):
         elif symbol == key.LSHIFT:
             inputs.boost = True
         elif symbol == key.I:
-            System.dispatch(event='LoadMap', map_name='wip', mode="racing")
+            System.dispatch(event="LoadMap", map_name="wip", mode="racing")
         elif symbol == key.R:
-            System.dispatch(event='Respawn')
+            System.dispatch(event="Respawn")
         elif symbol == key.P:
             inputs.mapping = not inputs.mapping
             if inputs.mapping:
-                System.dispatch(event='StartMapping')
+                System.dispatch(event="StartMapping")
             else:
-                System.dispatch(event='StopMapping')
+                System.dispatch(event="StopMapping")
         elif symbol == key.M:
             inputs.placement = not inputs.placement
             if inputs.placement:
-                System.dispatch(event='StartPlacements')
+                System.dispatch(event="StartPlacements")
             else:
-                System.dispatch(event='StopPlacements')
+                System.dispatch(event="StopPlacements")
         elif symbol == key.LEFT:
-            System.dispatch(
-                event='PlacementSelection',
-                direction='up'
-            )
+            System.dispatch(event="PlacementSelection", direction="up")
         elif symbol == key.RIGHT:
-            System.dispatch(
-                event='PlacementSelection',
-                direction='down'
-            )
+            System.dispatch(event="PlacementSelection", direction="down")
 
     def on_key_release(self, symbol, modifiers):
         inputs = get_inputs()
@@ -240,38 +251,36 @@ class DefendingMarsWindow(pyglet.window.Window):
         camera = window.camera_position
         width, height = window.window.width, window.window.height
         w_x, w_y = screen_to_world(
-            x, y, width, height,
-            camera.x, camera.y,
-            window.camera_zoom
+            x, y, width, height, camera.x, camera.y, window.camera_zoom
         )
         mouse_position = V2(w_x, w_y)
         entity = get_ship_entity()
-        ship_physics = entity['physics']
+        ship_physics = entity["physics"]
         ship_position = ship_physics.position
 
         if settings.MOUSE_TURNING:
-            ship_physics.rotation = (mouse_position - ship_physics.position).degrees - 90
+            ship_physics.rotation = (
+                mouse_position - ship_physics.position
+            ).degrees - 90
 
     def on_mouse_press(self, x, y, button, modifiers):
         window = get_window()
         camera = window.camera_position
         width, height = window.window.width, window.window.height
         w_x, w_y = screen_to_world(
-            x, y, width, height,
-            camera.x, camera.y,
-            window.camera_zoom
+            x, y, width, height, camera.x, camera.y, window.camera_zoom
         )
         mouse_position = V2(w_x, w_y)
         if button == 1:
             map_entity = get_active_map_entity()
-            if map_entity and map_entity['map'].is_active:
+            if map_entity and map_entity["map"].is_active:
                 System.dispatch(
-                    event='Place',
+                    event="Place",
                     position=mouse_position,
                     map_entity_id=map_entity.entity_id,
                 )
 
-    def on_mouse_scroll(self, x, y, scroll_x, scroll_y ):
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         window = get_window()
         if scroll_y > 0:
             window.camera_zoom /= 1.1
@@ -290,27 +299,31 @@ def run_game():
     # System for managing a race
     RacingSystem()
 
+    # System for managing a race
+    AudioSystem()
+
     # The render system draws things to the Window
     RenderSystem()
 
     # Create a Window entity
     window_entity = Entity()
-    window=DefendingMarsWindow(1280, 720, resizable=True)
-    window_entity.attach(WindowComponent(
-        window=window,
-        background_layers = [
-            pyglet.sprite.Sprite(ASSETS['star_field'], x=0, y=0),
-            pyglet.sprite.Sprite(ASSETS['closer_stars'], x=0, y=0),
-            pyglet.sprite.Sprite(ASSETS['nebula'], x=0, y=0),
-        ]
-    ))
-    System.dispatch(event='LoadMap', map_name='default')
+    window = DefendingMarsWindow(1280, 720, resizable=True)
+    window_entity.attach(
+        WindowComponent(
+            window=window,
+            background_layers=[
+                pyglet.sprite.Sprite(ASSETS["star_field"], x=0, y=0),
+                pyglet.sprite.Sprite(ASSETS["closer_stars"], x=0, y=0),
+                pyglet.sprite.Sprite(ASSETS["nebula"], x=0, y=0),
+            ],
+        )
+    )
+    System.dispatch(event="LoadMap", map_name="default")
 
     def update(dt, *args, **kwargs):
         ecs.DELTA_TIME = dt
         window.clear()
         System.update_all()
 
-    pyglet.clock.schedule(update, 1/60.0)
+    pyglet.clock.schedule(update, 1 / 60.0)
     pyglet.app.run()
-
