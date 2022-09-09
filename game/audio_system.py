@@ -8,11 +8,20 @@
 
 from .ecs import *
 from .assets import ASSETS
-
+from .settings import settings
 
 class AudioSystem(System):
     def setup(self):
         self.subscribe("PlaySound", self.handle_sound)
+        self.subscribe("RaceComplete", self.handle_sound)
 
     def handle_sound(self, *, sound, **kwargs):
-        ASSETS[sound].play()
+        # if sound not playing play, else nothing
+        if settings.audio:
+            try:
+                print('sound')
+                ASSETS[sound].play()
+            # Not the best way to handle this probably but it is working
+            except:
+                pass
+# System.dispatch(event="PlaySound", sound="map_win")

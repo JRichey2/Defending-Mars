@@ -112,6 +112,9 @@ class DefendingMarsWindow(pyglet.window.Window):
         ASSETS["star_field"] = load_image("starfield-2048x2048.png", center=False)
         ASSETS["3_2_1"] = pyglet.media.load(os.path.join("assets", "3_2_1.wav"))
         ASSETS["go"] = pyglet.media.load(os.path.join("assets", "go.wav"))
+        ASSETS["collision"] = pyglet.media.load(os.path.join("assets", "collision.wav"))
+        ASSETS["map_win"] = pyglet.media.load(os.path.join("assets", "fanfare_low.wav"))
+        ASSETS["cp_complete"] = pyglet.media.load(os.path.join("assets", "cp_complete.wav"))
         Entity().attach(InputComponent())
 
     def create_fps_meter(self):

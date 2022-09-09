@@ -1,0 +1,7 @@
+All .png files located in the assests folder were designed by Quikli
+
+3_2_1.wav - designed by JRichey2SwiFt in Audacity
+go.wav - designed by JRichey2SwiFt in Audacity
+collision.wav - downloaded from https://freesound.org/people/lavik89/sounds/168984/ creative common 0 license
+fanfare_low.wav - downloaded from https://freesound.org/people/ricniclas/sounds/449069/ creative common 0 license
+cp_complete.wav - downloaded from https://freesound.org/people/suntemple/sounds/253177/ creative common 0 license

@@ -343,6 +343,7 @@ class RacingSystem(System):
                 top_visual.value.image = cp.passed_image_top
                 bottom_visual.value.image = cp.passed_image_bottom
                 got_checkpoint = True
+                System.dispatch(event="PlaySound", sound="cp_complete")
                 cp.is_next = False
                 if cp.cp_order == last_cp:
                     map_ = map_entity["map"]
@@ -351,6 +352,7 @@ class RacingSystem(System):
                         event="RaceComplete",
                         map_name=map_.map_name,
                         map_entity_id=map_entity.entity_id,
+                        sound='map_win',
                     )
 
         if got_checkpoint:

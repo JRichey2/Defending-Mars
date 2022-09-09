@@ -2,10 +2,11 @@
   "acceleration": true,
   "boost": true,
   "camera_spring": true,
-  "gravity": true,
+  "gravity": false,
   "grav_constant": 100.0,
   "max_grav_acc": 0.18,
   "mouse_turning": true,
   "physics_frozen": false,
-  "selected_ship": "Sparrow"
+  "selected_ship": "Sparrow",
+  "audio": true
 }
