@@ -58,7 +58,7 @@ class MenuSystem(System):
     def select_ship(self, ship_name):
         settings.selected_ship = ship_name
         entity = get_ship_entity()
-        entity['game visual'].visuals[0].value.image = ASSETS[ship_name]
+        entity["game visual"].visuals[0].value.image = ASSETS[ship_name]
         System.dispatch(event="DisplayMenu", menu_name="main menu")
 
     def open_settings(self):
