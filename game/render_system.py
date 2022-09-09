@@ -5,8 +5,8 @@ import pyglet
 
 from . import ecs
 from .ecs import *
-from .common import get_ship_entity
-from .coordinates import world_to_screen
+from .common import *
+from .coordinates import *
 from .vector import V2
 
 
@@ -74,6 +74,17 @@ class RenderSystem(System):
     def draw_emitter(self, window, entity, visual):
         visual.value.batch.draw()
 
+    def draw_flare(self, window, entity, visual, ship_entity):
+        physics = entity['physics']
+        ship_physics = ship_entity['physics']
+        sprite = visual.value
+        distance = (ship_physics.position - physics.position).length
+        fade_distance = 700
+        if distance > fade_distance:
+            return
+        sprite.opacity = int((1 - (distance / fade_distance)) * 255)
+        sprite.draw()
+
     def draw_sprite(self, window, entity, visual):
         physics = entity['physics']
         sprite = visual.value
@@ -83,9 +94,18 @@ class RenderSystem(System):
             sprite.rotation = float(-physics.rotation)
         sprite.draw()
 
+    def draw_real_time_label(self, window, entity, visual):
+        ui_vis = entity['ui visual']
+        value = visual.value
+        label = value['label']
+        label.text = value['fn']()
+        if ui_vis.right is not None:
+            label.x = window.window.width * ui_vis.right
+        if ui_vis.top is not None:
+            label.y = window.window.height * ui_vis.top
+        label.draw()
+
     def draw_label(self, window, entity, visual):
-        # countdown_list = ['Get Ready!', '3', '2', '1', 'GO']
-        # if visual.value.text in countdown_list:
         ui_vis = entity['ui visual']
         if ui_vis.right is not None:
             visual.value.x = window.window.width * ui_vis.right
@@ -230,8 +250,8 @@ class RenderSystem(System):
                     arrow.draw()
 
     def update(self):
-        window_entity = Entity.with_component("window")[0]
-        window = window_entity['window']
+        ship_entity = get_ship_entity()
+        window = get_window()
 
         self.render_bg(window)
 
@@ -246,10 +266,12 @@ class RenderSystem(System):
         for entity, visual in sorted(visuals, key=lambda x: x[1].z_sort):
             if visual.kind == 'emitter':
                 self.draw_emitter(window, entity, visual)
-            elif visual.kind == 'flight path':
-                self.draw_flight_path(window, entity, visual)
+            elif visual.kind == 'flare':
+                self.draw_flare(window, entity, visual, ship_entity)
             elif visual.kind == 'sprite':
                 self.draw_sprite(window, entity, visual)
+            elif visual.kind == 'flight path':
+                self.draw_flight_path(window, entity, visual)
 
         self.reset_camera(window)
 
@@ -266,4 +288,6 @@ class RenderSystem(System):
                 self.draw_boost_meter(window, entity, visual)
             elif visual.kind == 'label':
                 self.draw_label(window, entity, visual)
+            elif visual.kind == 'real time label':
+                self.draw_real_time_label(window, entity, visual)
 

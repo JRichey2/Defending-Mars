@@ -117,6 +117,8 @@ class MapComponent:
     # Mode - "racing", "mapping", "editing", or "freeplay"
     mode: str = "racing"
 
+    speedometer_id: int = None
+
     # Whether or not the entity with this component is the active map
     is_active: bool = True
 

@@ -26,9 +26,32 @@ from .vector import V2
 def create_flare(image, position):
     entity = Entity()
     entity.attach(PhysicsComponent(position=position))
-    emitter = Emitter(image=image, batch=pyglet.graphics.Batch(), rate=0.1)
-    visual = Visual(kind="emitter", z_sort=-100.0, value=emitter)
-    entity.attach(GameVisualComponent(visuals=[visual]))
+
+    flare_sprite = pyglet.sprite.Sprite(
+        ASSETS['particle_flare'],
+        x=position.x,
+        y=position.y,
+        blend_src=pyglet.gl.GL_SRC_ALPHA,
+        blend_dest=pyglet.gl.GL_ONE,
+    )
+    visuals = [
+        Visual(
+            kind='sprite',
+            z_sort=-13,
+            value=pyglet.sprite.Sprite(
+                ASSETS['base_flare'],
+                x=position.x,
+                y=position.y,
+            ),
+        ),
+        Visual(
+            kind='flare',
+            z_sort=-13,
+            value=flare_sprite
+        ),
+    ]
+
+    entity.attach(GameVisualComponent(visuals=visuals))
     return entity
 
 
@@ -290,6 +313,9 @@ class CartographySystem(System):
         old_maps = Entity.with_component("map")
         for old_map in old_maps:
             old_map['map'].is_active = False
+            if old_map['map'].speedometer_id:
+                print("destroying old speedo")
+                Entity.find(old_map['map'].speedometer_id).destroy()
             old_map.destroy()
 
         ship_id = get_ship_entity().entity_id

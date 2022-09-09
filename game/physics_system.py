@@ -34,7 +34,8 @@ class PhysicsSystem(System):
         if completed_checkpoint:
             checkpoint_physics = completed_checkpoint['physics']
             ship_physics.position = checkpoint_physics.position
-            ship_physics.velocity = V2(0, 0)
+            ship_physics.rotation = checkpoint_physics.rotation
+            ship_physics.velocity = V2.from_degrees_and_length(checkpoint_physics.rotation + 90, 6.0)
 
     def update(self):
         self.update_ship_controls()

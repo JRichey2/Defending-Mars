@@ -44,6 +44,45 @@ class RacingSystem(System):
         ship_entity['physics'].static = True
 
 
+        def get_avg_speed(over_ticks):
+            nonlocal ship_entity
+            ticks = list(0 for _ in range(over_ticks))
+            tick = 0
+            physics = ship_entity['physics']
+            def inner():
+                nonlocal ticks
+                nonlocal tick
+                ticks[tick] = 350 * ship_entity['physics'].velocity.length
+                tick = (tick + 1) % over_ticks
+                avg_speed = int(sum(ticks) / over_ticks)
+                return f'{avg_speed} km/s'
+            return inner
+
+
+        speedometer_entity = Entity()
+        label = pyglet.text.Label(
+            'SPEED',
+            font_size=36,
+            x=0, y=0,
+            anchor_x="center",
+            anchor_y="bottom"
+        )
+        speedometer_entity.attach(UIVisualComponent(
+            top=0.015,
+            right=0.5,
+            visuals=[Visual(
+                kind='real time label',
+                z_sort=1.0,
+                value={
+                    "fn": get_avg_speed(20),
+                    'label': label,
+                }
+            )]
+        ))
+
+        map_.speedometer_id = speedometer_entity.entity_id
+
+
         # Create a countdown label
         countdown_entity = Entity()
         countdown_entity.attach(CountdownComponent(
