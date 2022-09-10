@@ -171,11 +171,15 @@ class PhysicsSystem(System):
             else:
                 physics.acceleration += V2.from_degrees_and_length(rotation, 0.4)
 
-        if inputs.w:
-            System.dispatch(event="PlaySound", sound="regular_thrust")
-
         if inputs.w or inputs.boost:
             physics.acceleration += V2.from_degrees_and_length(rotation + 90, 1.0)
+            if inputs.w and not inputs.boost:
+                System.dispatch(event="PlaySound", sound="regular_thrust")
+            # see if we have any boost
+            # elif inputs.boost:
+            #     System.dispatch(event="PlaySound", sound="rocket_booster")
+            else:
+                System.dispatch(event="PlaySound", sound="regular_thrust")
 
         if inputs.s:
             physics.acceleration += V2.from_degrees_and_length(rotation + 270, 0.4)
