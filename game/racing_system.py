@@ -14,7 +14,7 @@ from .components import (
     UIVisualComponent,
     CountdownComponent,
     Visual,
-    FlightPath,
+    FlightPathComponent,
 )
 from .ecs import *
 from .vector import *
@@ -297,11 +297,12 @@ class RacingSystem(System):
         for p in points:
             points_p.append(p.x)
             points_p.append(p.y)
-
         infinite_magenta = cycle((255, 0, 255, 50))
-        fp = FlightPath(
-            path=points,
-            points=pyglet.graphics.vertex_list(
+        fp_component = FlightPathComponent(path=points)
+        fp_line_visual = Visual(
+            kind="flight path",
+            z_sort=-10.0,
+            value=pyglet.graphics.vertex_list(
                 len(points),
                 ("v2f", points_p),
                 (
@@ -310,9 +311,8 @@ class RacingSystem(System):
                 ),
             ),
         )
-
-        visuals = [Visual(kind="flight path", z_sort=-10.0, value=fp)]
-        entity.attach(GameVisualComponent(visuals=visuals))
+        entity.attach(fp_component)
+        entity.attach(GameVisualComponent(visuals=[fp_line_visual]))
         return entity.entity_id
 
     def update_checkpoints(self, map_entity):

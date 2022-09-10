@@ -57,54 +57,17 @@ class PhysicsSystem(System):
         ship_entity = get_ship_entity()
         ship_position = ship_entity["physics"].position
 
-        for entity in Entity.with_component("game visual"):
-            emitters = [
-                v.value for v in entity["game visual"].visuals if v.kind == "emitter"
-            ]
-
-            if entity.entity_id == ship_entity.entity_id:
-                # Skip the ship
-                continue
-
-            physics = entity["physics"]
-            if physics is None:
-                continue
-
-            for emitter in emitters:
-
-                distance = (ship_position - physics.position).length
+        for entity in Entity.with_component("flight path"):
+            fp = entity['flight path']
+            for s in fp.flares:
+                flare_pos = V2(s.x, s.y)
+                distance = (ship_position - flare_pos).length
                 if distance < 750:
-                    emitter.enabled = True
-                    emitter.rate = distance / 750
+                    s.visible = True
+                    s.opacity = int(255 * (1 - (distance / 750)))
                 else:
-                    emitter.enabled = False
+                    s.visible = False
 
-                if not emitter.enabled:
-                    for sprite in emitter.sprites:
-                        sprite.delete()
-                    emitter.sprites = []
-                    continue
-
-                for sprite in emitter.sprites:
-                    sprite.opacity *= 1 - (0.03 * time_factor)
-
-                to_be_deleted = [s for s in emitter.sprites if s.opacity < 0.01]
-                emitter.sprites = [s for s in emitter.sprites if s.opacity >= 0.01]
-                for sprite in to_be_deleted:
-                    sprite.delete()
-
-                emitter.time_since_last_emission += dt
-                if emitter.time_since_last_emission > emitter.rate:
-                    sprite = pyglet.sprite.Sprite(
-                        emitter.image,
-                        x=physics.position.x,
-                        y=physics.position.y,
-                        batch=emitter.batch,
-                        blend_src=pyglet.gl.GL_SRC_ALPHA,
-                        blend_dest=pyglet.gl.GL_ONE,
-                    )
-                    emitter.sprites.append(sprite)
-                    emitter.time_since_last_emission = 0
 
     def get_all_masses(self):
         mass_points = []
@@ -173,13 +136,6 @@ class PhysicsSystem(System):
 
         if inputs.w or inputs.boost:
             physics.acceleration += V2.from_degrees_and_length(rotation + 90, 1.0)
-            if inputs.w and not inputs.boost:
-                System.dispatch(event="PlaySound", sound="regular_thrust")
-            # see if we have any boost
-            elif inputs.boost:
-                System.dispatch(event="PlaySound", sound="rocket_booster", loop=True)
-            else:
-                System.dispatch(event="PlaySound", sound="regular_thrust")
 
         if inputs.s:
             physics.acceleration += V2.from_degrees_and_length(rotation + 270, 0.4)

@@ -68,11 +68,14 @@ class RenderSystem(System):
         pyglet.gl.glMatrixMode(pyglet.gl.GL_MODELVIEW)
         pyglet.gl.glLoadIdentity()
 
-    def draw_flight_path(self, window, entity, visual):
-        visual.value.points.draw(pyglet.gl.GL_LINE_STRIP)
+    def draw_flight_path_line(self, window, entity, visual):
+        visual.value.draw(pyglet.gl.GL_LINE_STRIP)
 
     def draw_emitter(self, window, entity, visual):
         visual.value.batch.draw()
+
+    def draw_sprite_batch(self, window, entity, visual):
+        visual.value.draw()
 
     def draw_flare(self, window, entity, visual, ship_entity):
         physics = entity["physics"]
@@ -296,7 +299,10 @@ class RenderSystem(System):
             elif visual.kind == "sprite":
                 self.draw_sprite(window, entity, visual)
             elif visual.kind == "flight path":
-                self.draw_flight_path(window, entity, visual)
+                self.draw_flight_path_line(window, entity, visual)
+            elif visual.kind == "sprite batch":
+                self.draw_sprite_batch(window, entity, visual)
+
 
         self.reset_camera(window)
 

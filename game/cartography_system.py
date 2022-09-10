@@ -10,8 +10,7 @@ from .assets import ASSETS
 from .common import *
 from .components import (
     PhysicsComponent,
-    Emitter,
-    FlightPath,
+    FlightPathComponent,
     MapComponent,
     Visual,
     GameVisualComponent,
@@ -23,32 +22,6 @@ from .ecs import *
 from .vector import V2
 
 
-def create_flare(image, position):
-    entity = Entity()
-    entity.attach(PhysicsComponent(position=position))
-
-    flare_sprite = pyglet.sprite.Sprite(
-        ASSETS["particle_flare"],
-        x=position.x,
-        y=position.y,
-        blend_src=pyglet.gl.GL_SRC_ALPHA,
-        blend_dest=pyglet.gl.GL_ONE,
-    )
-    visuals = [
-        Visual(
-            kind="sprite",
-            z_sort=-13,
-            value=pyglet.sprite.Sprite(
-                ASSETS["base_flare"],
-                x=position.x,
-                y=position.y,
-            ),
-        ),
-        Visual(kind="flare", z_sort=-13, value=flare_sprite),
-    ]
-
-    entity.attach(GameVisualComponent(visuals=visuals))
-    return entity
 
 
 class CartographySystem(System):
@@ -365,43 +338,54 @@ class CartographySystem(System):
             points_p.append(p.x)
             points_p.append(p.y)
 
-        infinite_magenta = cycle((255, 0, 255, 50))
-        flight_path.attach(
-            GameVisualComponent(
-                visuals=[
-                    Visual(
-                        kind="flight path",
-                        z_sort=-100.0,
-                        value=FlightPath(
-                            path=points,
-                            points=pyglet.graphics.vertex_list(
-                                len(points),
-                                ("v2f", points_p),
-                                (
-                                    "c4B",
-                                    list(
-                                        y
-                                        for x, y in zip(
-                                            range(len(points) * 4), infinite_magenta
-                                        )
-                                    ),
-                                ),
-                            ),
-                        ),
-                    )
-                ]
-            )
-        )
+        fp_component = FlightPathComponent(path=points)
 
-        flight_path.destroy()
+        infinite_magenta = cycle((255, 0, 255, 50))
+
+        base_batch = pyglet.graphics.Batch()
+        flare_batch = pyglet.graphics.Batch()
 
         for i, point in enumerate(points):
-            if i % 2 == 1:
-                v = points[i] - points[i - 1]
-                a = V2.from_degrees_and_length(v.degrees + 90, 150) + point
-                b = V2.from_degrees_and_length(v.degrees - 90, 150) + point
-                entity = create_flare(ASSETS["particle_flare"], a)
-                entity = create_flare(ASSETS["particle_flare"], b)
+            if i % 2 == 0:
+                continue
+            v = points[i] - points[i - 1]
+            a = V2.from_degrees_and_length(v.degrees + 90, 150) + point
+            b = V2.from_degrees_and_length(v.degrees - 90, 150) + point
+
+            # Create the base flare sprites (unlit flare)
+            fp_component.flares.append(pyglet.sprite.Sprite(
+                ASSETS["base_flare"],
+                x=a.x, y=a.y, batch=base_batch
+            ))
+
+            fp_component.flares.append(pyglet.sprite.Sprite(
+                ASSETS["base_flare"],
+                x=b.x, y=b.y, batch=base_batch
+            ))
+
+            # Create the overlay/light flare sprites
+            fp_component.flares.append(pyglet.sprite.Sprite(
+                ASSETS["particle_flare"],
+                x=a.x, y=a.y, batch=flare_batch,
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ))
+
+            fp_component.flares.append(pyglet.sprite.Sprite(
+                ASSETS["particle_flare"],
+                x=b.x, y=b.y, batch=flare_batch,
+                blend_src=pyglet.gl.GL_SRC_ALPHA,
+                blend_dest=pyglet.gl.GL_ONE,
+            ))
+
+        flare_bases_visual = Visual(kind="sprite batch", z_sort=-14, value=base_batch)
+        flare_flares_visual = Visual(kind="sprite batch", z_sort=-13, value=flare_batch)
+
+        flight_path.attach(fp_component)
+        flight_path.attach(GameVisualComponent(visuals=[
+            flare_bases_visual,
+            flare_flares_visual,
+        ]))
 
         entity = get_ship_entity()
         entity["physics"].position = points[0]

@@ -105,9 +105,10 @@ class EmitterBoost(Emitter):
 
 
 @dataclass
-class FlightPath:
-    points: pyglet.graphics.vertexdomain.VertexList
+class FlightPathComponent:
+    component_name: str = "flight path"
     path: list[V2] = field(default_factory=list)
+    flares: list[pyglet.sprite.Sprite] = field(default_factory=list)
 
 
 @dataclass
