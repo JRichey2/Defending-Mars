@@ -13,6 +13,8 @@ class AudioSystem(System):
         entity.attach(AudioComponent())
 
     def update(self):
+        if not settings.audio:
+            return
         inputs = get_inputs()
         ship_entity = get_ship_entity()
         ship = ship_entity['ship']
@@ -33,6 +35,8 @@ class AudioSystem(System):
         return Entity.with_component("audio")[0]['audio']
 
     def start_loop(self, fx, volume=1.0):
+        if not settings.audio:
+            return
         audio = self.audio
         loops = [p for f, p in audio.fx_loops if f == fx]
         if len(loops) > 0:
@@ -43,6 +47,8 @@ class AudioSystem(System):
 
 
     def stop_loop(self, fx):
+        if not settings.audio:
+            return
         audio = self.audio
         loops = [p for f, p in audio.fx_loops if f == fx]
         if len(loops) > 0:
@@ -51,6 +57,8 @@ class AudioSystem(System):
             player.pause()
 
     def handle_fx(self, *, fx, volume=1.0, **kwargs):
+        if not settings.audio:
+            return
         audio = self.audio
 
         player = ASSETS[fx].play()

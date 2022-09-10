@@ -52,7 +52,7 @@ def load_image(asset_name, center=True, anchor_x=0, anchor_y=0):
     return image
 
 
-class DefendingMarsWindow(pyglet.window.Window):
+class GameWindow(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.load_assets()
@@ -151,26 +151,27 @@ class DefendingMarsWindow(pyglet.window.Window):
 
             return inner
 
-        fps_entity = Entity()
-        label = pyglet.text.Label(
-            "FPS", font_size=24, x=0, y=0, anchor_x="left", anchor_y="top"
-        )
-        fps_entity.attach(
-            UIVisualComponent(
-                top=0.985,
-                right=0.0,
-                visuals=[
-                    Visual(
-                        kind="real time label",
-                        z_sort=1.0,
-                        value={
-                            "fn": get_avg_fps(10),
-                            "label": label,
-                        },
-                    )
-                ],
+        if False:
+            fps_entity = Entity()
+            label = pyglet.text.Label(
+                "FPS", font_size=24, x=0, y=0, anchor_x="left", anchor_y="top"
             )
-        )
+            fps_entity.attach(
+                UIVisualComponent(
+                    top=0.985,
+                    right=0.0,
+                    visuals=[
+                        Visual(
+                            kind="real time label",
+                            z_sort=1.0,
+                            value={
+                                "fn": get_avg_fps(10),
+                                "label": label,
+                            },
+                        )
+                    ],
+                )
+            )
 
     def create_ship(self):
         # Entity Components
@@ -294,7 +295,7 @@ def run_game():
 
     # Create a Window entity
     window_entity = Entity()
-    window = DefendingMarsWindow(1280, 720, resizable=True)
+    window = GameWindow(1280, 720, resizable=True)
     window_entity.attach(
         WindowComponent(
             window=window,

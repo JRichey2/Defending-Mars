@@ -1,11 +1,11 @@
-# Defending Mars
+# Race for the Red Planet
 
 A Pyweek 34 Entry by Quikli and JRichey2SwiFt
 
 Dependencies:
 
 * pyglet 1.5+
-* pyrsistent 0.18+
+* Pillow 9.2+ for faster image loading (optional)
 
 To install dependencies:
 

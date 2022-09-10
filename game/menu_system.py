@@ -1,3 +1,4 @@
+import os
 import json
 import pyglet
 
@@ -205,6 +206,15 @@ class MenuSystem(System):
         label = menu_entity['ui visual'].visuals[2].value
         label.text = f'Finish Time: {ct:.2f}s\nPersonal Best: {pb:.2f}s'
 
+    def change_audio_setting(self):
+        settings.audio = not settings.audio
+        for menu_entity in Entity.with_component("menu"):
+            menu = menu_entity["menu"]
+            if menu.menu_name == "settings menu":
+                option_index = menu.selected_option
+                style = "Audio: On" if settings.audio else "Audio: Off"
+                menu.option_labels[option_index] = style
+
     def change_turning_style(self):
         settings.mouse_turning = not settings.mouse_turning
         for menu_entity in Entity.with_component("menu"):
@@ -396,11 +406,14 @@ class MenuSystem(System):
             "Turning Style: Mouse": self.change_turning_style,
             "Camera Spring: On": self.change_camera_spring,
             "Camera Spring: Off": self.change_camera_spring,
+            "Audio: On": self.change_audio_setting,
+            "Audio: Off": self.change_audio_setting,
             "Back to Menu": self.open_main,
         }
         option_labels = [
-            "Turning Style: Mouse" if settings.mouse_turning else "Turning Style: A & D Keys",
+            "Audio: On" if settings.audio else "Audio: Off",
             "Camera Spring: On" if settings.camera_spring else "Camera Spring: Off",
+            "Turning Style: Mouse" if settings.mouse_turning else "Turning Style: A & D Keys",
             "Back to Menu",
         ]
 
