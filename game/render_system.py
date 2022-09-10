@@ -309,6 +309,10 @@ class RenderSystem(System):
 
         self.camera_offset(window)
 
+        width, height = window.window.width, window.window.height
+        pan_x, pan_y = window.camera_position.x, window.camera_position.y
+        zoom = window.camera_zoom
+
         entities = Entity.with_component("game visual")
         visuals = []
         for entity in entities:
@@ -321,12 +325,26 @@ class RenderSystem(System):
             elif visual.kind == "flare":
                 self.draw_flare(window, entity, visual, ship_entity)
             elif visual.kind == "sprite":
-                self.draw_sprite(window, entity, visual)
+                physics = entity["physics"]
+                sprite = visual.value
+                if physics is not None:
+                    sprite.x = physics.position.x
+                    sprite.y = physics.position.y
+                    sprite.rotation = float(-physics.rotation)
+                x, y = world_to_screen(
+                    sprite.x, sprite.y,
+                    width, height,
+                    pan_x, pan_y,
+                    zoom
+                )
+                s_w = sprite.width / 2 + 50
+                s_h = sprite.height / 2 + 50
+                if x + s_w > 0 and x - s_w < width and y + s_h > 0 and y - s_h < width:
+                    sprite.draw()
             elif visual.kind == "flight path":
                 self.draw_flight_path_line(window, entity, visual)
             elif visual.kind == "sprite batch":
                 self.draw_sprite_batch(window, entity, visual)
-
 
         self.reset_camera(window)
 
@@ -351,3 +369,4 @@ class RenderSystem(System):
                 self.draw_menu_sprite(window, entity, visual)
             elif visual.kind == "menu description":
                 self.draw_menu_description(window, entity, visual)
+
