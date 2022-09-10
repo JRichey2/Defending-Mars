@@ -171,6 +171,9 @@ class PhysicsSystem(System):
             else:
                 physics.acceleration += V2.from_degrees_and_length(rotation, 0.4)
 
+        if inputs.w:
+            System.dispatch(event="PlaySound", sound="regular_thrust")
+
         if inputs.w or inputs.boost:
             physics.acceleration += V2.from_degrees_and_length(rotation + 90, 1.0)
 

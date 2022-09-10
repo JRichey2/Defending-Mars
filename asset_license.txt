@@ -7,3 +7,4 @@ fanfare_low.wav - downloaded from https://freesound.org/people/ricniclas/sounds/
 cp_complete.wav - downloaded from https://freesound.org/people/suntemple/sounds/253177/ creative common 0 license
 boost_powerup.wav - downloaded from https://freesound.org/people/colorsCrimsonTears/sounds/577965/ creative common 0 license
 slowdown.wav - downloaded from https://freesound.org/people/colorsCrimsonTears/sounds/577960/ creative common 0 license
+regular_thrust.wav - designed by JRichey2SwiFt in Audacity

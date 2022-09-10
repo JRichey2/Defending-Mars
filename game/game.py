@@ -115,6 +115,10 @@ class DefendingMarsWindow(pyglet.window.Window):
         ASSETS["collision"] = pyglet.media.load(os.path.join("assets", "collision.wav"))
         ASSETS["map_win"] = pyglet.media.load(os.path.join("assets", "fanfare_low.wav"))
         ASSETS["cp_complete"] = pyglet.media.load(os.path.join("assets", "cp_complete.wav"))
+        ASSETS["slowdown_sound"] = pyglet.media.load(os.path.join("assets", "slowdown.wav"))
+        ASSETS["boost_powerup_sound"] = pyglet.media.load(os.path.join("assets", "boost_powerup.wav"))
+        ASSETS["regular_thrust"] = pyglet.media.load(os.path.join("assets", "regular_thrust.wav"))
+        ASSETS["rocket_booster"] = pyglet.media.load(os.path.join("assets", "rocket_booster_test.wav"))
         Entity().attach(InputComponent())
 
     def create_fps_meter(self):

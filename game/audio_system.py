@@ -19,7 +19,6 @@ class AudioSystem(System):
         # if sound not playing play, else nothing
         if settings.audio:
             try:
-                print('sound')
                 ASSETS[sound].play()
             # Not the best way to handle this probably but it is working
             except:
