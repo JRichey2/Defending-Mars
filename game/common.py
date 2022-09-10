@@ -5,6 +5,7 @@ from .components import (
     GameVisualComponent,
     Visual,
     PhysicsComponent,
+    ShipComponent,
 )
 
 
@@ -57,4 +58,20 @@ def create_sprite(position, rotation, image, scale=1.0, subpixel=True, z_sort=0.
 def map_is_active():
     map_entity = get_active_map_entity()
     return bool(map_entity)
+
+def set_ship_stats(ship_name, ship, physics):
+    boost_tweak = 0.5
+    acc_tweak = 0.05
+    drag_tweak = -0.005
+
+    if ship_name == 'Avocado':
+        physics.acc_constant = PhysicsComponent().acc_constant + 0.33 * acc_tweak
+        physics.drag_constant = PhysicsComponent().drag_constant + 0.33 * drag_tweak
+        ship.boost_constant = ShipComponent().boost_constant + 0.33 * boost_tweak
+    elif ship_name == 'Martian Express':
+        physics.drag_constant = PhysicsComponent().drag_constant + drag_tweak
+    elif ship_name == 'Sparrow':
+        ship.boost_constant = ShipComponent().boost_constant + boost_tweak
+    elif ship_name == 'BMS-12':
+        physics.acc_constant = PhysicsComponent().acc_constant + acc_tweak
 

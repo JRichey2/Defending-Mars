@@ -137,6 +137,30 @@ class RenderSystem(System):
                 label.color = (255, 255, 255, 160)
             label.draw()
 
+    def draw_menu_sprite(self, window, entity, visual):
+        menu = entity["menu"]
+        if not menu.displayed:
+            return
+        ui_vis = entity["ui visual"]
+        sprite = visual.value
+        w, h = window.window.width, window.window.height
+        origin_x, origin_y = w * 0.78, h * ui_vis.top
+        sprite.x = origin_x
+        sprite.y = origin_y
+        sprite.draw()
+
+    def draw_menu_description(self, window, entity, visual):
+        menu = entity["menu"]
+        if not menu.displayed:
+            return
+        ui_vis = entity["ui visual"]
+        label = visual.value
+        w, h = window.window.width, window.window.height
+        origin_x, origin_y = w * 0.78, h * ui_vis.top - 150
+        label.x = origin_x
+        label.y = origin_y
+        label.draw()
+
     def draw_boost_meter(self, window, entity, visual):
         if settings.PHYSICS_FROZEN:
             return
@@ -323,3 +347,7 @@ class RenderSystem(System):
                 self.draw_real_time_label(window, entity, visual)
             elif visual.kind == "menu options":
                 self.draw_menu_options(window, entity, visual)
+            elif visual.kind == "menu sprite":
+                self.draw_menu_sprite(window, entity, visual)
+            elif visual.kind == "menu description":
+                self.draw_menu_description(window, entity, visual)

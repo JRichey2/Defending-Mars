@@ -166,18 +166,14 @@ class DefendingMarsWindow(pyglet.window.Window):
     def create_ship(self):
         # Entity Components
         entity = Entity()
-        entity.attach(
-            PhysicsComponent(
-                position=V2(0, 0),
-                rotation=0,
-                static=False,
-            )
-        )
-        entity.attach(ShipComponent())
-        entity.attach(CollisionComponent(circle_radius=24))
+        physics = PhysicsComponent(position=V2(0, 0), rotation=0, static=False)
+        ship = ShipComponent()
 
         # Game Visuals
         ship_name = settings.selected_ship
+
+        set_ship_stats(ship_name, ship, physics)
+
         sprite = pyglet.sprite.Sprite(ASSETS[ship_name], x=0, y=0, subpixel=True)
         sprite.scale = 0.25
         emitter = EmitterBoost(
@@ -190,7 +186,6 @@ class DefendingMarsWindow(pyglet.window.Window):
             Visual(kind="sprite", z_sort=-10.0, value=sprite),
             Visual(kind="emitter", z_sort=-11.0, value=emitter),
         ]
-        entity.attach(GameVisualComponent(visuals=game_visuals))
 
         # UI Visuals
         boost_visual = {
@@ -211,6 +206,11 @@ class DefendingMarsWindow(pyglet.window.Window):
         ui_visuals = [
             Visual(kind="boost", z_sort=0.0, value=boost_visual),
         ]
+
+        entity.attach(physics)
+        entity.attach(ship)
+        entity.attach(CollisionComponent(circle_radius=24))
+        entity.attach(GameVisualComponent(visuals=game_visuals))
         entity.attach(UIVisualComponent(visuals=ui_visuals))
 
     def on_key_press(self, symbol, modifiers):
@@ -313,6 +313,20 @@ class DefendingMarsWindow(pyglet.window.Window):
 
 def run_game():
 
+    # Create a Window entity
+    window_entity = Entity()
+    window = DefendingMarsWindow(1280, 720, resizable=True)
+    window_entity.attach(
+        WindowComponent(
+            window=window,
+            background_layers=[
+                pyglet.sprite.Sprite(ASSETS["star_field"], x=0, y=0),
+                pyglet.sprite.Sprite(ASSETS["closer_stars"], x=0, y=0),
+                pyglet.sprite.Sprite(ASSETS["nebula"], x=0, y=0),
+            ],
+        )
+    )
+
     # Handle all of our menus
     MenuSystem()
 
@@ -331,19 +345,6 @@ def run_game():
     # The render system draws things to the Window
     RenderSystem()
 
-    # Create a Window entity
-    window_entity = Entity()
-    window = DefendingMarsWindow(1280, 720, resizable=True)
-    window_entity.attach(
-        WindowComponent(
-            window=window,
-            background_layers=[
-                pyglet.sprite.Sprite(ASSETS["star_field"], x=0, y=0),
-                pyglet.sprite.Sprite(ASSETS["closer_stars"], x=0, y=0),
-                pyglet.sprite.Sprite(ASSETS["nebula"], x=0, y=0),
-            ],
-        )
-    )
     System.dispatch(event="DisplayMenu", menu_name="main menu")
 
     def update(dt, *args, **kwargs):

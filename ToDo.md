@@ -60,19 +60,22 @@
 * [ ] mapping - Richey
 * [ ] boost sound - Richey
 * [X] PB Line is not working - Quikli
-* [.] Menu System - Quikli
+* [O] Menu System - Quikli
     * [X] in game menu
-    * [ ] Finish menu
-        * [ ] Best time
-        * [ ] Current time
-        * [ ] Improve
-        * [ ] Return
+    * [X] Finish menu
+        * [X] Best time
+        * [X] Current time
+        * [X] Improve
+        * [X] Return
     * [ ] Map Selection
         * [ ] Images
         * [ ] Title
         * [ ] map image show PB time
+    * [X] Ship Selection
+        * [X] Add ship images and text
 * [ ] speed boost power up in game - Richey
 * [ ] tutorial text - Quikli/Richey
 * [ ] Adding collision for side of rings - Richey
+* [X] Tuning the ships
 * [X] Performance Enhancement as good as we can
 

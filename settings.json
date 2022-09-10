@@ -6,7 +6,7 @@
   "grav_constant": 100.0,
   "max_grav_acc": 0.18,
   "mouse_turning": true,
-  "physics_frozen": false,
-  "selected_ship": "Sparrow",
+  "physics_frozen": true,
+  "selected_ship": "Martian Express",
   "audio": true
 }
