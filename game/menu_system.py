@@ -292,7 +292,7 @@ class MenuSystem(System):
         options = {
             "Tutorial Map": (lambda: self.play_game('tutorial_map')),
             "Getting Started Map": (lambda: self.play_game('default')),
-            "Take a Tour Map": (lambda: self.play_game('random')),
+            "Take a Tour Map": (lambda: self.play_game('random_map')),
             "Slalom Map": (lambda: self.play_game('slalom_map')),
             "Speed Map": (lambda: self.play_game('speedy_map')),
             "The Red Planet Map": (lambda: self.play_game('final_map')),

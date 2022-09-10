@@ -46,7 +46,7 @@ class CartographySystem(System):
             ("medium_gas_planet", 150, 240),
             ("gas_giant", 300, 500),
             ("black_hole", 1000, 332),
-            ("checkpoint", None, None),
+            ("checkpoint", None, 1),
             ("boost_powerup", None, None),
             ("slowdown", None, None),
             ("large_red_planet", 3000, 2130),
@@ -164,6 +164,7 @@ class CartographySystem(System):
                     rotation,
                     num_points,
                     map_entity_id,
+                    radius,
                 )
 
         elif mass is not None and radius is not None:
@@ -224,10 +225,11 @@ class CartographySystem(System):
         entity.attach(PhysicsComponent(position=position, mass=mass))
         entity.attach(CollisionComponent(circle_radius=radius))
 
-    def load_checkpoint(self, position, rotation, cp_order, map_entity_id):
+    def load_checkpoint(self, position, rotation, cp_order, map_entity_id, radius):
         cp = Entity()
 
         cp.attach(PhysicsComponent(position=position, rotation=rotation))
+        cp.attach(CollisionComponent(circle_radius=radius))
 
         top_cp_image = "checkpoint_top" if cp_order == 0 else "checkpoint_next_top"
         top_cp_sprite = pyglet.sprite.Sprite(
@@ -336,7 +338,7 @@ class CartographySystem(System):
         for cp_order, checkpoint in enumerate(checkpoints):
             position = checkpoint["center"]
             rotation = checkpoint["rotation"]
-            self.load_checkpoint(position, rotation, cp_order, map_entity.entity_id)
+            self.load_checkpoint(position, rotation, cp_order, map_entity.entity_id, radius)
 
         points_p = []
         for p in points:
