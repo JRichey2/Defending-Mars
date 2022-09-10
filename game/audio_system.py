@@ -35,7 +35,7 @@ class AudioSystem(System):
 
     def handle_sound(self, *, sound, loop=False, off=False, **kwargs):
         # Sound is crashing for me so going to turn it off
-        # return
+        return
         # if sound not playing play, else nothing
         entities = Entity.with_component("audio")
         player = None

@@ -42,6 +42,34 @@ SHIPS = {
 }
 
 
+MAPS = {
+    "Tutorial Map": (
+        'tutorial_map',
+        'Learn the game',
+    ),
+    "Getting Started Map": (
+        'getting_started',
+        'A simple map',
+    ),
+    "Take a Tour Map": (
+        'random_map',
+        'A scenic tour',
+    ),
+    "Slalom Map": (
+        'slalom_map',
+        'A weaving path through obstacles',
+    ),
+    "Speed Map": (
+        'speedy_map',
+        'A map designed to get high speeds',
+    ),
+    "The Red Planet Map": (
+        'final_map',
+        'Around the red planet in 34 checkpoints',
+    ),
+}
+
+
 class MenuSystem(System):
     def setup(self):
         self.subscribe("DisplayMenu", self.handle_display_menu)
@@ -86,6 +114,21 @@ class MenuSystem(System):
                 ship_sprite.image = ASSETS[ship]
                 ship_label = visuals[2].value
                 ship_label.text = description
+
+            elif menu.menu_name == 'map menu':
+                map_title = menu.option_labels[menu.selected_option]
+                map_name, map_description = MAPS.get(map_title, (None, None))
+                visuals = entity['ui visual'].visuals
+                map_sprite = visuals[1].value
+                map_label = visuals[2].value
+                if map_name:
+                    map_sprite.image = ASSETS[map_name]
+                    map_sprite.visible = True
+                    map_label.text = map_description
+                    map_label.visible = True
+                else:
+                    map_sprite.visible = False
+                    map_label.visible = False
 
             return
 
@@ -296,7 +339,7 @@ class MenuSystem(System):
             "Slalom Map": (lambda: self.play_game('slalom_map')),
             "Speed Map": (lambda: self.play_game('speedy_map')),
             "The Red Planet Map": (lambda: self.play_game('final_map')),
-            "WIP Map": (lambda: self.play_game('wip')),
+            #"WIP Map": (lambda: self.play_game('wip')),
             "Back to Menu": self.open_main,
         }
         option_labels = [l for l in options]
@@ -314,7 +357,20 @@ class MenuSystem(System):
                 )
             )
 
-        visuals = [Visual(kind="menu options", z_sort=10, value=labels)]
+        visuals = [
+            Visual(kind="menu options", z_sort=10, value=labels),
+            Visual(kind="menu sprite", z_sort=9, value=pyglet.sprite.Sprite(ASSETS['tutorial_map'])),
+            Visual(kind="menu description", z_sort = 10, value=pyglet.text.Label(
+                'Tutorial Map',
+                align="center",
+                multiline=True,
+                font_size=24,
+                width=400,
+                anchor_x="center",
+                anchor_y="top",
+            ))
+        ]
+
 
         entity = Entity()
         entity.attach(
