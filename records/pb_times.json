@@ -1,6 +1,10 @@
 {
-  "default": 5.625,
-  "wip": 6.280446453951299,
-  "training_map": 13.097543700947426,
-  "slalom_map": 21.003515137941577
+  "accurate_map": 5000.0,
+  "escape_black_hole": 5000.0,
+  "final_map": 5000.0,
+  "random_map": 5000.0,
+  "slalom_map": 5000.0,
+  "speedy_map": 5000.0,
+  "tutorial_map": 5000.0,
+  "wip": 5000.0
 }
