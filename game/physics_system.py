@@ -176,8 +176,8 @@ class PhysicsSystem(System):
             if inputs.w and not inputs.boost:
                 System.dispatch(event="PlaySound", sound="regular_thrust")
             # see if we have any boost
-            # elif inputs.boost:
-            #     System.dispatch(event="PlaySound", sound="rocket_booster")
+            elif inputs.boost:
+                System.dispatch(event="PlaySound", sound="rocket_booster", loop=True)
             else:
                 System.dispatch(event="PlaySound", sound="regular_thrust")
 
