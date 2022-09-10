@@ -4,7 +4,7 @@ import sys
 
 import pyglet
 # Has to be imported before pyglet.media is accessed
-pyglet.options['audio'] = ('pulse', 'directsound','openal', 'silent')
+pyglet.options['audio'] = ('pulse', 'directsound', 'openal', 'silent')
 
 from pyglet.window import key
 
@@ -16,7 +16,6 @@ from .common import *
 from .coordinates import *
 from .ecs import *
 from .vector import V2
-
 
 # Component Imports
 from .components import (
@@ -120,8 +119,8 @@ class DefendingMarsWindow(pyglet.window.Window):
         ASSETS["cp_complete"] = pyglet.media.load(os.path.join("assets", "cp_complete.wav"), streaming=False)
         ASSETS["slowdown_sound"] = pyglet.media.load(os.path.join("assets", "slowdown.wav"), streaming=False)
         ASSETS["boost_powerup_sound"] = pyglet.media.load(os.path.join("assets", "boost_powerup.wav"), streaming=False)
-        ASSETS["regular_thrust"] = pyglet.media.load(os.path.join("assets", "regular_thrust.wav"), streaming=False)
-        ASSETS["rocket_booster"] = pyglet.media.load(os.path.join("assets", "booster_thrust.wav"), streaming=False)
+        ASSETS["thrust_sound"] = pyglet.media.load(os.path.join("assets", "regular_thrust.wav"), streaming=False)
+        ASSETS["boost_sound"] = pyglet.media.load(os.path.join("assets", "booster_thrust.wav"), streaming=False)
         ASSETS["large_red_planet"] = load_image("red-planet-4096x4096.png")
         ASSETS["tutorial_map"] = load_image("map-tutorial_map-256x256.png")
         ASSETS["getting_started"] = load_image("map-getting_started-256x256.png")

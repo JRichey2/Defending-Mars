@@ -205,4 +205,5 @@ class MenuComponent:
 class AudioComponent:
     component_name: str = "audio"
     fx_volume: float = 0.5
+    fx_loops: list[tuple] = field(default_factory=list)
 
