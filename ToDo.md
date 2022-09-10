@@ -61,11 +61,16 @@
 * [ ] boost sound - Richey
 * [X] PB Line is not working - Quikli
 * [.] Menu System - Quikli
-  * [X] in game menu 
-  * [ ] Finish menu
-  * [ ] out of game images
-    * [ ] map image show PB time
-  * [ ] Pop up(best time: , Current time, options
+    * [X] in game menu
+    * [ ] Finish menu
+        * [ ] Best time
+        * [ ] Current time
+        * [ ] Improve
+        * [ ] Return
+    * [ ] Map Selection
+        * [ ] Images
+        * [ ] Title
+        * [ ] map image show PB time
 * [ ] speed boost power up in game - Richey
 * [ ] tutorial text - Quikli/Richey
 * [ ] Adding collision for side of rings - Richey
