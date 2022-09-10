@@ -229,7 +229,7 @@ class CartographySystem(System):
         cp = Entity()
 
         cp.attach(PhysicsComponent(position=position, rotation=rotation))
-        cp.attach(CollisionComponent(circle_radius=radius))
+        #cp.attach(CollisionComponent(circle_radius=radius))
 
         top_cp_image = "checkpoint_top" if cp_order == 0 else "checkpoint_next_top"
         top_cp_sprite = pyglet.sprite.Sprite(

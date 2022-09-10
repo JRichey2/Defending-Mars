@@ -3,6 +3,9 @@ import sys
 
 
 import pyglet
+# Has to be imported before pyglet.media is accessed
+pyglet.options['audio'] = ('pulse', 'directsound','openal', 'silent')
+
 from pyglet.window import key
 
 # ECS Import

@@ -204,6 +204,5 @@ class MenuComponent:
 @dataclass
 class AudioComponent:
     component_name: str = "audio"
-    audio: str = None
-    player: pyglet.media.player.Player = None
-    loop: bool = False
+    fx_volume: float = 0.5
+

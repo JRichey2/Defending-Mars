@@ -40,6 +40,7 @@ class RacingSystem(System):
             ghost.destroy()
 
     def handle_map_loaded(self, *, map_entity_id, **kwargs):
+        System.dispatch(event="PlayFX", fx="map_win")
         ship_entity = get_ship_entity()
 
         # Update the map component that was loaded to know about the countdown label
@@ -258,19 +259,19 @@ class RacingSystem(System):
             elif time_left > 2.0:
                 label.text = "3"
                 if countdown.last_evaluated > 3.0:
-                    System.dispatch(event="PlaySound", sound="3_2_1")
+                    System.dispatch(event="PlayFX", fx="3_2_1", volume=0.5)
             elif time_left > 1.0:
                 label.text = "2"
                 if countdown.last_evaluated > 2.0:
-                    System.dispatch(event="PlaySound", sound="3_2_1")
+                    System.dispatch(event="PlayFX", fx="3_2_1", volume=0.5)
             elif time_left > 0.0:
                 label.text = "1"
                 if countdown.last_evaluated > 1.0:
-                    System.dispatch(event="PlaySound", sound="3_2_1")
+                    System.dispatch(event="PlayFX", fx="3_2_1", volume=0.5)
             elif time_left > -1.0:
                 label.text = "Go"
                 if countdown.last_evaluated > 0.0:
-                    System.dispatch(event="PlaySound", sound="go")
+                    System.dispatch(event="PlayFX", fx="go")
                 if not countdown.completed:
                     countdown.completed = True
                     System.dispatch(
@@ -367,7 +368,6 @@ class RacingSystem(System):
                 top_visual.value.image = cp.passed_image_top
                 bottom_visual.value.image = cp.passed_image_bottom
                 got_checkpoint = True
-                System.dispatch(event="PlaySound", sound="cp_complete")
                 cp.is_next = False
                 if cp.cp_order == last_cp:
                     map_ = map_entity["map"]
@@ -376,8 +376,10 @@ class RacingSystem(System):
                         event="RaceComplete",
                         map_name=map_.map_name,
                         map_entity_id=map_entity.entity_id,
-                        sound='map_win',
                     )
+                    System.dispatch(event="PlayFX", fx="map_win")
+                else:
+                    System.dispatch(event="PlayFX", fx="cp_complete")
 
         if got_checkpoint:
             # If we picked up a checkpoint, we need to re-calculate what the next checkpoint is
