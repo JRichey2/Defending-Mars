@@ -203,6 +203,8 @@ class MenuSystem(System):
         pb = int(pb * 100) / 100
         ct = int(ct * 100) / 100
 
+        ship_sprite = menu_entity['ui visual'].visuals[1].value
+        ship_sprite.image = ASSETS[settings.selected_ship]
         label = menu_entity['ui visual'].visuals[2].value
         label.text = f'Finish Time: {ct:.2f}s\nPersonal Best: {pb:.2f}s'
 

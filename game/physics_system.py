@@ -124,13 +124,13 @@ class PhysicsSystem(System):
 
         if inputs.a:
             if not settings.MOUSE_TURNING:
-                rotation += 3.0 * time_factor
+                rotation += 4.5 * time_factor
             else:
                 physics.acceleration += V2.from_degrees_and_length(rotation + 180, 0.4)
 
         if inputs.d:
             if not settings.MOUSE_TURNING:
-                rotation -= 3.0 * time_factor
+                rotation -= 4.5 * time_factor
             else:
                 physics.acceleration += V2.from_degrees_and_length(rotation, 0.4)
 
