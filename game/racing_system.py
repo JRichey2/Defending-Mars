@@ -109,11 +109,11 @@ class RacingSystem(System):
         # Open the PB line file and load in the line
         try:
             with open(
-                os.path.join("records", "{map_.map_name}_pb_line.json"), "r"
+                os.path.join("records", f"{map_.map_name}_pb_line.json"), "r"
             ) as f:
                 map_.pb_racing_line = json.loads(f.read())
         except:
-            # No PB on this map yet
+            print("no PB Line Found")
             return
 
         map_.pb_line_entity_id = self.create_pb_line(map_)
@@ -283,7 +283,7 @@ class RacingSystem(System):
     def create_pb_ghost(self):
         entity = Entity()
         entity.attach(PhysicsComponent(position=V2(0, 0), rotation=0))
-        sprite = pyglet.sprite.Sprite(ASSETS["base_ship"], x=0, y=0, subpixel=True)
+        sprite = pyglet.sprite.Sprite(ASSETS[settings.selected_ship], x=0, y=0, subpixel=True)
         sprite.opacity = 127
         sprite.scale = 0.25
         game_visuals = [Visual(kind="sprite", z_sort=-10.0, value=sprite)]
@@ -291,6 +291,7 @@ class RacingSystem(System):
         return entity.entity_id
 
     def create_pb_line(self, map_):
+        print("here")
         entity = Entity()
         points = [V2(p["x"], p["y"]) for p in map_.pb_racing_line]
         points_p = []
