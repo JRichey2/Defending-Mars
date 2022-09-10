@@ -13,17 +13,19 @@ class AudioSystem(System):
         entity.attach(AudioComponent())
 
     def update(self):
+        inputs = get_inputs()
         ship_entity = get_ship_entity()
         ship = ship_entity['ship']
-        physics = ship_entity['physics']
-        thrusting = (physics.acceleration.length > 0.0)
+        thrusting = (inputs.w and map_is_active())
 
         if ship.boosting:
             self.start_loop('boost_sound')
         elif thrusting:
             self.start_loop('thrust_sound')
-        else:
+
+        if not ship.boosting:
             self.stop_loop('boost_sound')
+        if not thrusting:
             self.stop_loop('thrust_sound')
 
     @property

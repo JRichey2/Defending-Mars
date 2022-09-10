@@ -134,8 +134,7 @@ class PhysicsSystem(System):
             else:
                 physics.acceleration += V2.from_degrees_and_length(rotation, 0.4)
 
-        if inputs.w:
-            #or inputs.boost: 
+        if inputs.w or inputs.boost:
             physics.acceleration += V2.from_degrees_and_length(rotation + 90, 1.0)
 
         if inputs.s:
@@ -151,7 +150,7 @@ class PhysicsSystem(System):
 
         boost_constant = ship.boost_constant if settings.BOOST else 0.0
 
-        if inputs.boost and settings.BOOST:
+        if inputs.boost and settings.BOOST and not physics.static:
             if ship.boost > 0:
                 physics.acceleration *= boost_constant
                 ship.boost -= 0.5 * time_factor

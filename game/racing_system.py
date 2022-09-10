@@ -40,7 +40,6 @@ class RacingSystem(System):
             ghost.destroy()
 
     def handle_map_loaded(self, *, map_entity_id, **kwargs):
-        System.dispatch(event="PlayFX", fx="map_win")
         ship_entity = get_ship_entity()
 
         # Update the map component that was loaded to know about the countdown label
