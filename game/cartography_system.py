@@ -29,6 +29,7 @@ class CartographySystem(System):
         self.subscribe("StartMapping", self.handle_start_mapping)
         self.subscribe("StopMapping", self.handle_stop_mapping)
         self.subscribe("LoadMap", self.handle_load_map)
+        self.subscribe("ExitMap", self.clear_map)
         self.subscribe("StartPlacements", self.handle_start_placements)
         self.subscribe("StopPlacements", self.handle_stop_placements)
         self.subscribe("PlacementSelection", self.handle_placement_selection)
@@ -280,7 +281,7 @@ class CartographySystem(System):
             )
         )
 
-    def clear_map(self):
+    def clear_map(self, **kwargs):
         old_maps = Entity.with_component("map")
         for old_map in old_maps:
             old_map["map"].is_active = False

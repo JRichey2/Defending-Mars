@@ -30,7 +30,6 @@ class RacingSystem(System):
         self.subscribe("RaceComplete", self.handle_race_complete)
         self.subscribe("ExitMap", self.handle_exit_map)
 
-
     def handle_exit_map(self, *, map_entity_id, **kwargs):
         map_entity = Entity.find(map_entity_id)
         map_ = map_entity["map"]
@@ -38,6 +37,8 @@ class RacingSystem(System):
         ghost = Entity.find(map_.pb_ghost_entity_id)
         if ghost:
             ghost.destroy()
+
+        reset_ship_physics()
 
     def handle_map_loaded(self, *, map_entity_id, **kwargs):
         ship_entity = get_ship_entity()
@@ -151,6 +152,7 @@ class RacingSystem(System):
         self.record_racing_line_point(map_, start_time)
 
     def handle_race_complete(self, *, map_entity_id, **kwargs):
+        reset_ship_physics()
         # Update the race completion if the map exists
         map_entity = Entity.find(map_entity_id)
         if not map_entity:

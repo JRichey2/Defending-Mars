@@ -197,8 +197,9 @@ class MenuSystem(System):
 
         with open(os.path.join("records", "pb_times.json"), "r") as f:
             records = json.loads(f.read())
-        pb = records[map_.map_name]
-
+        pb = records.get(map_.map_name)
+        if pb is None:
+            pb = ct
         pb = int(pb * 100) / 100
         ct = int(ct * 100) / 100
 

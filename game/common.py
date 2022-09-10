@@ -7,6 +7,7 @@ from .components import (
     PhysicsComponent,
     ShipComponent,
 )
+from .vector import V2
 
 
 def get_inputs():
@@ -74,4 +75,13 @@ def set_ship_stats(ship_name, ship, physics):
         ship.boost_constant = ShipComponent().boost_constant + boost_tweak
     elif ship_name == 'BMS-12':
         physics.acc_constant = PhysicsComponent().acc_constant + acc_tweak
+
+def reset_ship_physics():
+    entity = get_ship_entity()
+    ship = entity['ship']
+    physics = entity['physics']
+    ship.boost = 100
+    ship.boosting = False
+    physics.acceletion = V2(0, 0)
+    physics.velocity = V2(0, 0)
 
