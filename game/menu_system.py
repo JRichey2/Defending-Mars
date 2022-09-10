@@ -290,9 +290,12 @@ class MenuSystem(System):
 
     def create_map_menu(self):
         options = {
-            "Default Map": (lambda: self.play_game('default')),
-            "Training Map": (lambda: self.play_game('training_map')),
+            "Tutorial Map": (lambda: self.play_game('tutorial_map')),
+            "Getting Started Map": (lambda: self.play_game('default')),
+            "Take a Tour Map": (lambda: self.play_game('random')),
             "Slalom Map": (lambda: self.play_game('slalom_map')),
+            "Speed Map": (lambda: self.play_game('speedy_map')),
+            "The Red Planet Map": (lambda: self.play_game('final_map')),
             "WIP Map": (lambda: self.play_game('wip')),
             "Back to Menu": self.open_main,
         }
