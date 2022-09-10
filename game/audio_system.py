@@ -19,20 +19,23 @@ class AudioSystem(System):
 
     def update(self):
         inputs = get_inputs()
-        if inputs.w and not inputs.boost:
+        ship_entity = get_ship_entity()
+        ship_boost = ship_entity["ship"].boost
+        if (inputs.w or inputs.a or inputs.s or inputs.d) and not inputs.boost:
             self.handle_sound(sound="regular_thrust", loop=True)
-            # self.handle_sound(sound="rocket_booster", off=True)
+            self.handle_sound(sound="rocket_booster", off=True)
         # see if we have any boost
-        elif inputs.boost:
-            # self.handle_sound(sound="rocket_booster", loop=True)
+        elif inputs.boost and ship_boost > 0:
+            # turned off loop on rocket_booster so when they release shift it would start over
+            self.handle_sound(sound="rocket_booster")
             self.handle_sound(sound="regular_thrust", off=True)
         else:
             self.handle_sound(sound="regular_thrust", off=True)
-            # self.handle_sound(sound="rocket_booster", off=True)
+            self.handle_sound(sound="rocket_booster", off=True)
 
     def handle_sound(self, *, sound, loop=False, off=False, **kwargs):
         # Sound is crashing for me so going to turn it off
-        return
+        # return
         # if sound not playing play, else nothing
         entities = Entity.with_component("audio")
         player = None
