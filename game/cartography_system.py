@@ -49,7 +49,7 @@ class CartographySystem(System):
             ("checkpoint", None, None),
             ("boost_powerup", None, None),
             ("slowdown", None, None),
-            ("large_red_planet", 3000, 2130),
+            ("large_red_planet", 3000, 2000),
         ]
 
     def handle_start_mapping(self, **kwargs):

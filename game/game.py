@@ -119,7 +119,7 @@ class DefendingMarsWindow(pyglet.window.Window):
         ASSETS["boost_powerup_sound"] = pyglet.media.load(os.path.join("assets", "boost_powerup.wav"), streaming=False)
         ASSETS["regular_thrust"] = pyglet.media.load(os.path.join("assets", "regular_thrust.wav"), streaming=False)
         ASSETS["rocket_booster"] = pyglet.media.load(os.path.join("assets", "booster_thrust.wav"), streaming=False)
-        ASSETS["large_red_planet"] = load_image("red-planet-5120x5120.png")
+        ASSETS["large_red_planet"] = load_image("red-planet-4096x4096.png")
         Entity().attach(InputComponent())
 
     def create_fps_meter(self):
