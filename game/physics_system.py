@@ -134,7 +134,8 @@ class PhysicsSystem(System):
             else:
                 physics.acceleration += V2.from_degrees_and_length(rotation, 0.4)
 
-        if inputs.w or inputs.boost:
+        if inputs.w:
+            #or inputs.boost: 
             physics.acceleration += V2.from_degrees_and_length(rotation + 90, 1.0)
 
         if inputs.s:
