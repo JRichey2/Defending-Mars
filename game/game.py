@@ -120,7 +120,7 @@ class DefendingMarsWindow(pyglet.window.Window):
         ASSETS["slowdown_sound"] = pyglet.media.load(os.path.join("assets", "slowdown.wav"), streaming=False)
         ASSETS["boost_powerup_sound"] = pyglet.media.load(os.path.join("assets", "boost_powerup.wav"), streaming=False)
         ASSETS["thrust_sound"] = pyglet.media.load(os.path.join("assets", "regular_thrust.wav"), streaming=False)
-        ASSETS["boost_sound"] = pyglet.media.load(os.path.join("assets", "booster_thrust.wav"), streaming=False)
+        ASSETS["boost_sound"] = pyglet.media.load(os.path.join("assets", "booster_thrust_16.wav"), streaming=False)
         ASSETS["large_red_planet"] = load_image("red-planet-4096x4096.png")
         ASSETS["tutorial_map"] = load_image("map-tutorial_map-256x256.png")
         ASSETS["getting_started"] = load_image("map-getting_started-256x256.png")
