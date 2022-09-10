@@ -52,3 +52,9 @@ def create_sprite(position, rotation, image, scale=1.0, subpixel=True, z_sort=0.
         )
     )
     return entity
+
+
+def map_is_active():
+    map_entity = get_active_map_entity()
+    return bool(map_entity)
+

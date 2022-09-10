@@ -16,6 +16,7 @@ from .components import (
     Visual,
     FlightPathComponent,
 )
+from . import ecs
 from .ecs import *
 from .vector import *
 
@@ -27,6 +28,16 @@ class RacingSystem(System):
         self.subscribe("MapLoaded", self.handle_map_loaded)
         self.subscribe("RaceStart", self.handle_race_start)
         self.subscribe("RaceComplete", self.handle_race_complete)
+        self.subscribe("ExitMap", self.handle_exit_map)
+
+
+    def handle_exit_map(self, *, map_entity_id, **kwargs):
+        map_entity = Entity.find(map_entity_id)
+        map_ = map_entity["map"]
+
+        ghost = Entity.find(map_.pb_ghost_entity_id)
+        if ghost:
+            ghost.destroy()
 
     def handle_map_loaded(self, *, map_entity_id, **kwargs):
         ship_entity = get_ship_entity()
@@ -82,6 +93,22 @@ class RacingSystem(System):
         map_.speedometer_id = speedometer_entity.entity_id
 
         # Create a countdown label
+        self.create_countdown(map_)
+
+        # Open the PB line file and load in the line
+        try:
+            with open(
+                os.path.join("records", f"{map_.map_name}_pb_line.json"), "r"
+            ) as f:
+                map_.pb_racing_line = json.loads(f.read())
+        except:
+            print("no PB Line Found")
+            return
+
+        map_.pb_line_entity_id = self.create_pb_line(map_)
+        map_.pb_ghost_entity_id = self.create_pb_ghost()
+
+    def create_countdown(self, map_):
         countdown_entity = Entity()
         countdown_entity.attach(
             CountdownComponent(
@@ -105,19 +132,7 @@ class RacingSystem(System):
         )
 
         map_.race_countdown_id = countdown_entity.entity_id
-
-        # Open the PB line file and load in the line
-        try:
-            with open(
-                os.path.join("records", f"{map_.map_name}_pb_line.json"), "r"
-            ) as f:
-                map_.pb_racing_line = json.loads(f.read())
-        except:
-            print("no PB Line Found")
-            return
-
-        map_.pb_line_entity_id = self.create_pb_line(map_)
-        map_.pb_ghost_entity_id = self.create_pb_ghost()
+        return countdown_entity
 
     def handle_race_start(self, *, map_entity_id, **kwargs):
         # Unfreeze the ship
@@ -171,6 +186,9 @@ class RacingSystem(System):
         for map_entity in Entity.with_component("map"):
             self.update_countdown(map_entity)
             map_ = map_entity["map"]
+            if settings.physics_frozen:
+                if map_.race_start_time is not None:
+                    map_.race_start_time += ecs.DELTA_TIME
             current_time = time.monotonic()
             if len(map_.racing_line) > 0:
                 self.record_racing_line_point(map_, current_time)
@@ -229,6 +247,12 @@ class RacingSystem(System):
             label = entity["ui visual"].visuals[0].value
 
             time_left = (countdown.duration + countdown.started_at) - time.monotonic()
+            if settings.physics_frozen:
+                # If physics are frozen, extend duration of any running countdown
+                # and re-calculate time_left before displaying the timer
+                # so that it'll re-start when physics get unfrozen
+                countdown.started_at += countdown.last_evaluated - time_left
+                time_left = (countdown.duration + countdown.started_at) - time.monotonic()
             if time_left > 3.0:
                 label.text = "Get Ready!"
             elif time_left > 2.0:
@@ -291,7 +315,6 @@ class RacingSystem(System):
         return entity.entity_id
 
     def create_pb_line(self, map_):
-        print("here")
         entity = Entity()
         points = [V2(p["x"], p["y"]) for p in map_.pb_racing_line]
         points_p = []

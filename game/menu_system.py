@@ -17,10 +17,22 @@ class MenuSystem(System):
         self.subscribe("DisplayMenu", self.handle_display_menu)
         self.subscribe("MenuSelection", self.handle_menu_selection)
         self.subscribe("MenuAccept", self.handle_menu_accept)
+        self.subscribe("Pause", self.handle_pause)
         self.create_main_menu()
         self.create_ship_menu()
         self.create_settings_menu()
         self.create_map_menu()
+        self.create_in_game_menu()
+
+
+    def handle_pause(self):
+        if not map_is_active():
+            return
+        if settings.physics_frozen:
+            self.back_to_race()
+        else:
+            settings.physics_frozen = True
+            System.dispatch(event="DisplayMenu", menu_name="in-game menu")
 
     def handle_menu_selection(self, *, direction, **kwargs):
         for entity in Entity.with_component("menu"):
@@ -48,7 +60,7 @@ class MenuSystem(System):
     def play_game(self, map_name):
         print("Play Game selected")
         # Unlock physics
-        settings.PHYSICS_FROZEN = False
+        settings.physics_frozen = False
 
         for menu_entity in Entity.with_component("menu"):
             menu = menu_entity["menu"]
@@ -71,6 +83,9 @@ class MenuSystem(System):
         System.dispatch(event="DisplayMenu", menu_name="settings menu")
 
     def open_main(self):
+        map_entity = get_active_map_entity()
+        if map_entity:
+            System.dispatch(event="ExitMap", map_entity_id=map_entity.entity_id)
         System.dispatch(event="DisplayMenu", menu_name="main menu")
 
     def open_map_menu(self):
@@ -93,6 +108,63 @@ class MenuSystem(System):
                 option_index = menu.selected_option
                 spring = "Camera Spring: On" if settings.camera_spring else "Camera Spring: Off"
                 menu.option_labels[option_index] = spring
+
+    def restart(self):
+        settings.physics_frozen = False
+
+        for menu_entity in Entity.with_component("menu"):
+            menu = menu_entity["menu"]
+            menu.displayed = False
+
+        map_entity = get_active_map_entity()
+        if map_entity:
+            map_ = map_entity['map']
+            System.dispatch(event="LoadMap", map_name=map_.map_name, mode=map_.mode)
+
+    def back_to_race(self):
+        settings.physics_frozen = False
+        for menu_entity in Entity.with_component("menu"):
+            menu = menu_entity["menu"]
+            menu.displayed = False
+
+    def create_in_game_menu(self):
+        options = {
+            "Back to Race": self.back_to_race,
+            "Restart": self.restart,
+            "Exit to Menu": self.open_main,
+        }
+        option_labels = [l for l in options]
+
+        labels = []
+        for option in option_labels:
+            labels.append(
+                pyglet.text.Label(
+                    option,
+                    font_size=36,
+                    x=0,
+                    y=0,
+                    anchor_x="left",
+                    anchor_y="center",
+                )
+            )
+
+        visuals = [Visual(kind="menu options", z_sort=10, value=labels)]
+
+        entity = Entity()
+        entity.attach(
+            MenuComponent(
+                menu_name="in-game menu",
+                option_labels=option_labels,
+                option_callbacks=options,
+            )
+        )
+        entity.attach(
+            UIVisualComponent(
+                top=0.66,
+                right=0.33,
+                visuals=visuals,
+            )
+        )
 
     def create_map_menu(self):
         options = {
@@ -266,14 +338,15 @@ class MenuSystem(System):
         print(f"displaying menu {menu_name}")
         settings.PHYSICS_FROZEN = True
 
-        # Move ship way off screen
-        ship_entity = get_ship_entity()
-        ship_physics = ship_entity["physics"]
-        ship_physics.position = V2(-10000, -10000)
+        if menu_name != 'in-game menu':
+            # Move ship way off screen
+            ship_entity = get_ship_entity()
+            ship_physics = ship_entity["physics"]
+            ship_physics.position = V2(-10000, -10000)
 
-        # Move window camera to origin
-        window = get_window()
-        window.camera_position = V2(0, 0)
+            # Move window camera to origin
+            window = get_window()
+            window.camera_position = V2(0, 0)
 
         for menu_entity in Entity.with_component("menu"):
             menu = menu_entity["menu"]

@@ -118,6 +118,8 @@ class MapComponent:
     # Name of the map for easier recording of records
     map_name: str = "default"
 
+    origin: V2 = None
+
     # Mode - "racing", "mapping", "editing", or "freeplay"
     mode: str = "racing"
 

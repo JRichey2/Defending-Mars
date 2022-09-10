@@ -253,6 +253,8 @@ class DefendingMarsWindow(pyglet.window.Window):
             System.dispatch(event="MenuAccept")
         elif symbol == key.SPACE:
             System.dispatch(event="MenuAccept")
+        elif symbol == key.BACKSPACE:
+            System.dispatch(event="Pause")
 
     def on_key_release(self, symbol, modifiers):
         inputs = get_inputs()

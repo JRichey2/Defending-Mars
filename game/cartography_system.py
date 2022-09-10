@@ -293,9 +293,13 @@ class CartographySystem(System):
             if entity.entity_id != ship_id:
                 entity.destroy()
 
+        for entity in Entity.with_component("flight path"):
+            entity.destroy()
+
     def load_map(self, map_name):
         map_entity = Entity()
         map_entity.attach(MapComponent(map_name=map_name))
+        map_ = map_entity['map']
 
         with open(os.path.join("maps", f"{map_name}_objects.json"), "r") as f:
             map_objects_data = f.read()
@@ -387,8 +391,12 @@ class CartographySystem(System):
             flare_flares_visual,
         ]))
 
-        entity = get_ship_entity()
-        entity["physics"].position = points[0]
+        map_.origin = points[0]
+
+        ship_entity = get_ship_entity()
+        ship_physics = ship_entity['physics']
+        ship_physics.position = map_.origin
+        ship_physics.velocity = V2(0, 0)
         System.dispatch(event="CenterCamera")
 
         return map_entity.entity_id

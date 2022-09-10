@@ -37,7 +37,7 @@
 # Quikli
 * [ ] Loading and Rendering Personal best line/ghost (toggleable)
 * [X] Zooming
-* [x] FPS Meter
+* [X] FPS Meter
 * [O] Art
     * [X] Black hole - 332
     * [X] Additional planets
@@ -59,13 +59,15 @@
 # Saturday ToDo:
 * [ ] mapping - Richey
 * [ ] boost sound - Richey
-* [ ] PB Line is not working - Quikli
-* [ ] Menu System - Quikli
-  * [ ] in game menu 
+* [X] PB Line is not working - Quikli
+* [.] Menu System - Quikli
+  * [X] in game menu 
+  * [ ] Finish menu
   * [ ] out of game images
     * [ ] map image show PB time
   * [ ] Pop up(best time: , Current time, options
 * [ ] speed boost power up in game - Richey
 * [ ] tutorial text - Quikli/Richey
 * [ ] Adding collision for side of rings - Richey
-* [ ] Performance Enhancement as good as we can
+* [X] Performance Enhancement as good as we can
+
