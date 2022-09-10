@@ -128,6 +128,7 @@ class System:
 
     @classmethod
     def update_all(cls):
+        # print(len(Entity.entity_index))
         for system_name, system in cls.systems.items():
             system.reload()
             if system.disabled:

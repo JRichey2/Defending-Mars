@@ -259,14 +259,22 @@ class PhysicsSystem(System):
 
             collider_collision = collider["collision"]
             collider_physics = collider["physics"]
-
+            collider_checkpoint = collider["checkpoint"]
+            # print(collider_checkpoint)
             if collider_physics is None:
                 continue
 
             separation = physics.position - collider_physics.position
             sep_length = separation.length
             min_length = collision.circle_radius + collider_collision.circle_radius
-            if sep_length < min_length:
+            if collider_checkpoint is None and sep_length < min_length:
+                n = separation.normalized
+                v = physics.velocity
+                a = n * (v.dot_product(n))
+                physics.position += separation.normalized * (min_length - sep_length)
+                physics.velocity = (v - (a * 1.3)) * 0.9
+                System.dispatch(event="PlaySound", sound="collision")
+            elif sep_length < min_length:
                 n = separation.normalized
                 v = physics.velocity
                 a = n * (v.dot_product(n))
