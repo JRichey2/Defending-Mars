@@ -29,7 +29,7 @@ class PhysicsSystem(System):
         ship_physics = ship_entity["physics"]
         checkpoints = Entity.with_component("checkpoint")
         completed_checkpoint = None
-        for entity in checkpoints:
+        for entity in sorted(checkpoints, key=lambda e: e['checkpoint'].cp_order):
             checkpoint = entity["checkpoint"]
             if checkpoint.completed:
                 completed_checkpoint = entity
