@@ -97,6 +97,8 @@ class MenuSystem(System):
     def create_map_menu(self):
         options = {
             "Default Map": (lambda: self.play_game('default')),
+            "Training Map": (lambda: self.play_game('training_map')),
+            "Slalom Map": (lambda: self.play_game('slalom_map')),
             "WIP Map": (lambda: self.play_game('wip')),
             "Back to Menu": self.open_main,
         }
