@@ -13,6 +13,17 @@
 * [x] Clock timer(physics frozen until you can go)(3,2,1 go)
 * [x] saving of maps/times
 * [ ] sound effects(thrust(idle, reg, boost), checkpoint, finish, collision, maybe background type/menu, (3,2,1 go))
+  * [x] checkpoint
+  * [x] finish
+  * [x] collision
+  * [ ] menu/background?
+  * [ ] thrust
+    * [ ] idle - just not make a sound?
+    * [x] regular
+    * [ ] boost
+  * [x] speed_boost Powerup
+  * [x] slowdown
+  * [ ] New-Record?
 * [ ] Adding collision for side of rings
 * [ ] Pop up(best time: , Current time: , new personal best, bonus coins?, gold-silver-bronze)
 * [ ] leaderboard(best times)

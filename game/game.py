@@ -112,6 +112,13 @@ class DefendingMarsWindow(pyglet.window.Window):
         ASSETS["star_field"] = load_image("starfield-2048x2048.png", center=False)
         ASSETS["3_2_1"] = pyglet.media.load(os.path.join("assets", "3_2_1.wav"))
         ASSETS["go"] = pyglet.media.load(os.path.join("assets", "go.wav"))
+        ASSETS["collision"] = pyglet.media.load(os.path.join("assets", "collision.wav"))
+        ASSETS["map_win"] = pyglet.media.load(os.path.join("assets", "fanfare_low.wav"))
+        ASSETS["cp_complete"] = pyglet.media.load(os.path.join("assets", "cp_complete.wav"))
+        ASSETS["slowdown_sound"] = pyglet.media.load(os.path.join("assets", "slowdown.wav"))
+        ASSETS["boost_powerup_sound"] = pyglet.media.load(os.path.join("assets", "boost_powerup.wav"))
+        ASSETS["regular_thrust"] = pyglet.media.load(os.path.join("assets", "regular_thrust.wav"))
+        # ASSETS["rocket_booster"] = pyglet.media.load(os.path.join("assets", "rocket_booster_test.wav"))
         Entity().attach(InputComponent())
 
     def create_fps_meter(self):
@@ -226,6 +233,7 @@ class DefendingMarsWindow(pyglet.window.Window):
             inputs.mapping = not inputs.mapping
             if inputs.mapping:
                 System.dispatch(event="StartMapping")
+                print('startMapping')
             else:
                 System.dispatch(event="StopMapping")
         elif symbol == key.M:

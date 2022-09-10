@@ -173,6 +173,13 @@ class PhysicsSystem(System):
 
         if inputs.w or inputs.boost:
             physics.acceleration += V2.from_degrees_and_length(rotation + 90, 1.0)
+            if inputs.w and not inputs.boost:
+                System.dispatch(event="PlaySound", sound="regular_thrust")
+            # see if we have any boost
+            # elif inputs.boost:
+            #     System.dispatch(event="PlaySound", sound="rocket_booster")
+            else:
+                System.dispatch(event="PlaySound", sound="regular_thrust")
 
         if inputs.s:
             physics.acceleration += V2.from_degrees_and_length(rotation + 270, 0.4)
@@ -308,3 +315,4 @@ class PhysicsSystem(System):
                 a = n * (v.dot_product(n))
                 physics.position += separation.normalized * (min_length - sep_length)
                 physics.velocity = (v - (a * 1.3)) * 0.9
+                System.dispatch(event="PlaySound", sound="collision")
