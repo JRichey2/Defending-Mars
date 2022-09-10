@@ -1,5 +1,77 @@
 [
     {
+        "object": "tutorial text",
+        "x": 1358,
+        "y": 2950,
+        "text": "Mouse scroll to zoom"
+    },
+    {
+        "object": "tutorial text",
+        "x": 1950,
+        "y": 3200,
+        "text": "Press W to accelerate toward the checkpoint"
+    },
+    {
+        "object": "tutorial text",
+        "x": 700,
+        "y": 3200,
+        "text": "mouse_or_keys"
+    },
+    {
+        "object": "tutorial text",
+        "x": 1950,
+        "y": 4100,
+        "text": "Fly through the checkpoints"
+    },
+    {
+        "object": "tutorial text",
+        "x": 800,
+        "y": 6200,
+        "text": "strafe"
+    },
+    {
+        "object": "tutorial text",
+        "x": 1650,
+        "y": 10800,
+        "text": "Accelerating can help you turn"
+    },
+    {
+        "object": "tutorial text",
+        "x": 3250,
+        "y": 11200,
+        "text": "Gold arrows shows next checkpoint when off screen"
+    },
+    {
+        "object": "tutorial text",
+        "x": 4550,
+        "y": 11900,
+        "text": "Press left shift to activate boost for a burst of acceleration"
+    },
+    {
+        "object": "tutorial text",
+        "x": 8800,
+        "y": 11300,
+        "text": "Big objects help you turn (Gravity) xdd"
+    },
+    {
+        "object": "tutorial text",
+        "x": 10100,
+        "y": 11000,
+        "text": "Small objects... not as much"
+    },
+    {
+        "object": "tutorial text",
+        "x": 9400,
+        "y": 9900,
+        "text": "Press R to respawn at the last checkpoint if you get off track"
+    },
+    {
+        "object": "tutorial text",
+        "x": 9950,
+        "y": 6650,
+        "text": "Red checkpoint is the finish."
+    },
+    {
       "object": "red_planet",
       "x": 9078.703543192463,
       "y": 11012.012951957051

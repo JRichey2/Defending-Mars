@@ -77,6 +77,11 @@ class RenderSystem(System):
     def draw_sprite_batch(self, window, entity, visual):
         visual.value.draw()
 
+    def draw_tutorial_text(self, window, entity, visual):
+        visual.value.x = entity['physics'].position.x
+        visual.value.y = entity['physics'].position.y
+        visual.value.draw()
+
     def draw_flare(self, window, entity, visual, ship_entity):
         physics = entity["physics"]
         ship_physics = ship_entity["physics"]
@@ -345,6 +350,8 @@ class RenderSystem(System):
                 self.draw_flight_path_line(window, entity, visual)
             elif visual.kind == "sprite batch":
                 self.draw_sprite_batch(window, entity, visual)
+            elif visual.kind == "tutorial text":
+                self.draw_tutorial_text(window, entity, visual)
 
         self.reset_camera(window)
 

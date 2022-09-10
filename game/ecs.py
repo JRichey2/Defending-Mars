@@ -1,11 +1,4 @@
-import os
-import uuid
-import importlib
-import traceback
-
-
 DELTA_TIME = 0.01667
-
 NEXT_ENTITY = 1
 
 
@@ -71,9 +64,6 @@ class System:
 
     def __init__(self):
         self.systems[self.name] = self
-        self.disabled = False
-        module = importlib.import_module(name=self.__module__)
-        self.loaded_at = os.path.getmtime(module.__file__)
         self.setup()
 
     def setup(self):
@@ -86,61 +76,18 @@ class System:
     def subscribe(self, event, handler):
         if event not in self.subscriptions:
             self.subscriptions[event] = []
-        # TODO: Reloaded systems trying to handle the same events?
         self.subscriptions[event].append((self, handler))
 
     @classmethod
     def dispatch(cls, event, **kwargs):
         for subscriber, handler in cls.subscriptions.get(event, []):
-            subscriber.reload()
-            if subscriber.disabled:
-                continue
-            try:
-                handler(**kwargs)
-            except SystemExit:
-                # Exit exceptions should be allowed through
-                raise
-            except:
-                # All other exceptions should disable the system until next reload
-                traceback.print_exc()
-                subscriber.disabled = True
-                print(f"Disabled system {subscriber} during {event} with args {kwargs}")
-
-    def reload(self):
-        # Get a reference to the module containing the system
-        module = importlib.import_module(name=self.__module__)
-        last_modified = os.path.getmtime(module.__file__)
-
-        if self.loaded_at >= last_modified:
-            return
-
-        # Reload the module that the system was defined in
-        importlib.reload(module)
-
-        # re-create the system
-        cls = getattr(module, self.name)
-        cls()
-
-        print(f"Reloaded system {self.name}")
+            handler(**kwargs)
 
     def update(self):
         pass
 
     @classmethod
     def update_all(cls):
-        # print(len(Entity.entity_index))
         for system_name, system in cls.systems.items():
-            system.reload()
-            if system.disabled:
-                continue
-            try:
-                system.update()
-            except SystemExit:
-                # Exit exceptions should be allowed through
-                raise
-            except:
-                # All other exceptions should disable the system until next reload
-                traceback.print_exc()
-                system.disabled = True
-                print(f"Disabled system {system} during update")
+            system.update()
         Entity.clean_pending_destruction()

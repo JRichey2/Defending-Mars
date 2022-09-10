@@ -144,7 +144,6 @@ class MenuSystem(System):
             return
 
     def play_game(self, map_name):
-        print("Play Game selected")
         # Unlock physics
         settings.physics_frozen = False
 
@@ -531,7 +530,6 @@ class MenuSystem(System):
         )
 
     def handle_display_menu(self, *, menu_name, **kwargs):
-        print(f"displaying menu {menu_name}")
         settings.PHYSICS_FROZEN = True
 
         if menu_name != 'in-game menu':

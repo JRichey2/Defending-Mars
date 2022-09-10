@@ -238,22 +238,6 @@ class DefendingMarsWindow(pyglet.window.Window):
             inputs.boost = True
         elif symbol == key.R:
             System.dispatch(event="Respawn")
-        elif symbol == key.P:
-            inputs.mapping = not inputs.mapping
-            if inputs.mapping:
-                System.dispatch(event="StartMapping")
-            else:
-                System.dispatch(event="StopMapping")
-        elif symbol == key.M:
-            inputs.placement = not inputs.placement
-            if inputs.placement:
-                System.dispatch(event="StartPlacements")
-            else:
-                System.dispatch(event="StopPlacements")
-        elif symbol == key.LEFT:
-            System.dispatch(event="PlacementSelection", direction="up")
-        elif symbol == key.RIGHT:
-            System.dispatch(event="PlacementSelection", direction="down")
         elif symbol == key.UP:
             System.dispatch(event="MenuSelection", direction="up")
         elif symbol == key.DOWN:
@@ -296,21 +280,7 @@ class DefendingMarsWindow(pyglet.window.Window):
             ).degrees - 90
 
     def on_mouse_press(self, x, y, button, modifiers):
-        window = get_window()
-        camera = window.camera_position
-        width, height = window.window.width, window.window.height
-        w_x, w_y = screen_to_world(
-            x, y, width, height, camera.x, camera.y, window.camera_zoom
-        )
-        mouse_position = V2(w_x, w_y)
-        if button == 1:
-            map_entity = get_active_map_entity()
-            if map_entity and map_entity["map"].is_active:
-                System.dispatch(
-                    event="Place",
-                    position=mouse_position,
-                    map_entity_id=map_entity.entity_id,
-                )
+        pass
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         window = get_window()

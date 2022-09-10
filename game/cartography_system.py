@@ -68,7 +68,6 @@ class CartographySystem(System):
         map_.mode = "freeplay"
 
     def handle_load_map(self, *, map_name, mode="racing", **kwargs):
-        print(f"Loading map {map_name}")
         self.clear_map()
         map_entity_id = self.load_map(map_name)
         map_entity = Entity.find(map_entity_id)
@@ -115,15 +114,12 @@ class CartographySystem(System):
             return
 
         map_.mode = "freeplay"
-        print("Entered freeplay mode")
 
         with open(os.path.join("maps", f"{map_.map_name}_objects.json"), "w") as f:
             f.write(json.dumps(map_.map_objects, indent=2))
-        print("wrote wip_objects.json")
 
         with open(os.path.join("maps", f"{map_.map_name}_path.json"), "w") as f:
             f.write(json.dumps(map_.flight_path, indent=2))
-        print("wrote wip_path.json")
 
         System.dispatch(event="LoadMap", map_name=map_.map_name, mode="freeplay")
         Entity.find(map_.edit_selection_id).destroy()
@@ -165,7 +161,6 @@ class CartographySystem(System):
                     rotation,
                     num_points,
                     map_entity_id,
-                    radius,
                 )
 
         elif mass is not None and radius is not None:
@@ -226,7 +221,7 @@ class CartographySystem(System):
         entity.attach(PhysicsComponent(position=position, mass=mass))
         entity.attach(CollisionComponent(circle_radius=radius))
 
-    def load_checkpoint(self, position, rotation, cp_order, map_entity_id, radius):
+    def load_checkpoint(self, position, rotation, cp_order, map_entity_id):
         cp = Entity()
 
         cp.attach(PhysicsComponent(position=position, rotation=rotation))
@@ -286,7 +281,6 @@ class CartographySystem(System):
         for old_map in old_maps:
             old_map["map"].is_active = False
             if old_map["map"].speedometer_id:
-                print("destroying old speedo")
                 Entity.find(old_map["map"].speedometer_id).destroy()
             old_map.destroy()
 
@@ -309,12 +303,44 @@ class CartographySystem(System):
             map_objects_data = f.read()
         map_objects = json.loads(map_objects_data)
 
+        objects_with_selections = set(i for i, _, _ in self.selections)
         for item in map_objects:
-            object_name, mass, radius = [
-                s for s in self.selections if s[0] == item["object"]
-            ][0]
-            position = V2(item["x"], item["y"])
-            self.load_object(object_name, position, mass, radius)
+            if item["object"] in objects_with_selections:
+                object_name, mass, radius = [
+                    s for s in self.selections if s[0] == item["object"]
+                ][0]
+                position = V2(item["x"], item["y"])
+                self.load_object(object_name, position, mass, radius)
+            elif item["object"] == 'tutorial text':
+                tutorial_text = item['text']
+                if tutorial_text == 'mouse_or_keys':
+                    if settings.MOUSE_TURNING:
+                        tutorial_text = 'Aim your ship with the mouse to turn'
+                    else:
+                        tutorial_text = 'Use A/D to turn left/right'
+                elif tutorial_text == 'strafe':
+                    if settings.MOUSE_TURNING:
+                        tutorial_text = 'Use A/D to strafe left/right'
+                    else:
+                        tutorial_text = ''
+
+                position = V2(item["x"], item["y"])
+                entity = Entity()
+                entity.attach(PhysicsComponent(position=position))
+                visual = Visual(
+                    kind="tutorial text",
+                    z_sort = -20,
+                    value=pyglet.text.Label(
+                        tutorial_text,
+                        align="center",
+                        multiline=True,
+                        font_size=36,
+                        width=600,
+                        anchor_x="center",
+                        anchor_y="center",
+                    )
+                )
+                entity.attach(GameVisualComponent(visuals=[visual]))
 
         flight_path = Entity()
 
@@ -339,7 +365,7 @@ class CartographySystem(System):
         for cp_order, checkpoint in enumerate(checkpoints):
             position = checkpoint["center"]
             rotation = checkpoint["rotation"]
-            self.load_checkpoint(position, rotation, cp_order, map_entity.entity_id, radius)
+            self.load_checkpoint(position, rotation, cp_order, map_entity.entity_id)
 
         points_p = []
         for p in points:

@@ -103,7 +103,6 @@ class RacingSystem(System):
             ) as f:
                 map_.pb_racing_line = json.loads(f.read())
         except:
-            print("no PB Line Found")
             return
 
         map_.pb_line_entity_id = self.create_pb_line(map_)
@@ -173,7 +172,6 @@ class RacingSystem(System):
 
         # Check the record and update it if we've beaten it
         if current_record is None or new_time < current_record:
-            print(f"NEW RECORD - {new_time}")
             records[map_.map_name] = new_time
             with open(os.path.join("records", "pb_times.json"), "w") as f:
                 f.write(json.dumps(records, indent=2))
@@ -243,7 +241,6 @@ class RacingSystem(System):
                 continue
 
             if not map_entity["map"].is_active:
-                print("Map is not active, destroying countdown")
                 entity.destroy()
 
             label = entity["ui visual"].visuals[0].value

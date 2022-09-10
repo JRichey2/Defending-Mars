@@ -259,7 +259,6 @@ class PhysicsSystem(System):
             collider_collision = collider["collision"]
             collider_physics = collider["physics"]
             collider_checkpoint = collider["checkpoint"]
-            # print(collider_checkpoint)
             if collider_physics is None:
                 continue
 
