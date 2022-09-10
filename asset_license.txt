@@ -8,3 +8,4 @@ cp_complete.wav - downloaded from https://freesound.org/people/suntemple/sounds/
 boost_powerup.wav - downloaded from https://freesound.org/people/colorsCrimsonTears/sounds/577965/ creative common 0 license
 slowdown.wav - downloaded from https://freesound.org/people/colorsCrimsonTears/sounds/577960/ creative common 0 license
 regular_thrust.wav - designed by JRichey2SwiFt in Audacity
+rocket_booster.wav - downloaded from https://freesound.org/people/colorsCrimsonTears/sounds/577960/ creative common 0 license

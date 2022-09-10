@@ -16,6 +16,7 @@
   * [x] checkpoint
   * [x] finish
   * [x] collision
+    * [ ] take into account speed of threshold so it's not consistently bumping.
   * [ ] menu/background?
   * [ ] thrust
     * [ ] idle - just not make a sound?
@@ -36,7 +37,7 @@
 # Quikli
 * [ ] Loading and Rendering Personal best line/ghost (toggleable)
 * [X] Zooming
-* [ ] FPS Meter
+* [x] FPS Meter
 * [O] Art
     * [X] Black hole - 332
     * [X] Additional planets
@@ -55,3 +56,16 @@
     * [X] Speed Limit Strips
     * [ ] Particle effects for checkpoints, finish, and power ups/downs
 
+# Saturday ToDo:
+* [ ] mapping - Richey
+* [ ] boost sound - Richey
+* [ ] PB Line is not working - Quikli
+* [ ] Menu System - Quikli
+  * [ ] in game menu 
+  * [ ] out of game images
+    * [ ] map image show PB time
+  * [ ] Pop up(best time: , Current time, options
+* [ ] speed boost power up in game - Richey
+* [ ] tutorial text - Quikli/Richey
+* [ ] Adding collision for side of rings - Richey
+* [ ] Performance Enhancement as good as we can

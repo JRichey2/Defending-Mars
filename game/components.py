@@ -196,3 +196,11 @@ class MenuComponent:
     option_callbacks: dict = field(default_factory=dict)
     selected_option: int = 0
     displayed: bool = False
+
+
+@dataclass
+class AudioComponent:
+    component_name: str = "audio"
+    audio: str = None
+    player: pyglet.media.player.Player = None
+    loop: bool = False
